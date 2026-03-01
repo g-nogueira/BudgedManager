@@ -1,0 +1,28 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+*.DotSettings.user
+# Build artifacts
+[Dd]ebug/
+[Rr]elease/
+[Pp]ublish/
+# NuGet
+packages/
+*.nupkg
+project.lock.json
+.nuget/
+# Environment
+appsettings.Development.json
+*.env
+# Frontend
+node_modules/
+frontend/.svelte-kit/
+frontend/build/
+frontend/dist/
+# OS
+.DS_Store
+Thumbs.db

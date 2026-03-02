@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: monthly_budget_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: monthly_budget
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: src/MonthlyBudget.Api/Dockerfile
+    container_name: monthly_budget_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=monthly_budget;Username=postgres;Password=postgres
+      - Jwt__Secret=CHANGE_ME_TO_A_VERY_LONG_SECRET_KEY_OF_AT_LEAST_256_BITS_IN_PRODUCTION
+      - Jwt__Issuer=MonthlyBudgetApi
+      - Jwt__Audience=MonthlyBudgetClient
+      - Jwt__AccessTokenExpiryMinutes=15
+
+volumes:
+  pg_data:
+

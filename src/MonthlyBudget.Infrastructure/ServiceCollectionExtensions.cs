@@ -5,27 +5,58 @@ using Microsoft.Extensions.DependencyInjection;
 using MonthlyBudget.BudgetManagement.Application.Ports;
 using MonthlyBudget.BudgetManagement.Domain.Repositories;
 using MonthlyBudget.BudgetManagement.Infrastructure.Events;
+using MonthlyBudget.ForecastEngine.Application.Ports;
+using MonthlyBudget.ForecastEngine.Domain.Repositories;
+using MonthlyBudget.IdentityHousehold.Application.Ports;
+using MonthlyBudget.IdentityHousehold.Domain.Repositories;
+using MonthlyBudget.IdentityHousehold.Infrastructure.Auth;
+using MonthlyBudget.IdentityHousehold.Infrastructure.Email;
+using MonthlyBudget.Infrastructure.Acl;
 using MonthlyBudget.Infrastructure.Database;
 using MonthlyBudget.Infrastructure.Repositories;
+
 namespace MonthlyBudget.Infrastructure;
+
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // EF Core with PostgreSQL
+        // ── EF Core with PostgreSQL ──────────────────────────────────────────────
         services.AddDbContext<AppDbContext>(opts =>
             opts.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),
                 npgsql => npgsql.MigrationsAssembly("MonthlyBudget.Infrastructure")));
-        // BudgetManagement adapters
+
+        // ── BudgetManagement adapters ────────────────────────────────────────────
         services.AddScoped<IBudgetRepository, PostgresBudgetRepository>();
         services.AddScoped<IBudgetEventPublisher, MediatRBudgetEventPublisher>();
-        // MediatR � register all handlers from all modules
+
+        // ── ForecastEngine adapters ──────────────────────────────────────────────
+        services.AddScoped<IForecastRepository, PostgresForecastRepository>();
+        services.AddScoped<IBudgetDataPort, BudgetManagementAcl>();
+
+        // ── IdentityHousehold adapters ───────────────────────────────────────────
+        services.AddScoped<IUserRepository, PostgresUserRepository>();
+        services.AddScoped<IHouseholdRepository, PostgresHouseholdRepository>();
+        services.AddScoped<IInvitationRepository, PostgresInvitationRepository>();
+        services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+        services.AddScoped<ITokenService, JwtTokenService>();
+        services.AddScoped<IEmailService, ConsoleEmailService>();
+
+        // ── MediatR — all module assemblies ─────────────────────────────────────
         services.AddMediatR(cfg =>
         {
-            cfg.RegisterServicesFromAssembly(typeof(BudgetManagement.Application.Features.CreateBudget.CreateBudgetHandler).Assembly);
+            cfg.RegisterServicesFromAssembly(
+                typeof(BudgetManagement.Application.Features.CreateBudget.CreateBudgetHandler).Assembly);
+            cfg.RegisterServicesFromAssembly(
+                typeof(ForecastEngine.Application.Features.GenerateForecast.GenerateForecastHandler).Assembly);
+            cfg.RegisterServicesFromAssembly(
+                typeof(IdentityHousehold.Application.Features.RegisterUser.RegisterUserHandler).Assembly);
         });
-        // FluentValidation � auto-discover all validators
-        services.AddValidatorsFromAssemblyContaining<BudgetManagement.Application.Features.CreateBudget.CreateBudgetValidator>();
+
+        // ── FluentValidation — all module assemblies ─────────────────────────────
+        services.AddValidatorsFromAssemblyContaining<
+            BudgetManagement.Application.Features.CreateBudget.CreateBudgetValidator>();
+
         return services;
     }
 }

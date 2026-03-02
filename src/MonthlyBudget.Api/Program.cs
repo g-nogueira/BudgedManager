@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MonthlyBudget.BudgetManagement.Domain.Exceptions;
 using MonthlyBudget.ForecastEngine.Domain.Exceptions;
@@ -35,7 +36,9 @@ builder.Services.AddAuthorization();
 
 // ─── Controllers — discover from all modules ─────────────────────────────────
 builder.Services.AddControllers()
-    .AddApplicationPart(typeof(MonthlyBudget.BudgetManagement.Infrastructure.Controllers.BudgetController).Assembly);
+    .AddApplicationPart(typeof(MonthlyBudget.BudgetManagement.Infrastructure.Controllers.BudgetController).Assembly)
+    .AddApplicationPart(typeof(MonthlyBudget.IdentityHousehold.Infrastructure.Controllers.AuthController).Assembly)
+    .AddApplicationPart(typeof(MonthlyBudget.ForecastEngine.Infrastructure.Controllers.ForecastController).Assembly);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -77,6 +80,13 @@ app.UseAuthentication();
 app.UseMiddleware<HouseholdScopeMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
+
+// ─── Auto-apply EF Core migrations on startup ─────────────────────────────────
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<MonthlyBudget.Infrastructure.Database.AppDbContext>();
+    db.Database.Migrate();
+}
 
 app.Run();
 

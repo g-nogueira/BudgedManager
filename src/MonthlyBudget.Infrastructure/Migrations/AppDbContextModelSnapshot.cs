@@ -58,9 +58,6 @@ namespace MonthlyBudget.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_spread");
 
-                    b.Property<Guid?>("MonthlyBudgetBudgetId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -74,8 +71,6 @@ namespace MonthlyBudget.Infrastructure.Migrations
                     b.HasKey("ExpenseId");
 
                     b.HasIndex("BudgetId");
-
-                    b.HasIndex("MonthlyBudgetBudgetId");
 
                     b.ToTable("expenses", "budget");
                 });
@@ -99,9 +94,6 @@ namespace MonthlyBudget.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<Guid?>("MonthlyBudgetBudgetId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -115,8 +107,6 @@ namespace MonthlyBudget.Infrastructure.Migrations
                     b.HasKey("IncomeId");
 
                     b.HasIndex("BudgetId");
-
-                    b.HasIndex("MonthlyBudgetBudgetId");
 
                     b.ToTable("income_sources", "budget");
                 });
@@ -178,16 +168,11 @@ namespace MonthlyBudget.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("forecast_id");
 
-                    b.Property<Guid?>("ForecastVersionForecastId")
-                        .HasColumnType("uuid");
-
                     b.Property<decimal>("RemainingBalance")
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("remaining_balance");
 
                     b.HasKey("EntryId");
-
-                    b.HasIndex("ForecastVersionForecastId");
 
                     b.HasIndex("ForecastId", "DayNumber")
                         .IsUnique();
@@ -206,9 +191,6 @@ namespace MonthlyBudget.Infrastructure.Migrations
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("amount");
 
-                    b.Property<Guid?>("DailyEntryEntryId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("EntryId")
                         .HasColumnType("uuid")
                         .HasColumnName("entry_id");
@@ -225,7 +207,7 @@ namespace MonthlyBudget.Infrastructure.Migrations
 
                     b.HasKey("ItemId");
 
-                    b.HasIndex("DailyEntryEntryId");
+                    b.HasIndex("EntryId");
 
                     b.ToTable("daily_expense_items", "forecast");
                 });
@@ -254,9 +236,6 @@ namespace MonthlyBudget.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("forecast_id");
 
-                    b.Property<Guid?>("ForecastVersionForecastId")
-                        .HasColumnType("uuid");
-
                     b.Property<bool>("IsExcluded")
                         .HasColumnType("boolean")
                         .HasColumnName("is_excluded");
@@ -277,7 +256,7 @@ namespace MonthlyBudget.Infrastructure.Migrations
 
                     b.HasKey("SnapshotId");
 
-                    b.HasIndex("ForecastVersionForecastId");
+                    b.HasIndex("ForecastId");
 
                     b.ToTable("expense_snapshots", "forecast");
                 });
@@ -446,48 +425,46 @@ namespace MonthlyBudget.Infrastructure.Migrations
             modelBuilder.Entity("MonthlyBudget.BudgetManagement.Domain.Entities.Expense", b =>
                 {
                     b.HasOne("MonthlyBudget.BudgetManagement.Domain.Entities.MonthlyBudget", null)
-                        .WithMany()
+                        .WithMany("Expenses")
                         .HasForeignKey("BudgetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("MonthlyBudget.BudgetManagement.Domain.Entities.MonthlyBudget", null)
-                        .WithMany("Expenses")
-                        .HasForeignKey("MonthlyBudgetBudgetId");
                 });
 
             modelBuilder.Entity("MonthlyBudget.BudgetManagement.Domain.Entities.IncomeSource", b =>
                 {
                     b.HasOne("MonthlyBudget.BudgetManagement.Domain.Entities.MonthlyBudget", null)
-                        .WithMany()
+                        .WithMany("IncomeSources")
                         .HasForeignKey("BudgetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("MonthlyBudget.BudgetManagement.Domain.Entities.MonthlyBudget", null)
-                        .WithMany("IncomeSources")
-                        .HasForeignKey("MonthlyBudgetBudgetId");
                 });
 
             modelBuilder.Entity("MonthlyBudget.ForecastEngine.Domain.Entities.DailyEntry", b =>
                 {
                     b.HasOne("MonthlyBudget.ForecastEngine.Domain.Entities.ForecastVersion", null)
                         .WithMany("DailyEntries")
-                        .HasForeignKey("ForecastVersionForecastId");
+                        .HasForeignKey("ForecastId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MonthlyBudget.ForecastEngine.Domain.Entities.DailyExpenseItem", b =>
                 {
                     b.HasOne("MonthlyBudget.ForecastEngine.Domain.Entities.DailyEntry", null)
                         .WithMany("ExpenseBreakdown")
-                        .HasForeignKey("DailyEntryEntryId");
+                        .HasForeignKey("EntryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MonthlyBudget.ForecastEngine.Domain.Entities.ExpenseSnapshot", b =>
                 {
                     b.HasOne("MonthlyBudget.ForecastEngine.Domain.Entities.ForecastVersion", null)
                         .WithMany("ExpenseSnapshots")
-                        .HasForeignKey("ForecastVersionForecastId");
+                        .HasForeignKey("ForecastId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MonthlyBudget.IdentityHousehold.Domain.Entities.Household", b =>

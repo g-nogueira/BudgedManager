@@ -14,6 +14,8 @@ public class DailyEntryConfiguration : IEntityTypeConfiguration<DailyEntry>
         builder.Property(d => d.RemainingBalance).HasColumnName("remaining_balance").HasColumnType("decimal(12,2)").IsRequired();
         builder.Property(d => d.DailyExpenseTotal).HasColumnName("daily_expense_total").HasColumnType("decimal(12,2)").IsRequired();
         builder.HasIndex(d => new { d.ForecastId, d.DayNumber }).IsUnique();
+        builder.HasMany(d => d.ExpenseBreakdown)
+               .WithOne().HasForeignKey(i => i.EntryId);
         builder.Navigation(d => d.ExpenseBreakdown).UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

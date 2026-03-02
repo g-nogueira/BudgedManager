@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using BudgetEntity = MonthlyBudget.BudgetManagement.Domain.Entities.MonthlyBudget;
+
 namespace MonthlyBudget.Infrastructure.Database.Configurations;
+
 public class MonthlyBudgetConfiguration : IEntityTypeConfiguration<BudgetEntity>
 {
     public void Configure(EntityTypeBuilder<BudgetEntity> builder)
@@ -15,11 +17,13 @@ public class MonthlyBudgetConfiguration : IEntityTypeConfiguration<BudgetEntity>
         builder.Property(b => b.CreatedAt).HasColumnName("created_at").IsRequired();
         builder.Property(b => b.UpdatedAt).HasColumnName("updated_at").IsRequired();
         builder.HasIndex(b => new { b.HouseholdId, b.YearMonth }).IsUnique();
-        builder.HasMany<MonthlyBudget.BudgetManagement.Domain.Entities.IncomeSource>()
+
+        // Use navigation-property overload so EF maps to the single BudgetId FK, no shadow duplicates
+        builder.HasMany(b => b.IncomeSources)
                .WithOne().HasForeignKey("BudgetId").OnDelete(DeleteBehavior.Cascade);
-        builder.HasMany<MonthlyBudget.BudgetManagement.Domain.Entities.Expense>()
+        builder.HasMany(b => b.Expenses)
                .WithOne().HasForeignKey("BudgetId").OnDelete(DeleteBehavior.Cascade);
-        // Map private backing fields for EF Core
+
         builder.Navigation(b => b.IncomeSources).UsePropertyAccessMode(PropertyAccessMode.Field);
         builder.Navigation(b => b.Expenses).UsePropertyAccessMode(PropertyAccessMode.Field);
     }

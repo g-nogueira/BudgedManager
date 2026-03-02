@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MonthlyBudget.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260302203428_InitialCreate")]
+    [Migration("20260302211302_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -61,9 +61,6 @@ namespace MonthlyBudget.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_spread");
 
-                    b.Property<Guid?>("MonthlyBudgetBudgetId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -77,8 +74,6 @@ namespace MonthlyBudget.Infrastructure.Migrations
                     b.HasKey("ExpenseId");
 
                     b.HasIndex("BudgetId");
-
-                    b.HasIndex("MonthlyBudgetBudgetId");
 
                     b.ToTable("expenses", "budget");
                 });
@@ -102,9 +97,6 @@ namespace MonthlyBudget.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<Guid?>("MonthlyBudgetBudgetId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -118,8 +110,6 @@ namespace MonthlyBudget.Infrastructure.Migrations
                     b.HasKey("IncomeId");
 
                     b.HasIndex("BudgetId");
-
-                    b.HasIndex("MonthlyBudgetBudgetId");
 
                     b.ToTable("income_sources", "budget");
                 });
@@ -449,27 +439,19 @@ namespace MonthlyBudget.Infrastructure.Migrations
             modelBuilder.Entity("MonthlyBudget.BudgetManagement.Domain.Entities.Expense", b =>
                 {
                     b.HasOne("MonthlyBudget.BudgetManagement.Domain.Entities.MonthlyBudget", null)
-                        .WithMany()
+                        .WithMany("Expenses")
                         .HasForeignKey("BudgetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("MonthlyBudget.BudgetManagement.Domain.Entities.MonthlyBudget", null)
-                        .WithMany("Expenses")
-                        .HasForeignKey("MonthlyBudgetBudgetId");
                 });
 
             modelBuilder.Entity("MonthlyBudget.BudgetManagement.Domain.Entities.IncomeSource", b =>
                 {
                     b.HasOne("MonthlyBudget.BudgetManagement.Domain.Entities.MonthlyBudget", null)
-                        .WithMany()
+                        .WithMany("IncomeSources")
                         .HasForeignKey("BudgetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("MonthlyBudget.BudgetManagement.Domain.Entities.MonthlyBudget", null)
-                        .WithMany("IncomeSources")
-                        .HasForeignKey("MonthlyBudgetBudgetId");
                 });
 
             modelBuilder.Entity("MonthlyBudget.ForecastEngine.Domain.Entities.DailyEntry", b =>

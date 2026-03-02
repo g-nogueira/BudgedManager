@@ -195,18 +195,11 @@ namespace MonthlyBudget.Infrastructure.Migrations
                     is_excluded = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    budget_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    MonthlyBudgetBudgetId = table.Column<Guid>(type: "uuid", nullable: true)
+                    budget_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_expenses", x => x.expense_id);
-                    table.ForeignKey(
-                        name: "FK_expenses_monthly_budgets_MonthlyBudgetBudgetId",
-                        column: x => x.MonthlyBudgetBudgetId,
-                        principalSchema: "budget",
-                        principalTable: "monthly_budgets",
-                        principalColumn: "budget_id");
                     table.ForeignKey(
                         name: "FK_expenses_monthly_budgets_budget_id",
                         column: x => x.budget_id,
@@ -226,18 +219,11 @@ namespace MonthlyBudget.Infrastructure.Migrations
                     amount = table.Column<decimal>(type: "numeric(12,2)", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    budget_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    MonthlyBudgetBudgetId = table.Column<Guid>(type: "uuid", nullable: true)
+                    budget_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_income_sources", x => x.income_id);
-                    table.ForeignKey(
-                        name: "FK_income_sources_monthly_budgets_MonthlyBudgetBudgetId",
-                        column: x => x.MonthlyBudgetBudgetId,
-                        principalSchema: "budget",
-                        principalTable: "monthly_budgets",
-                        principalColumn: "budget_id");
                     table.ForeignKey(
                         name: "FK_income_sources_monthly_budgets_budget_id",
                         column: x => x.budget_id,
@@ -309,12 +295,6 @@ namespace MonthlyBudget.Infrastructure.Migrations
                 column: "budget_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_expenses_MonthlyBudgetBudgetId",
-                schema: "budget",
-                table: "expenses",
-                column: "MonthlyBudgetBudgetId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_household_members_HouseholdId",
                 schema: "identity",
                 table: "household_members",
@@ -325,12 +305,6 @@ namespace MonthlyBudget.Infrastructure.Migrations
                 schema: "budget",
                 table: "income_sources",
                 column: "budget_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_income_sources_MonthlyBudgetBudgetId",
-                schema: "budget",
-                table: "income_sources",
-                column: "MonthlyBudgetBudgetId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_invitations_token",

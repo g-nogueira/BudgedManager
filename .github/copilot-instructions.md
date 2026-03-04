@@ -11,7 +11,13 @@ You operate as the execution engine of the multi-agent pipeline. You do not inve
     - Last Resort: Only propose manual code edits if both MCP and CLI avenues are completely exhausted and you have logged the failure.
 2. Git-Driven State Management: You must maintain a continuous version control audit trail. You are required to initialize the repository (`git init`) at the very beginning of the project. You must execute atomic `git commit` commands with descriptive messages between every development phase and after successfully implementing any logical code block.
 3. Cognitive Processing: Before executing any tool, command, or code generation, you must use a hidden `<internal_computation>` XML block to plan your file structures, test cases, and logic step-by-step.
-   </Operational_Directives>
+4. GitHub Project Scope Enforcement: This repository is tracked under the GitHub Project at https://github.com/users/g-nogueira/projects/6. You MUST NEVER perform any work outside the explicit scope of an active task or story defined in that project. Before starting any implementation, verify that the work corresponds to an existing project item. If no matching task or story exists, halt and request one to be created before proceeding.
+5. GitHub Flow Branching Strategy: This repository uses **GitHub Flow**. You MUST follow these rules on every task or story:
+    - Before writing any code, create a short-lived feature branch from `main` using the naming convention `feature/<task-id>-<short-description>` (e.g., `feature/42-add-rollover-endpoint`).
+    - All commits for the task go exclusively on that branch — never commit directly to `main`.
+    - Once the task is fully implemented, all tests are green, and Phase 6 API validation has passed, open a Pull Request from the feature branch into `main` with a descriptive title and body summarising the changes and the validation results.
+    - Do not merge the PR yourself — leave it open for human review unless explicitly instructed otherwise.
+</Operational_Directives>
 
 <Architectural_Constraints_and_Fail_Safes>
 - TEST-DRIVEN DEVELOPMENT (TDD): Do not write implementation code first. You must strictly adhere to the Red-Green-Refactor loop.
@@ -40,7 +46,17 @@ Implement the Use Cases (Primary Ports) to orchestrate the flow of data. Do not 
 Implement the Secondary Adapters (e.g., Database repositories, external APIs). Ensure all tool definitions and API endpoints strictly validate against the input/output JSON schemas defined in the architecture contract. Execute a `git commit` for the infrastructure layer.
 
 **Phase 5: Refactoring & Validation (Refactor Phase)**
-Run the test suite. Once tests are green, refactor the code to improve naming conventions and reduce complexity. Verify no dependencies have leaked into the Domain layer. Execute a final `git commit` for the completed feature.
+Run the test suite. Once tests are green, refactor the code to improve naming conventions and reduce complexity. Verify no dependencies have leaked into the Domain layer.
+
+**Phase 6: API Validation & Finalization (Mandatory)**
+Before considering any story or task complete, you MUST:
+1. Start the API (`dotnet run --project src/MonthlyBudget.Api`).
+2. Exercise every endpoint added or modified by the story/task and confirm the responses match the expected contracts defined in the architecture spec.
+3. Document the validation result (request + response) in the commit message or a comment.
+4. Execute a final `git commit` for the completed feature on the feature branch.
+5. Open a Pull Request from the feature branch into `main`. The PR title must reference the task/story ID and the body must include a summary of changes and the API validation results (sample requests + responses).
+
+> ⚠️ A story or task is **NOT complete** until the API has been started, the related endpoints have been validated, and a Pull Request has been opened.
 </Execution_Pipeline>
 
 <Blocker_Protocol>

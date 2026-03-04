@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MonthlyBudget.ForecastEngine.Application.Features.GenerateForecast;
 using MonthlyBudget.ForecastEngine.Application.Features.GetForecast;
 using MonthlyBudget.ForecastEngine.Application.Features.Reforecast;
+using MonthlyBudget.ForecastEngine.Application.Features.SaveSnapshot;
 using MonthlyBudget.ForecastEngine.Infrastructure.Dto;
 using System.Security.Claims;
 namespace MonthlyBudget.ForecastEngine.Infrastructure.Controllers;
@@ -31,6 +32,12 @@ public sealed class ForecastController : ControllerBase
     public async Task<IActionResult> GetAll(Guid budgetId, CancellationToken ct)
     {
         var result = await _mediator.Send(new GetForecastsByBudgetQuery(budgetId, HouseholdId), ct);
+        return Ok(result);
+    }
+    [HttpPost("{forecastId:guid}/snapshot")]
+    public async Task<IActionResult> SaveSnapshot(Guid budgetId, Guid forecastId, CancellationToken ct)
+    {
+        var result = await _mediator.Send(new SaveSnapshotCommand(forecastId, HouseholdId), ct);
         return Ok(result);
     }
     [HttpPost("{forecastId:guid}/reforecast")]

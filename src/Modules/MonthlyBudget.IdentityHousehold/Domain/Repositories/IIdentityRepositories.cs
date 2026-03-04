@@ -10,11 +10,13 @@ public interface IUserRepository
 public interface IHouseholdRepository
 {
     Task<Household?> FindByIdAsync(Guid householdId, CancellationToken ct = default);
+    Task<Household?> FindByMemberIdAsync(Guid userId, CancellationToken ct = default);
     Task SaveAsync(Household household, CancellationToken ct = default);
 }
 public interface IInvitationRepository
 {
     Task<Invitation?> FindByTokenAsync(string token, CancellationToken ct = default);
     Task<Invitation?> FindByHouseholdAndEmailAsync(Guid householdId, string email, CancellationToken ct = default);
+    Task<Invitation?> FindPendingByHouseholdAsync(Guid householdId, CancellationToken ct = default);
     Task SaveAsync(Invitation invitation, CancellationToken ct = default);
 }

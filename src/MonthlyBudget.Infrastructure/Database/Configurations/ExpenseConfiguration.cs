@@ -8,7 +8,7 @@ public class ExpenseConfiguration : IEntityTypeConfiguration<Expense>
     {
         builder.ToTable("expenses", "budget");
         builder.HasKey(e => e.ExpenseId);
-        builder.Property(e => e.ExpenseId).HasColumnName("expense_id");
+        builder.Property(e => e.ExpenseId).HasColumnName("expense_id").ValueGeneratedNever();
         builder.Property<Guid>("BudgetId").HasColumnName("budget_id");
         builder.Property(e => e.Name).HasColumnName("name").HasMaxLength(100).IsRequired();
         builder.Property(e => e.Category).HasColumnName("category").HasConversion<string>().IsRequired();

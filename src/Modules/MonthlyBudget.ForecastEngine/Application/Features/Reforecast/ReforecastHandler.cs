@@ -16,7 +16,13 @@ public sealed class ReforecastHandler : IRequestHandler<ReforecastCommand, Refor
         var data = await _budgetPort.GetBudgetDataAsync(cmd.BudgetId, cmd.HouseholdId, ct) ?? throw new ForecastNotFoundException(cmd.BudgetId);
         var yearMonth = System.DateTime.ParseExact(data.YearMonth + "-01", "yyyy-MM-dd", null);
         int monthDays = System.DateTime.DaysInMonth(yearMonth.Year, yearMonth.Month);
-        // Use parent snapshots as base — allow future adjustment via explicit snapshot updates
+        // AutoSnapshotOnReforecast policy: snapshot parent if not already snapshotted
+        if (!parent.IsSnapshot)
+        {
+            parent.MarkAsSnapshot();
+            await _repo.SaveAsync(parent, ct);
+        }
+        // Use parent snapshots as base ï¿½ allow future adjustment via explicit snapshot updates
         var snapshots = parent.ExpenseSnapshots.ToList();
         var forecast = ForecastCalculator.Reforecast(cmd.BudgetId, cmd.HouseholdId, cmd.ParentForecastId,
             cmd.StartDay, cmd.ActualBalance, monthDays, snapshots, cmd.VersionLabel);

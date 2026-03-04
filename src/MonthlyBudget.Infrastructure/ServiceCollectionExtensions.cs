@@ -11,6 +11,7 @@ using MonthlyBudget.IdentityHousehold.Application.Ports;
 using MonthlyBudget.IdentityHousehold.Domain.Repositories;
 using MonthlyBudget.IdentityHousehold.Infrastructure.Auth;
 using MonthlyBudget.IdentityHousehold.Infrastructure.Email;
+using MonthlyBudget.ForecastEngine.Infrastructure.Events;
 using MonthlyBudget.Infrastructure.Acl;
 using MonthlyBudget.Infrastructure.Database;
 using MonthlyBudget.Infrastructure.Repositories;
@@ -32,6 +33,7 @@ public static class ServiceCollectionExtensions
 
         // ── ForecastEngine adapters ──────────────────────────────────────────────
         services.AddScoped<IForecastRepository, PostgresForecastRepository>();
+        services.AddScoped<IForecastEventPublisher, MediatRForecastEventPublisher>();
         services.AddScoped<IBudgetDataPort, BudgetManagementAcl>();
 
         // ── IdentityHousehold adapters ───────────────────────────────────────────

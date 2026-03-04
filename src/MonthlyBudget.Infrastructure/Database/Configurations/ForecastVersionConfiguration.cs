@@ -10,7 +10,7 @@ public class ForecastVersionConfiguration : IEntityTypeConfiguration<ForecastVer
     {
         builder.ToTable("forecast_versions", "forecast");
         builder.HasKey(f => f.ForecastId);
-        builder.Property(f => f.ForecastId).HasColumnName("forecast_id");
+        builder.Property(f => f.ForecastId).HasColumnName("forecast_id").ValueGeneratedNever();
         builder.Property(f => f.BudgetId).HasColumnName("budget_id").IsRequired();
         builder.Property(f => f.HouseholdId).HasColumnName("household_id").IsRequired();
         builder.Property(f => f.VersionLabel).HasColumnName("version_label").HasMaxLength(50).IsRequired();

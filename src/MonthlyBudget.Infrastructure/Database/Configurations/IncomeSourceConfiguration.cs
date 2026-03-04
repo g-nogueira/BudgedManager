@@ -8,7 +8,7 @@ public class IncomeSourceConfiguration : IEntityTypeConfiguration<IncomeSource>
     {
         builder.ToTable("income_sources", "budget");
         builder.HasKey(i => i.IncomeId);
-        builder.Property(i => i.IncomeId).HasColumnName("income_id");
+        builder.Property(i => i.IncomeId).HasColumnName("income_id").ValueGeneratedNever();
         builder.Property<Guid>("BudgetId").HasColumnName("budget_id");
         builder.Property(i => i.Name).HasColumnName("name").HasMaxLength(100).IsRequired();
         builder.Property(i => i.Amount).HasColumnName("amount").HasColumnType("decimal(12,2)").IsRequired();

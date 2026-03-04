@@ -26,11 +26,9 @@ public sealed class PostgresBudgetRepository : IBudgetRepository
             .ToListAsync(ct);
     public async Task SaveAsync(BudgetEntity budget, CancellationToken ct = default)
     {
-        var existing = await _db.Budgets.FindAsync(new object[] { budget.BudgetId }, ct);
-        if (existing == null)
+        var entry = _db.Entry(budget);
+        if (entry.State == EntityState.Detached)
             _db.Budgets.Add(budget);
-        else
-            _db.Entry(existing).CurrentValues.SetValues(budget);
         await _db.SaveChangesAsync(ct);
     }
     public async Task<bool> ExistsForHouseholdAndMonthAsync(Guid householdId, string yearMonth, CancellationToken ct = default)

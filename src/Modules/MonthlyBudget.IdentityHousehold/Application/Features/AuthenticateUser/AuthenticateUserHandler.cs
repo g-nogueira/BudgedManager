@@ -15,11 +15,10 @@ public sealed class AuthenticateUserHandler : IRequestHandler<AuthenticateUserCo
     {
         var user = await _users.FindByEmailAsync(cmd.Email, ct) ?? throw new InvalidCredentialsException();
         if (!_hasher.Verify(cmd.Password, user.PasswordHash)) throw new InvalidCredentialsException();
-        // Find household membership (if any)
-        // For MVP: scan all households would be expensive; householdId stored on user claim
-        // Here we return null and let the front-end redirect to household creation
-        var access = _tokens.GenerateAccessToken(user.UserId, user.Email, user.DisplayName, null);
+        // Find household membership for this user (null = not yet in a household)
+        var household = await _households.FindByMemberIdAsync(user.UserId, ct);
+        var access = _tokens.GenerateAccessToken(user.UserId, user.Email, user.DisplayName, household?.HouseholdId);
         var refresh = _tokens.GenerateRefreshToken();
-        return new AuthenticateUserResult(access, refresh, user.UserId, null);
+        return new AuthenticateUserResult(access, refresh, user.UserId, household?.HouseholdId);
     }
 }

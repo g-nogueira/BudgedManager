@@ -27,7 +27,9 @@ public sealed class PostgresForecastRepository : IForecastRepository
             .FirstOrDefaultAsync(ct);
     public async Task SaveAsync(ForecastVersion forecast, CancellationToken ct = default)
     {
-        _db.ForecastVersions.Add(forecast);
+        var entry = _db.Entry(forecast);
+        if (entry.State == EntityState.Detached)
+            _db.ForecastVersions.Add(forecast);
         await _db.SaveChangesAsync(ct);
     }
 }

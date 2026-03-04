@@ -8,7 +8,7 @@ public class DailyEntryConfiguration : IEntityTypeConfiguration<DailyEntry>
     {
         builder.ToTable("daily_entries", "forecast");
         builder.HasKey(d => d.EntryId);
-        builder.Property(d => d.EntryId).HasColumnName("entry_id");
+        builder.Property(d => d.EntryId).HasColumnName("entry_id").ValueGeneratedNever();
         builder.Property(d => d.ForecastId).HasColumnName("forecast_id").IsRequired();
         builder.Property(d => d.DayNumber).HasColumnName("day_number").IsRequired();
         builder.Property(d => d.RemainingBalance).HasColumnName("remaining_balance").HasColumnType("decimal(12,2)").IsRequired();
@@ -25,7 +25,7 @@ public class DailyExpenseItemConfiguration : IEntityTypeConfiguration<DailyExpen
     {
         builder.ToTable("daily_expense_items", "forecast");
         builder.HasKey(i => i.ItemId);
-        builder.Property(i => i.ItemId).HasColumnName("item_id");
+        builder.Property(i => i.ItemId).HasColumnName("item_id").ValueGeneratedNever();
         builder.Property(i => i.EntryId).HasColumnName("entry_id").IsRequired();
         builder.Property(i => i.ExpenseSnapshotId).HasColumnName("expense_snapshot_id").IsRequired();
         builder.Property(i => i.ExpenseName).HasColumnName("expense_name").HasMaxLength(100).IsRequired();
@@ -38,7 +38,7 @@ public class ExpenseSnapshotConfiguration : IEntityTypeConfiguration<ExpenseSnap
     {
         builder.ToTable("expense_snapshots", "forecast");
         builder.HasKey(s => s.SnapshotId);
-        builder.Property(s => s.SnapshotId).HasColumnName("snapshot_id");
+        builder.Property(s => s.SnapshotId).HasColumnName("snapshot_id").ValueGeneratedNever();
         builder.Property(s => s.ForecastId).HasColumnName("forecast_id").IsRequired();
         builder.Property(s => s.OriginalExpenseId).HasColumnName("original_expense_id").IsRequired();
         builder.Property(s => s.Name).HasColumnName("name").HasMaxLength(100).IsRequired();

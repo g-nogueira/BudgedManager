@@ -37,7 +37,9 @@ public sealed class HouseholdController : ControllerBase
 {
     private readonly IMediator _mediator;
     public HouseholdController(IMediator mediator) { _mediator = mediator; }
-    private Guid UserId => Guid.Parse(User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)!);
+    private Guid UserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
+        ?? User.FindFirstValue("sub")
+        ?? throw new UnauthorizedAccessException("User ID claim not found"));
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateHouseholdRequest req, CancellationToken ct)
     {

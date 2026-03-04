@@ -8,7 +8,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         builder.ToTable("app_users", "identity");
         builder.HasKey(u => u.UserId);
-        builder.Property(u => u.UserId).HasColumnName("user_id");
+        builder.Property(u => u.UserId).HasColumnName("user_id").ValueGeneratedNever();
         builder.Property(u => u.Email).HasColumnName("email").HasMaxLength(255).IsRequired();
         builder.Property(u => u.DisplayName).HasColumnName("display_name").HasMaxLength(100).IsRequired();
         builder.Property(u => u.PasswordHash).HasColumnName("password_hash").IsRequired();
@@ -22,7 +22,7 @@ public class HouseholdConfiguration : IEntityTypeConfiguration<Household>
     {
         builder.ToTable("households", "identity");
         builder.HasKey(h => h.HouseholdId);
-        builder.Property(h => h.HouseholdId).HasColumnName("household_id");
+        builder.Property(h => h.HouseholdId).HasColumnName("household_id").ValueGeneratedNever();
         builder.Property(h => h.Name).HasColumnName("name").HasMaxLength(100).IsRequired();
         builder.Property(h => h.CreatedAt).HasColumnName("created_at").IsRequired();
         builder.OwnsMany(h => h.Members, m =>
@@ -43,7 +43,7 @@ public class InvitationConfiguration : IEntityTypeConfiguration<Invitation>
     {
         builder.ToTable("invitations", "identity");
         builder.HasKey(i => i.InvitationId);
-        builder.Property(i => i.InvitationId).HasColumnName("invitation_id");
+        builder.Property(i => i.InvitationId).HasColumnName("invitation_id").ValueGeneratedNever();
         builder.Property(i => i.HouseholdId).HasColumnName("household_id").IsRequired();
         builder.Property(i => i.InvitedEmail).HasColumnName("invited_email").HasMaxLength(255).IsRequired();
         builder.Property(i => i.Token).HasColumnName("token").HasMaxLength(100).IsRequired();

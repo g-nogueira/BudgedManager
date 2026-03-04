@@ -10,7 +10,7 @@ public class MonthlyBudgetConfiguration : IEntityTypeConfiguration<BudgetEntity>
     {
         builder.ToTable("monthly_budgets", "budget");
         builder.HasKey(b => b.BudgetId);
-        builder.Property(b => b.BudgetId).HasColumnName("budget_id");
+        builder.Property(b => b.BudgetId).HasColumnName("budget_id").ValueGeneratedNever();
         builder.Property(b => b.HouseholdId).HasColumnName("household_id").IsRequired();
         builder.Property(b => b.YearMonth).HasColumnName("year_month").HasMaxLength(7).IsRequired();
         builder.Property(b => b.Status).HasColumnName("status").HasConversion<string>().IsRequired();

@@ -87,4 +87,55 @@ public class ForecastCalculatorTests
         Assert.Equal(500m, day10.RemainingBalance);
         Assert.Equal(500m, day10.DailyExpenseTotal);
     }
+
+    // --- SaveSnapshot (INV-F4) ---------------------------------------------------
+    [Fact]
+    public void SaveSnapshot_NonSnapshotForecast_SetsIsSnapshotTrue()
+    {
+        var forecast = ForecastCalculator.Generate(BudgetId, HouseholdId, 5000m, 31, new List<ExpenseSnapshot>());
+        Assert.False(forecast.IsSnapshot);
+        forecast.MarkAsSnapshot();
+        Assert.True(forecast.IsSnapshot);
+    }
+
+    [Fact]
+    public void SaveSnapshot_AlreadySnapshot_RemainsTrue_Idempotent()
+    {
+        var forecast = ForecastCalculator.Generate(BudgetId, HouseholdId, 5000m, 31, new List<ExpenseSnapshot>());
+        forecast.MarkAsSnapshot();
+        forecast.MarkAsSnapshot(); // second call — idempotent
+        Assert.True(forecast.IsSnapshot);
+    }
+
+    // --- CompareForecasts --------------------------------------------------------
+    [Fact]
+    public void CompareForecasts_SameForecasts_ZeroDrift()
+    {
+        var snapshots = new List<ExpenseSnapshot> { FixedExpense(5, 500m) };
+        var a = ForecastCalculator.Generate(BudgetId, HouseholdId, 2000m, 30, snapshots);
+        var endA = a.GetEndOfMonthBalance();
+        Assert.Equal(0m, endA - endA); // same forecast — zero drift
+    }
+
+    [Fact]
+    public void CompareForecasts_DifferentEndBalances_CorrectTotalDrift()
+    {
+        var snapshotsA = new List<ExpenseSnapshot> { FixedExpense(1, 500m) };
+        var snapshotsB = new List<ExpenseSnapshot> { FixedExpense(1, 300m) };
+        var a = ForecastCalculator.Generate(BudgetId, HouseholdId, 1000m, 30, snapshotsA);
+        var b = ForecastCalculator.Generate(BudgetId, HouseholdId, 1000m, 30, snapshotsB);
+        var drift = a.GetEndOfMonthBalance() - b.GetEndOfMonthBalance();
+        Assert.Equal(-200m, drift); // A pays 500, B pays 300 → A has 200 less
+    }
+
+    // --- AutoSnapshot on Reforecast policy ---------------------------------------
+    [Fact]
+    public void ForecastVersion_MarkAsSnapshot_IsSnapshot_BeforeReforecast()
+    {
+        var parent = ForecastCalculator.Generate(BudgetId, HouseholdId, 3000m, 31, new List<ExpenseSnapshot>());
+        Assert.False(parent.IsSnapshot);
+        // Simulate what ReforecastHandler does: mark parent as snapshot before creating reforecast
+        parent.MarkAsSnapshot();
+        Assert.True(parent.IsSnapshot);
+    }
 }

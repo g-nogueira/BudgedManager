@@ -6,3 +6,8 @@ public class DuplicateEmailException : IdentityDomainException { public Duplicat
 public class InvitationExpiredException : IdentityDomainException { public InvitationExpiredException() : base("This invitation has expired.") {} }
 public class InvalidCredentialsException : IdentityDomainException { public InvalidCredentialsException() : base("Invalid email or password.") {} }
 public class HouseholdNotFoundException : IdentityDomainException { public HouseholdNotFoundException(Guid id) : base($"Household '{id}' was not found.") {} }
+public sealed class PendingInvitationExistsException : IdentityDomainException
+{
+    public PendingInvitationExistsException(Guid householdId)
+        : base($"A pending invitation already exists for household {householdId}.") { }
+}

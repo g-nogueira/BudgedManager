@@ -8,7 +8,7 @@ using MonthlyBudget.BudgetManagement.Infrastructure.Dto;
 using System.Security.Claims;
 namespace MonthlyBudget.BudgetManagement.Infrastructure.Controllers;
 [ApiController]
-[Route("api/v1/budgets/{budgetId:guid}/incomes")]
+[Route("api/v1/budgets/{budgetId:guid}/income")]
 [Authorize]
 public sealed class IncomeController : ControllerBase
 {

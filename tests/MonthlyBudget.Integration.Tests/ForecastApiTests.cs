@@ -124,10 +124,44 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
         Assert.NotEmpty(list!);
     }
 
+    [Fact]
+    public async Task CompareForecasts_TwoVersions_ReturnsDriftAnalysis()
+    {
+        var (client, budgetId) = await SetupActiveBudgetAsync("2027-01");
+
+        // Generate original forecast
+        var genResp1 = await client.PostAsJsonAsync(
+            $"/api/v1/budgets/{budgetId}/forecasts", new { startBalance = 3000m });
+        genResp1.EnsureSuccessStatusCode();
+        var forecastA = await genResp1.Content.ReadFromJsonAsync<ForecastBody>();
+
+        // Create reforecast (auto-snapshots the parent)
+        var rfResp = await client.PostAsJsonAsync(
+            $"/api/v1/budgets/{budgetId}/forecasts/{forecastA!.ForecastId}/reforecast",
+            new { startDay = 5, actualBalance = 2500m, versionLabel = "RF-Compare" });
+        rfResp.EnsureSuccessStatusCode();
+        var forecastB = await rfResp.Content.ReadFromJsonAsync<ForecastBody>();
+
+        // Compare the two versions
+        var compareResp = await client.GetAsync(
+            $"/api/v1/budgets/{budgetId}/forecasts/compare?versionA={forecastA.ForecastId}&versionB={forecastB!.ForecastId}");
+        Assert.Equal(HttpStatusCode.OK, compareResp.StatusCode);
+        var result = await compareResp.Content.ReadFromJsonAsync<ComparisonBody>();
+        Assert.NotNull(result);
+        Assert.Equal(forecastA.ForecastId, result!.ForecastAId);
+        Assert.Equal(forecastB.ForecastId, result.ForecastBId);
+        Assert.NotEmpty(result.DayVariances);
+    }
+
     private sealed record LoginBody(string AccessToken, string RefreshToken, Guid UserId, Guid? HouseholdId);
     private sealed record BudgetBody(Guid BudgetId, string Status);
     private sealed record ForecastBody(Guid ForecastId, string VersionLabel, decimal EndOfMonthBalance, int DayCount);
     private sealed record SnapshotBody(Guid ForecastId, bool IsSnapshot);
     private sealed record ForecastDetailBody(Guid ForecastId, bool IsSnapshot);
     private sealed record ForecastSummaryBody(Guid ForecastId, string VersionLabel);
+    private sealed record ComparisonBody(
+        Guid ForecastAId, Guid ForecastBId, string LabelA, string LabelB,
+        decimal EndBalanceA, decimal EndBalanceB, decimal TotalDrift,
+        List<DayVarianceBody> DayVariances, List<object> ExpenseChanges);
+    private sealed record DayVarianceBody(int DayNumber, decimal BalanceA, decimal BalanceB, decimal Variance);
 }

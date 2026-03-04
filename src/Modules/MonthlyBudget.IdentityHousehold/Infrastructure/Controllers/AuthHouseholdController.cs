@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MonthlyBudget.IdentityHousehold.Application.Features.AuthenticateUser;
 using MonthlyBudget.IdentityHousehold.Application.Features.CreateHousehold;
+using MonthlyBudget.IdentityHousehold.Application.Features.GetHousehold;
 using MonthlyBudget.IdentityHousehold.Application.Features.InviteMember;
 using MonthlyBudget.IdentityHousehold.Application.Features.JoinHousehold;
 using MonthlyBudget.IdentityHousehold.Application.Features.RegisterUser;
@@ -44,7 +45,14 @@ public sealed class HouseholdController : ControllerBase
     public async Task<IActionResult> Create([FromBody] CreateHouseholdRequest req, CancellationToken ct)
     {
         var result = await _mediator.Send(new CreateHouseholdCommand(UserId, req.Name), ct);
-        return CreatedAtAction(nameof(Create), new { householdId = result.HouseholdId }, result);
+        return CreatedAtAction(nameof(GetById), new { householdId = result.HouseholdId }, result);
+    }
+    [HttpGet("{householdId:guid}")]
+    public async Task<IActionResult> GetById(Guid householdId, CancellationToken ct)
+    {
+        var result = await _mediator.Send(new GetHouseholdQuery(householdId, UserId), ct);
+        if (result == null) return NotFound();
+        return Ok(result);
     }
     [HttpPost("{householdId:guid}/invitations")]
     public async Task<IActionResult> Invite(Guid householdId, [FromBody] InviteRequest req, CancellationToken ct)

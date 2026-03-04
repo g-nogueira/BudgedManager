@@ -54,12 +54,23 @@ app.UseExceptionHandler(errorApp =>
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = error switch
         {
-            DomainException       => StatusCodes.Status400BadRequest,
-            ForecastDomainException => StatusCodes.Status400BadRequest,
-            IdentityDomainException => StatusCodes.Status400BadRequest,
+            // ── Identity-specific codes (must precede base IdentityDomainException) ──
+            InvalidCredentialsException   => StatusCodes.Status401Unauthorized,
+            DuplicateEmailException       => StatusCodes.Status409Conflict,
+            UserAlreadyInHouseholdException => StatusCodes.Status409Conflict,
+            HouseholdFullException        => StatusCodes.Status409Conflict,
+            PendingInvitationExistsException => StatusCodes.Status409Conflict,
+            InsufficientRoleException     => StatusCodes.Status403Forbidden,
+            InvitationExpiredException    => StatusCodes.Status410Gone,
+            InvitationNotFoundException   => StatusCodes.Status404NotFound,
+            HouseholdNotFoundException    => StatusCodes.Status404NotFound,
+            // ── Generic domain exceptions ──────────────────────────────────────────
+            DomainException               => StatusCodes.Status400BadRequest,
+            ForecastDomainException       => StatusCodes.Status400BadRequest,
+            IdentityDomainException       => StatusCodes.Status400BadRequest,
             FluentValidation.ValidationException => StatusCodes.Status422UnprocessableEntity,
-            UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
-            _                     => StatusCodes.Status500InternalServerError
+            UnauthorizedAccessException   => StatusCodes.Status401Unauthorized,
+            _                             => StatusCodes.Status500InternalServerError
         };
         await context.Response.WriteAsJsonAsync(new
         {

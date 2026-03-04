@@ -1,3 +1,4 @@
+using MonthlyBudget.SharedKernel.Events;
 namespace MonthlyBudget.IdentityHousehold.Application.Ports;
 public interface IPasswordHasher
 {
@@ -12,4 +13,8 @@ public interface ITokenService
 public interface IEmailService
 {
     Task SendInvitationAsync(string toEmail, string householdName, string token, CancellationToken ct = default);
+}
+public interface IHouseholdEventPublisher
+{
+    Task PublishAsync(IDomainEvent domainEvent, CancellationToken ct = default);
 }

@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MonthlyBudget.ForecastEngine.Application.Features.CompareForecasts;
 using MonthlyBudget.ForecastEngine.Application.Features.GenerateForecast;
 using MonthlyBudget.ForecastEngine.Application.Features.GetForecast;
 using MonthlyBudget.ForecastEngine.Application.Features.Reforecast;
@@ -32,6 +33,12 @@ public sealed class ForecastController : ControllerBase
     public async Task<IActionResult> GetAll(Guid budgetId, CancellationToken ct)
     {
         var result = await _mediator.Send(new GetForecastsByBudgetQuery(budgetId, HouseholdId), ct);
+        return Ok(result);
+    }
+    [HttpGet("compare")]
+    public async Task<IActionResult> Compare(Guid budgetId, [FromQuery] Guid versionA, [FromQuery] Guid versionB, CancellationToken ct)
+    {
+        var result = await _mediator.Send(new CompareForecastsQuery(versionA, versionB, HouseholdId), ct);
         return Ok(result);
     }
     [HttpPost("{forecastId:guid}/snapshot")]

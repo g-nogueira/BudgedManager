@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MonthlyBudget.IdentityHousehold.Application.Features.AuthenticateUser;
 using MonthlyBudget.IdentityHousehold.Application.Features.CreateHousehold;
@@ -57,9 +58,12 @@ public sealed class HouseholdController : ControllerBase
     [HttpPost("{householdId:guid}/invitations")]
     public async Task<IActionResult> Invite(Guid householdId, [FromBody] InviteRequest req, CancellationToken ct)
     {
-        var result = await _mediator.Send(new InviteMemberCommand(householdId, UserId, req.PartnerEmail), ct);
-        return Ok(result);
+        var result = await _mediator.Send(new InviteMemberCommand(householdId, UserId, req.Email), ct);
+        return StatusCode(StatusCodes.Status201Created, result);
     }
+    // NOTE: /join requires authentication. The invited user must register first via
+    // POST /api/v1/auth/register, then authenticate, and finally call this endpoint
+    // with their JWT token. This is intentional — UserId is derived from JWT claims.
     [HttpPost("join")]
     public async Task<IActionResult> Join([FromBody] JoinRequest req, CancellationToken ct)
     {

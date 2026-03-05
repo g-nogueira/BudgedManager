@@ -140,9 +140,9 @@ public sealed class IdentityApiTests : IClassFixture<IntegrationTestFixture>
 
         var resp = await client.PostAsJsonAsync(
             $"/api/v1/households/{householdId}/invitations",
-            new { partnerEmail });
+            new { email = partnerEmail });
 
-        Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
         var body = await resp.Content.ReadFromJsonAsync<InvitationBody>();
         Assert.NotEqual(Guid.Empty, body!.InvitationId);
         Assert.False(string.IsNullOrEmpty(body.Token));
@@ -157,11 +157,11 @@ public sealed class IdentityApiTests : IClassFixture<IntegrationTestFixture>
 
         // First invite
         await client.PostAsJsonAsync(
-            $"/api/v1/households/{householdId}/invitations", new { partnerEmail = email1 });
+            $"/api/v1/households/{householdId}/invitations", new { email = email1 });
 
         // Second invite — should conflict (INV-H4)
         var resp = await client.PostAsJsonAsync(
-            $"/api/v1/households/{householdId}/invitations", new { partnerEmail = email2 });
+            $"/api/v1/households/{householdId}/invitations", new { email = email2 });
 
         Assert.Equal(HttpStatusCode.Conflict, resp.StatusCode);
     }
@@ -175,7 +175,7 @@ public sealed class IdentityApiTests : IClassFixture<IntegrationTestFixture>
 
         var invResp = await ownerClient.PostAsJsonAsync(
             $"/api/v1/households/{householdId}/invitations",
-            new { partnerEmail });
+            new { email = partnerEmail });
         invResp.EnsureSuccessStatusCode();
         var invitation = await invResp.Content.ReadFromJsonAsync<InvitationBody>();
 
@@ -222,7 +222,7 @@ public sealed class IdentityApiTests : IClassFixture<IntegrationTestFixture>
         // Invite partner
         var invResp = await ownerClient.PostAsJsonAsync(
             $"/api/v1/households/{householdId}/invitations",
-            new { partnerEmail });
+            new { email = partnerEmail });
         invResp.EnsureSuccessStatusCode();
         var invitation = await invResp.Content.ReadFromJsonAsync<InvitationBody>();
 
@@ -241,7 +241,7 @@ public sealed class IdentityApiTests : IClassFixture<IntegrationTestFixture>
         var thirdEmail = $"third_{Guid.NewGuid():N}@test.com";
         var fullResp = await ownerClient.PostAsJsonAsync(
             $"/api/v1/households/{householdId}/invitations",
-            new { partnerEmail = thirdEmail });
+            new { email = thirdEmail });
 
         Assert.Equal(HttpStatusCode.Conflict, fullResp.StatusCode);
     }
@@ -255,4 +255,5 @@ public sealed class IdentityApiTests : IClassFixture<IntegrationTestFixture>
     private sealed record InvitationBody(Guid InvitationId, string Token);
     private sealed record JoinBody(Guid HouseholdId, string AccessToken);
 }
+
 

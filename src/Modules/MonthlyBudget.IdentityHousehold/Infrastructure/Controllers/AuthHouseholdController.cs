@@ -55,7 +55,7 @@ public sealed class HouseholdController : ControllerBase
         if (result == null) return NotFound();
         return Ok(result);
     }
-    [HttpPost("{householdId:guid}/invitations")]
+    [HttpPost("{householdId:guid}/invite")]
     public async Task<IActionResult> Invite(Guid householdId, [FromBody] InviteRequest req, CancellationToken ct)
     {
         var result = await _mediator.Send(new InviteMemberCommand(householdId, UserId, req.Email), ct);

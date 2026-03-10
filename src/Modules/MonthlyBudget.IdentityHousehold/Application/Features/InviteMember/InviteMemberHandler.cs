@@ -21,9 +21,9 @@ public sealed class InviteMemberHandler : IRequestHandler<InviteMemberCommand, I
         if (invitingMember?.Role != MemberRole.OWNER) throw new InsufficientRoleException();
         // INV-H1: prevent inviting if already full
         if (household.Members.Count >= 2) throw new HouseholdFullException();
-        // INV-H4: only one pending invitation per household at a time
+        // INV-H4: only one pending invitation per household at a time (domain-enforced)
         var pending = await _invitations.FindPendingByHouseholdAsync(cmd.HouseholdId, ct);
-        if (pending != null) throw new PendingInvitationExistsException(cmd.HouseholdId);
+        household.GuardPendingInvitation(pending != null);
         var invitation = Invitation.Create(cmd.HouseholdId, cmd.PartnerEmail);
         await _invitations.SaveAsync(invitation, ct);
         await _email.SendInvitationAsync(cmd.PartnerEmail, household.Name, invitation.Token, ct);

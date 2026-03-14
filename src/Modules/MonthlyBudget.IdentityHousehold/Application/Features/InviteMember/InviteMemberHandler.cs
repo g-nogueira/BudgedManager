@@ -16,9 +16,8 @@ public sealed class InviteMemberHandler : IRequestHandler<InviteMemberCommand, I
     public async Task<InviteMemberResult> Handle(InviteMemberCommand cmd, CancellationToken ct)
     {
         var household = await _households.FindByIdAsync(cmd.HouseholdId, ct) ?? throw new HouseholdNotFoundException(cmd.HouseholdId);
-        // Only OWNER may invite
-        var invitingMember = household.Members.FirstOrDefault(m => m.UserId == cmd.InvitingUserId);
-        if (invitingMember?.Role != MemberRole.OWNER) throw new InsufficientRoleException();
+        // INV-H2: Only the OWNER may invite — enforced in domain
+        household.AuthorizeInvite(cmd.InvitingUserId);
         // INV-H1: prevent inviting if already full
         if (household.Members.Count >= 2) throw new HouseholdFullException();
         // INV-H4: only one pending invitation per household at a time (domain-enforced)
@@ -28,6 +27,6 @@ public sealed class InviteMemberHandler : IRequestHandler<InviteMemberCommand, I
         await _invitations.SaveAsync(invitation, ct);
         await _email.SendInvitationAsync(cmd.PartnerEmail, household.Name, invitation.Token, ct);
         await _events.PublishAsync(new MemberInvited(cmd.HouseholdId, invitation.InvitationId, cmd.PartnerEmail), ct);
-        return new InviteMemberResult(invitation.InvitationId, invitation.Token);
+        return new InviteMemberResult(invitation.InvitationId);
     }
 }

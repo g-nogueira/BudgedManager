@@ -186,3 +186,32 @@ public class IdentityExceptionsTests
         Assert.Contains(id.ToString(), ex.Message);
     }
 }
+
+public class HouseholdAuthorizeInviteTests
+{
+    [Fact]
+    public void AuthorizeInvite_WithOwner_DoesNotThrow()
+    {
+        var ownerId = Guid.NewGuid();
+        var household = Household.Create("Test", ownerId);
+        var ex = Record.Exception(() => household.AuthorizeInvite(ownerId));
+        Assert.Null(ex);
+    }
+
+    [Fact]
+    public void AuthorizeInvite_WithPartner_ThrowsInsufficientRoleException()
+    {
+        var ownerId = Guid.NewGuid();
+        var partnerId = Guid.NewGuid();
+        var household = Household.Create("Test", ownerId);
+        household.AddMember(partnerId, MemberRole.PARTNER);
+        Assert.Throws<InsufficientRoleException>(() => household.AuthorizeInvite(partnerId));
+    }
+
+    [Fact]
+    public void AuthorizeInvite_WithUnknownUser_ThrowsInsufficientRoleException()
+    {
+        var household = Household.Create("Test", Guid.NewGuid());
+        Assert.Throws<InsufficientRoleException>(() => household.AuthorizeInvite(Guid.NewGuid()));
+    }
+}

@@ -66,6 +66,21 @@ public class UserTests
 }
 public class InvitationTests
 {
+    private sealed class FixedTimeProvider : TimeProvider
+    {
+        private readonly DateTimeOffset _utcNow;
+
+        public FixedTimeProvider(DateTimeOffset utcNow)
+        {
+            _utcNow = utcNow;
+        }
+
+        public override DateTimeOffset GetUtcNow()
+        {
+            return _utcNow;
+        }
+    }
+
     [Fact]
     public void Create_ValidInputs_StatusIsPending()
     {
@@ -87,6 +102,16 @@ public class InvitationTests
         inv.Accept();
         Assert.Throws<InvalidOperationException>(() => inv.Accept());
     }
+
+    [Fact]
+    public void Accept_ExpiredInvitation_ThrowsInvitationExpiredException_INV_H5()
+    {
+        var inv = Invitation.Create(Guid.NewGuid(), "partner@example.com");
+        var futureClock = new FixedTimeProvider(DateTimeOffset.UtcNow.AddDays(8));
+
+        Assert.Throws<InvitationExpiredException>(() => inv.Accept(futureClock));
+    }
+
     [Fact]
     public void Expire_SetsStatusToExpired()
     {

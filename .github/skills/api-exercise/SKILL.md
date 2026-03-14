@@ -181,6 +181,34 @@ For each endpoint exercised, verify:
 | Error cases | Invalid input returns proper error object with `error` and `type` fields |
 | Household scope | Users can only access their own household's data |
 
+**Always verify contracts against `docs/arch/api-contracts.md`** — never rely on memory for expected request/response schemas.
+
+## Error Scenario Tests
+
+Exercise these negative paths after verifying happy paths:
+
+```powershell
+# Budget: Create with invalid yearMonth → 400
+$body = @{ yearMonth = "invalid" } | ConvertTo-Json
+try { Invoke-RestMethod -Uri "http://localhost:5000/api/v1/budgets" -Method POST -ContentType "application/json" -Body $body -Headers $headers } catch { $_.Exception.Response.StatusCode }
+
+# Budget: Activate budget with no income → 409 (InsufficientIncomeException)
+# (create budget, skip income, attempt activate)
+
+# Budget: Add spread expense with dayOfMonth → 400 (INV-B4 violation)
+$body = @{ label = "Bad"; amount = 100; category = "VARIABLE"; isSpread = $true; dayOfMonth = 15 } | ConvertTo-Json
+try { Invoke-RestMethod -Uri "http://localhost:5000/api/v1/budgets/$budgetId/expenses" -Method POST -ContentType "application/json" -Body $body -Headers $headers } catch { $_.Exception.Response.StatusCode }
+
+# Budget: Mutate closed budget → 409 (INV-B8 violation)
+
+# Forecast: Snapshot already-snapshotted forecast → 409 (INV-F4)
+
+# Forecast: Reforecast without parentForecastId → 400 (INV-F2)
+
+# Auth: Access without token → 401
+try { Invoke-RestMethod -Uri "http://localhost:5000/api/v1/budgets" -Method GET } catch { $_.Exception.Response.StatusCode }
+```
+
 ## Error Response Format
 
 ```json

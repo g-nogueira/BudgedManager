@@ -118,7 +118,11 @@ Get-Content "src/MonthlyBudget.Infrastructure/ServiceCollectionExtensions.cs" | 
 
 ## Domain Invariant Enforcement Location
 
-Invariants must be enforced **in the Aggregate Root**, not in handlers or controllers:
+Invariants must be enforced **in the Aggregate Root**, not in handlers or controllers.
+
+**Always refer to `docs/arch/domain-invariants.md` for the canonical list of invariants.** Do not rely on this summary — the architecture extract is the source of truth.
+
+Quick reference (see architecture extract for full details):
 
 | Invariant | Aggregate | Rule |
 |---|---|---|

@@ -138,10 +138,48 @@ docker compose up -d postgres
 dotnet run --project src/MonthlyBudget.Api
 ```
 
+## Scope Guard — Before Committing
+
+Before every commit, verify you haven't drifted outside the planned scope:
+
+```powershell
+# Check what files were changed vs what was expected
+git diff --stat HEAD
+
+# Verify no unexpected files were created
+git status --short
+```
+
+Ask yourself:
+1. Is every changed file listed in the implementation plan?
+2. Did I add any "nice to have" code (extra logging, XML docs, comments)?
+3. Did I add error handling beyond what the invariants require?
+
+If any answer is yes, revert the unplanned changes or ask the user.
+
+## Known Gotchas
+
+| Problem | Solution |
+|---|---|
+| `dotnet test` hangs | Check if Docker is running (integration tests use Testcontainers) |
+| EF migration fails | Ensure `--startup-project` points to `src/MonthlyBudget.Api` |
+| Build error on SharedKernel types | Verify `using MonthlyBudget.SharedKernel.Types;` namespace |
+| Test naming mismatch | Check existing tests in the same project — use `MethodUnderTest_Scenario_ExpectedBehavior` |
+| `HouseholdId` type confusion | It's a value object in SharedKernel, not a raw `Guid` |
+
+## Architecture Extracts for Reference
+
+Instead of reading the full architecture spec, use these focused files:
+- **Domain invariants:** `docs/arch/domain-invariants.md`
+- **API contracts:** `docs/arch/api-contracts.md`
+- **Persistence conventions:** `docs/arch/persistence-conventions.md`
+- **Allowed tech stack:** `docs/arch/tech-stack.md`
+- **Code patterns per context:** `.github/agents/context/<context>-patterns.md`
+
 ## Git Commit Convention
 
 ```
-type(context): description
+type(context): description for #<issue>
 
 # Types: test, feat, refactor, fix, chore
 # Contexts: budget, forecast, identity, infra, api

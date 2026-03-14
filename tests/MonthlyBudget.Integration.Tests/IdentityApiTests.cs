@@ -145,7 +145,6 @@ public sealed class IdentityApiTests : IClassFixture<IntegrationTestFixture>
         Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
         var body = await resp.Content.ReadFromJsonAsync<InvitationBody>();
         Assert.NotEqual(Guid.Empty, body!.InvitationId);
-        Assert.False(string.IsNullOrEmpty(body.Token));
     }
 
     [Fact]
@@ -178,6 +177,7 @@ public sealed class IdentityApiTests : IClassFixture<IntegrationTestFixture>
             new { email = partnerEmail });
         invResp.EnsureSuccessStatusCode();
         var invitation = await invResp.Content.ReadFromJsonAsync<InvitationBody>();
+        var invToken = await _fixture.GetInvitationTokenAsync(invitation!.InvitationId);
 
         // Partner registers
         var partnerClient = _fixture.CreateClient();
@@ -189,7 +189,7 @@ public sealed class IdentityApiTests : IClassFixture<IntegrationTestFixture>
 
         // Partner joins
         var joinResp = await partnerClient.PostAsJsonAsync(
-            "/api/v1/households/join", new { token = invitation!.Token });
+            "/api/v1/households/join", new { token = invToken });
 
         Assert.Equal(HttpStatusCode.OK, joinResp.StatusCode);
         var joinBody = await joinResp.Content.ReadFromJsonAsync<JoinBody>();
@@ -233,8 +233,9 @@ public sealed class IdentityApiTests : IClassFixture<IntegrationTestFixture>
         var partnerTok = await LoginAsync(partnerClient, partnerEmail);
         partnerClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", partnerTok);
+        var invToken2 = await _fixture.GetInvitationTokenAsync(invitation!.InvitationId);
         var joinResp = await partnerClient.PostAsJsonAsync(
-            "/api/v1/households/join", new { token = invitation!.Token });
+            "/api/v1/households/join", new { token = invToken2 });
         joinResp.EnsureSuccessStatusCode();
 
         // Now household has 2 members — invite a 3rd should be 409 (INV-H1)
@@ -252,8 +253,8 @@ public sealed class IdentityApiTests : IClassFixture<IntegrationTestFixture>
     private sealed record HouseholdCreatedBody(Guid HouseholdId, string Name);
     private sealed record HouseholdDto(Guid HouseholdId, string Name, List<MemberDto> Members);
     private sealed record MemberDto(Guid UserId, string Role);
-    private sealed record InvitationBody(Guid InvitationId, string Token);
-    private sealed record JoinBody(Guid HouseholdId, string AccessToken);
+    private sealed record InvitationBody(Guid InvitationId);
+    private sealed record JoinBody(Guid HouseholdId);
 }
 
 

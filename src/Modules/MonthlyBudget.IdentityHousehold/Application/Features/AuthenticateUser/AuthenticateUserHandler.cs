@@ -19,6 +19,6 @@ public sealed class AuthenticateUserHandler : IRequestHandler<AuthenticateUserCo
         var household = await _households.FindByMemberIdAsync(user.UserId, ct);
         var access = _tokens.GenerateAccessToken(user.UserId, user.Email, user.DisplayName, household?.HouseholdId);
         var refresh = _tokens.GenerateRefreshToken();
-        return new AuthenticateUserResult(access, refresh, user.UserId, household?.HouseholdId);
+        return new AuthenticateUserResult(access, refresh);
     }
 }

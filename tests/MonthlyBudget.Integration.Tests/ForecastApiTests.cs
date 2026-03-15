@@ -153,7 +153,7 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
         Assert.NotEmpty(result.DayVariances);
     }
 
-    private sealed record LoginBody(string AccessToken, string RefreshToken, Guid UserId, Guid? HouseholdId);
+    private sealed record LoginBody(string AccessToken, string RefreshToken);
     private sealed record BudgetBody(Guid BudgetId, string Status);
     private sealed record ForecastBody(Guid ForecastId, string VersionLabel, decimal EndOfMonthBalance, int DayCount);
     private sealed record SnapshotBody(Guid ForecastId, bool IsSnapshot);

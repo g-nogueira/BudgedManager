@@ -13,6 +13,6 @@ public sealed class RegisterUserHandler : IRequestHandler<RegisterUserCommand, R
         if (await _users.ExistsWithEmailAsync(cmd.Email, ct)) throw new DuplicateEmailException(cmd.Email);
         var user = User.Create(cmd.Email, cmd.DisplayName, _hasher.Hash(cmd.Password));
         await _users.SaveAsync(user, ct);
-        return new RegisterUserResult(user.UserId, user.Email, user.DisplayName);
+        return new RegisterUserResult(user.UserId);
     }
 }

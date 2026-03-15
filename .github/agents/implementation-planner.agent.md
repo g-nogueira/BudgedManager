@@ -1,7 +1,7 @@
 ---
 name: Implementation Planner
 description: "Reads issue context from memory, analyzes the codebase, and produces a precise file-level implementation plan. Hands off to the Code Implementor."
-user-invokable: false
+user-invokable: true
 disable-model-invocation: true
 model: Claude Opus 4.6 (copilot)
 tools: ['search', 'read', 'execute', 'edit/createFile', 'todo', 'vscode/askQuestions']
@@ -121,6 +121,8 @@ Compare the acceptance criteria against the current codebase. For each acceptanc
 - What already exists (reference the exact file and method)
 - What needs to be created
 - What needs to be modified
+
+**When planning from a PR review (fix cycle):** Read `.github/agents/memory/code-reviewer-<issue>.md` and filter the `## Review Points` table to only `OPEN` status points. Each OPEN review point becomes a fix item in your plan. Ignore `ADDRESSED`, `WONTFIX`, and `SUPERSEDED` points — they are already resolved. Use the Review Point's `File`, `Line`, `Description`, and `Fix Suggestion` columns to plan the exact change.
 
 ### Step 4: Ask Clarifying Questions
 

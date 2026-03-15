@@ -58,10 +58,15 @@ This project uses a multi-agent pipeline with manual handoffs. The agents and th
 2. **Implementation Planner** → Reads memory, analyzes codebase, writes precise file-level plan to memory
 3. **Code Implementor** → Reads plan, implements, tests, commits, pushes, opens PR
 
-**Workflow 2 — PR Review & Fix:**
-1. **PR Reviewer** → Reviews PR against architecture + acceptance criteria, writes review to memory
-2. **Implementation Planner** → Reads review, plans fixes
-3. **Code Implementor** → Executes fixes
+**Workflow 2 — PR Review & Fix (Additive Model):**
+1. **PR Reviewer** → Reviews PR using the **additive review model**:
+   - **Round 1:** Full review — evaluates entire PR, logs findings as Review Points (RP-1, RP-2, …), captures file-state baseline (blob SHAs)
+   - **Round 2+:** Additive review — resolves prior RPs via GitHub threaded replies, scans only changed files for new issues
+   - **Staleness threshold:** If >10 files changed since last baseline, falls back to full review
+   - Memory file: `code-reviewer-<issue>.md` (structured with Baseline, Review Points, Review History)
+   - Skill: `.github/skills/additive-review/SKILL.md`
+2. **Implementation Planner** → Reads review (filters to OPEN review points), plans fixes
+3. **Code Implementor** → Executes fixes, pushes, triggering the next additive review round
 
 **Workflow 3 — Resume Interrupted Work:**
 Use the `resume` skill (`.github/skills/resume/SKILL.md`) to reconstruct progress from git history, memory files, and plan progress markers.

@@ -1,7 +1,7 @@
 ---
 name: Code Implementor
 description: "Executes the implementation plan: writes code + tests per feature, commits per layer, builds, tests, validates API, and opens a PR."
-user-invokable: false
+user-invokable: true
 disable-model-invocation: true
 model: GPT-5.3-Codex (copilot)
 tools: ['search', 'edit', 'execute', 'read', 'read/problems', 'todo', 'web/fetch', 'github/*', 'google-search/*', 'microsoftdocs/mcp/*', 'vscode/askQuestions']
@@ -141,6 +141,22 @@ After each commit, append a progress comment to the plan memory file:
 ```
 This enables resume if the session is interrupted.
 
+#### 1f-bis. Log Review Point Resolutions (Fix Cycles Only)
+
+If the plan originates from a PR review (the plan has a `## Review Points Being Addressed` section), append an RP resolution entry to the plan memory file after each relevant commit:
+
+```markdown
+<!-- RP-RESOLVED: RP-<ID> | Fixed in <short-hash> | <what was changed> | Tested by <test name or "existing tests pass"> -->
+```
+
+Example:
+```markdown
+<!-- RP-RESOLVED: RP-1 | Fixed in a1b2c3d | Removed Name from CreateHouseholdResult | Tested by existing integration tests -->
+<!-- RP-RESOLVED: RP-2 | Fixed in e4f5g6h | Added password complexity rules to RegisterUserValidator | Tested by Should_Fail_When_Password_Missing_Uppercase + 4 more -->
+```
+
+These markers enable the PR Reviewer's additive round to quickly confirm fixes without re-reading all code.
+
 #### 1g. Repeat for Next Feature
 Move to the next feature group in the plan. Each commit should represent a buildable, testable increment.
 
@@ -186,7 +202,7 @@ Before pushing, review your changes against the plan:
 git push origin <branch-name>
 ```
 
-Use GitHub tools to create a Pull Request:
+**If creating a new PR:** Use GitHub tools to create a Pull Request:
 - **Base:** `master`
 - **Title:** `feat(<context>): #<issue> — <title>`
 - **Body:**
@@ -212,6 +228,57 @@ Use GitHub tools to create a Pull Request:
 
   Closes #<issue>
   ```
+
+**If pushing to an existing PR (fix cycle):** Reply directly to the reviewer's inline comments on the PR, then post a summary.
+
+#### Step 7a. Reply to Each Review Comment Thread
+
+Read the review memory file (`.github/agents/memory/code-reviewer-<issue>.md`) and find the `## Review Points` table. For each Review Point you addressed:
+
+1. Get the `GitHub Comment ID` from the memory file
+2. Use the GitHub `add_reply_to_pull_request_comment` tool to post a **threaded reply** on that comment:
+
+```
+✅ Addressed in `<short-hash>` — <what was changed>.
+Tested by: <test name(s) or "existing tests pass">.
+```
+
+Example replies:
+
+> **On RP-1 (reviewer said: "CreateHouseholdResult returns name — spec says householdId only"):**
+> ✅ Addressed in `a1b2c3d` — removed `Name` from `CreateHouseholdResult` record and updated handler + integration test.
+> Tested by: existing integration tests pass (updated `HouseholdCreatedBody` deserialization).
+
+> **On RP-2 (reviewer said: "Password validator only enforces MinimumLength(8)"):**
+> ✅ Addressed in `e4f5g6h` — added uppercase, lowercase, digit, and special character rules to `RegisterUserValidator`.
+> Tested by: `Should_Fail_When_Password_Missing_Uppercase` + 4 new unit tests.
+
+If a Review Point was **not addressed** (e.g., deferred or disagreed with), reply explaining why:
+
+```
+⏭️ Not addressed — <reason>. Suggest discussing in next review round.
+```
+
+#### Step 7b. Post Summary Comment
+
+After replying to all threads, post a single **top-level summary comment** on the PR:
+
+```markdown
+## Review Fix Push — <date>
+
+### Review Points Addressed
+| RP | Status | What Changed | Commit | Tests |
+|---|---|---|---|---|
+| RP-1 | ✅ Addressed | Removed `Name` from `CreateHouseholdResult` | `a1b2c3d` | Existing integration tests pass |
+| RP-2 | ✅ Addressed | Added password complexity rules | `e4f5g6h` | 5 new unit tests added |
+
+### Build & Test
+- Build: ✅ PASS
+- Unit tests: <X> passed, 0 failed
+- All green: ✅
+```
+
+This creates a conversational flow: the reviewer comments → the implementor replies in-thread explaining the fix → the reviewer (next round) replies again confirming resolution or noting remaining issues.
 
 **NEVER merge the PR** — leave it open for human review.
 
@@ -257,6 +324,11 @@ Create `.github/agents/memory/implementation-<issue-number>.md`:
 
 ## Deviations from Plan
 <List any deviations from the implementation plan, with justification. "None" if fully aligned.>
+
+## Review Points Addressed (Fix Cycles Only)
+| RP | Status | What Changed | Commit | Tests |
+|---|---|---|---|---|
+| RP-1 | ✅ Addressed | <description> | <short-hash> | <test names or "existing tests pass"> |
 ```
 
 ## Hexagonal Architecture Rules — Quick Reference

@@ -55,4 +55,13 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
         _factory.Dispose();
         await _postgres.DisposeAsync();
     }
+
+    /// <summary>Fetches the invitation token directly from the DB — for use in integration tests only.</summary>
+    public async Task<string?> GetInvitationTokenAsync(Guid invitationId)
+    {
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var inv = await db.Invitations.FindAsync(invitationId);
+        return inv?.Token;
+    }
 }

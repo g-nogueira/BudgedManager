@@ -23,6 +23,8 @@ node_modules/
 frontend/.svelte-kit/
 frontend/build/
 frontend/dist/
+# Agent memory (runtime files, not for version control)
+.github/agents/memory/
 # OS
 .DS_Store
 Thumbs.db

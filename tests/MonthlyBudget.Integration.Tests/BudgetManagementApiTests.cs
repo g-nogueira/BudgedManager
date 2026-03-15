@@ -124,7 +124,7 @@ public sealed class BudgetManagementApiTests : IClassFixture<IntegrationTestFixt
     }
 
     // ── Response bodies ───────────────────────────────────────────────────────────
-    private sealed record LoginBody(string AccessToken, string RefreshToken, Guid UserId, Guid? HouseholdId);
+    private sealed record LoginBody(string AccessToken, string RefreshToken);
     private sealed record BudgetBody(Guid BudgetId, string Status);
     private sealed record ActivateBody(Guid BudgetId, string Status);
 }

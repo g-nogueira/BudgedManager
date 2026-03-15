@@ -78,12 +78,35 @@ public sealed class PostgresInvitationRepository : IInvitationRepository
         => await _db.Invitations.FirstOrDefaultAsync(
             i => i.HouseholdId == householdId && i.Status == InvitationStatus.PENDING, ct);
 
+    public async Task<IReadOnlyList<Invitation>> FindAllExpiredPendingAsync(CancellationToken ct = default)
+        => await _db.Invitations
+            .Where(i => i.Status == InvitationStatus.PENDING && i.ExpiresAt < DateTime.UtcNow)
+            .ToListAsync(ct);
+
     public async Task SaveAsync(Invitation invitation, CancellationToken ct = default)
     {
         var existing = await _db.Invitations
             .FindAsync(new object[] { invitation.InvitationId }, ct);
         if (existing == null) _db.Invitations.Add(invitation);
         else _db.Entry(existing).CurrentValues.SetValues(invitation);
+        await _db.SaveChangesAsync(ct);
+    }
+
+    public async Task SaveAllAsync(IEnumerable<Invitation> invitations, CancellationToken ct = default)
+    {
+        var list = invitations.ToList();
+        var ids = list.Select(i => i.InvitationId).ToList();
+        var existing = await _db.Invitations
+            .Where(i => ids.Contains(i.InvitationId))
+            .ToDictionaryAsync(i => i.InvitationId, ct);
+
+        foreach (var invitation in list)
+        {
+            if (existing.TryGetValue(invitation.InvitationId, out var tracked))
+                _db.Entry(tracked).CurrentValues.SetValues(invitation);
+            else
+                _db.Invitations.Add(invitation);
+        }
         await _db.SaveChangesAsync(ct);
     }
 }

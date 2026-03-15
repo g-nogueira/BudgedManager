@@ -11,6 +11,7 @@ using MonthlyBudget.IdentityHousehold.Application.Ports;
 using MonthlyBudget.IdentityHousehold.Domain.Repositories;
 using MonthlyBudget.IdentityHousehold.Infrastructure.Auth;
 using MonthlyBudget.IdentityHousehold.Infrastructure.Email;
+using MonthlyBudget.IdentityHousehold.Infrastructure.Events;
 using MonthlyBudget.ForecastEngine.Infrastructure.Events;
 using MonthlyBudget.Infrastructure.Acl;
 using MonthlyBudget.Infrastructure.Database;
@@ -43,6 +44,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
         services.AddScoped<ITokenService, JwtTokenService>();
         services.AddScoped<IEmailService, ConsoleEmailService>();
+        services.AddScoped<IHouseholdEventPublisher, MediatRHouseholdEventPublisher>();
 
         // ── MediatR — all module assemblies ─────────────────────────────────────
         services.AddMediatR(cfg =>
@@ -53,11 +55,17 @@ public static class ServiceCollectionExtensions
                 typeof(ForecastEngine.Application.Features.GenerateForecast.GenerateForecastHandler).Assembly);
             cfg.RegisterServicesFromAssembly(
                 typeof(IdentityHousehold.Application.Features.RegisterUser.RegisterUserHandler).Assembly);
+            cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
 
         // ── FluentValidation — all module assemblies ─────────────────────────────
         services.AddValidatorsFromAssemblyContaining<
             BudgetManagement.Application.Features.CreateBudget.CreateBudgetValidator>();
+        services.AddValidatorsFromAssemblyContaining<
+            IdentityHousehold.Application.Features.RegisterUser.RegisterUserValidator>();
+
+        // ── Background Services ───────────────────────────────────────────────
+        services.AddHostedService<ExpireStaleInvitationsService>();
 
         return services;
     }

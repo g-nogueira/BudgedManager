@@ -4,8 +4,11 @@ public class HouseholdFullException : IdentityDomainException { public Household
 public class DuplicateOwnerException : IdentityDomainException { public DuplicateOwnerException() : base("Household already has an OWNER.") {} }
 public class DuplicateEmailException : IdentityDomainException { public DuplicateEmailException(string email) : base($"Email '{email}' is already registered.") {} }
 public class InvitationExpiredException : IdentityDomainException { public InvitationExpiredException() : base("This invitation has expired.") {} }
+public class InvitationNotFoundException : IdentityDomainException { public InvitationNotFoundException() : base("Invitation not found.") {} }
 public class InvalidCredentialsException : IdentityDomainException { public InvalidCredentialsException() : base("Invalid email or password.") {} }
 public class HouseholdNotFoundException : IdentityDomainException { public HouseholdNotFoundException(Guid id) : base($"Household '{id}' was not found.") {} }
+public class UserAlreadyInHouseholdException : IdentityDomainException { public UserAlreadyInHouseholdException() : base("User already belongs to a household.") {} }
+public class InsufficientRoleException : IdentityDomainException { public InsufficientRoleException() : base("Only the OWNER can perform this action.") {} }
 public sealed class PendingInvitationExistsException : IdentityDomainException
 {
     public PendingInvitationExistsException(Guid householdId)

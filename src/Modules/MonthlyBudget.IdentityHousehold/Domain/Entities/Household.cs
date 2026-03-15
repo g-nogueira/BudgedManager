@@ -24,4 +24,25 @@ public class Household
             throw new DuplicateOwnerException();
         _members.Add(Member.Create(userId, role));
     }
+
+    /// <summary>
+    /// INV-H2: Only the OWNER may invite new members.
+    /// </summary>
+    public void AuthorizeInvite(Guid actorUserId)
+    {
+        var member = _members.FirstOrDefault(m => m.UserId == actorUserId);
+        if (member?.Role != MemberRole.OWNER)
+            throw new InsufficientRoleException();
+    }
+
+    /// <summary>
+    /// INV-H4: Enforces that only one pending invitation may exist per household at a time.
+    /// The caller resolves whether a pending invitation exists (requires a repo query)
+    /// and passes the result so the invariant is declared and enforced in the domain.
+    /// </summary>
+    public void GuardPendingInvitation(bool hasPendingInvitation)
+    {
+        if (hasPendingInvitation)
+            throw new PendingInvitationExistsException(HouseholdId);
+    }
 }

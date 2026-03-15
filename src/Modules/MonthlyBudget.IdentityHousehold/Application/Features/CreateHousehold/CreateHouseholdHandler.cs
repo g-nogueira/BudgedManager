@@ -18,6 +18,6 @@ public sealed class CreateHouseholdHandler : IRequestHandler<CreateHouseholdComm
         var household = Household.Create(cmd.Name, cmd.UserId);
         await _repo.SaveAsync(household, ct);
         await _events.PublishAsync(new HouseholdCreated(household.HouseholdId, cmd.UserId), ct);
-        return new CreateHouseholdResult(household.HouseholdId, household.Name);
+        return new CreateHouseholdResult(household.HouseholdId);
     }
 }

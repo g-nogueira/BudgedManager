@@ -250,7 +250,7 @@ public sealed class IdentityApiTests : IClassFixture<IntegrationTestFixture>
     // ── Response DTOs ─────────────────────────────────────────────────────────────
 
     private sealed record LoginBody(string AccessToken, string RefreshToken);
-    private sealed record HouseholdCreatedBody(Guid HouseholdId, string Name);
+    private sealed record HouseholdCreatedBody(Guid HouseholdId);
     private sealed record HouseholdDto(Guid HouseholdId, string Name, List<MemberDto> Members);
     private sealed record MemberDto(Guid UserId, string Role);
     private sealed record InvitationBody(Guid InvitationId);

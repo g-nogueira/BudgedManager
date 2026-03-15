@@ -63,10 +63,18 @@ git diff --name-only master
 
 ## Step 5: Verify Build State
 
+### Backend (.NET)
 ```powershell
 dotnet build
 dotnet test
 ```
+
+### Frontend (SvelteKit)
+```powershell
+cd frontend; pnpm check && pnpm lint && pnpm test
+```
+
+Run the appropriate commands based on which stack the feature branch targets. If unsure, check the plan memory file for `**Stack:**` metadata.
 
 Record whether the current state builds and tests pass.
 
@@ -107,10 +115,10 @@ Based on the assessment:
 
 - **If mid-feature (partial files, failing tests):** Complete the current feature first
 - **If between features (last feature committed, next not started):** Start the next feature group
-- **If all features done but no PR:** Run hexagonal validation, API exercise, then push and open PR
+- **If all features done but no PR:** Run validation (hexagonal for backend, type check + lint for frontend), then push and open PR
 - **If PR exists but review has issues:** Read the review memory file and plan fixes
 
-Continue following the **Code Implementor** workflow from the identified resume point.
+Continue following the **Backend Implementor** or **Frontend Implementor** workflow (depending on the stack) from the identified resume point.
 
 ## Important
 

@@ -1,14 +1,18 @@
 ---
 name: Issue Reader
-description: "Fetches a GitHub issue, its parent epic, sub-issues, and full context. Writes structured memory for handoff to the Implementation Planner."
+description: "Fetches a GitHub issue, its parent epic, sub-issues, and full context. Writes structured memory for handoff to the Backend Planner or Frontend Planner."
 user-invokable: true
 disable-model-invocation: true
 model: Claude Opus 4.6 (copilot)
 tools: ['search', 'read', 'edit/createFile', 'todo', 'github/*', 'vscode/askQuestions']
 handoffs:
-  - label: "Hand off to Implementation Planner"
-    agent: Implementation Planner
-    prompt: "Issue context has been written to memory. Read the memory file and plan the implementation."
+  - label: "Hand off to Backend Planner"
+    agent: Backend Planner
+    prompt: "Issue context has been written to memory. Read the memory file and plan the backend implementation."
+    send: false
+  - label: "Hand off to Frontend Planner"
+    agent: Frontend Planner
+    prompt: "Issue context has been written to memory. Read the memory file and plan the frontend implementation."
     send: false
 ---
 

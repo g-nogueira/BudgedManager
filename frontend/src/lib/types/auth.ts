@@ -17,7 +17,7 @@ export interface Household {
 
 export interface HouseholdMember {
   userId: string;
-  role: string;
+  role: MemberRole;
 }
 
 export interface CreateHouseholdResult {

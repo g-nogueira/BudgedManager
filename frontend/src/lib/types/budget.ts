@@ -22,7 +22,7 @@ export interface IncomeSource {
 export interface Expense {
   expenseId: string;
   name: string;
-  category: string;
+  category: ExpenseCategory;
   dayOfMonth: number | null;
   isSpread: boolean;
   amount: number;

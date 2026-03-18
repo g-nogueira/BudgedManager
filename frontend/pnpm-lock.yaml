@@ -10,9 +10,6 @@ importers:
       chart.js:
         specifier: ^4.5.1
         version: 4.5.1
-      svelte-chartjs:
-        specifier: ^4.0.1
-        version: 4.0.1(chart.js@4.5.1)(svelte@5.53.12)
     devDependencies:
       '@eslint/js':
         specifier: ^10.0.1
@@ -2008,15 +2005,6 @@ packages:
       }
     engines: { node: '>=8' }
 
-  svelte-chartjs@4.0.1:
-    resolution:
-      {
-        integrity: sha512-4z+0J+w/6ADH2Cy+/AnVek2HxRrznQ7dJfWTybc9BHm9//DCb1BmLrSE3NGDRDLj+kwJbKw2o1tPLBE3CmdHmw==
-      }
-    peerDependencies:
-      chart.js: ^3.5.0 || ^4.0.0
-      svelte: ^5.0.0
-
   svelte-check@4.4.5:
     resolution:
       {
@@ -3385,11 +3373,6 @@ snapshots:
   strip-indent@3.0.0:
     dependencies:
       min-indent: 1.0.1
-
-  svelte-chartjs@4.0.1(chart.js@4.5.1)(svelte@5.53.12):
-    dependencies:
-      chart.js: 4.5.1
-      svelte: 5.53.12
 
   svelte-check@4.4.5(picomatch@4.0.3)(svelte@5.53.12)(typescript@5.9.3):
     dependencies:

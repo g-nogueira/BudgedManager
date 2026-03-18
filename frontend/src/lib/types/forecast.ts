@@ -4,7 +4,7 @@ export interface Forecast {
   forecastId: string;
   budgetId: string;
   versionLabel: string;
-  forecastType: string;
+  forecastType: ForecastType;
   startDay: number;
   startBalance: number;
   endOfMonthBalance: number;
@@ -15,7 +15,7 @@ export interface Forecast {
 export interface ForecastSummary {
   forecastId: string;
   versionLabel: string;
-  forecastType: string;
+  forecastType: ForecastType;
   endOfMonthBalance: number;
   isSnapshot: boolean;
   createdAt: string;

@@ -31,7 +31,7 @@ export interface Expense {
 
 export interface CreateBudgetResult {
   budgetId: string;
-  status: string;
+  status: BudgetStatus;
 }
 
 export interface AddIncomeResult {
@@ -44,7 +44,7 @@ export interface AddExpenseResult {
 
 export interface ActivateBudgetResult {
   budgetId: string;
-  status: string;
+  status: BudgetStatus;
 }
 
 export interface RolloverMonthResult {

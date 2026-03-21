@@ -18,9 +18,9 @@ public sealed class ForecastController : ControllerBase
     public ForecastController(IMediator mediator) { _mediator = mediator; }
     private Guid HouseholdId => Guid.Parse(User.FindFirstValue("householdId")!);
     [HttpPost]
-    public async Task<IActionResult> Generate(Guid budgetId, [FromBody] GenerateForecastRequest req, CancellationToken ct)
+    public async Task<IActionResult> Generate(Guid budgetId, CancellationToken ct)
     {
-        var result = await _mediator.Send(new GenerateForecastCommand(budgetId, HouseholdId, req.StartBalance), ct);
+        var result = await _mediator.Send(new GenerateForecastCommand(budgetId, HouseholdId), ct);
         return CreatedAtAction(nameof(GetById), new { budgetId, forecastId = result.ForecastId }, result);
     }
     [HttpGet("{forecastId:guid}")]

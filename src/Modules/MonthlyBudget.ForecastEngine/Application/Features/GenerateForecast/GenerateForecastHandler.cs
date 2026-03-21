@@ -19,7 +19,7 @@ public sealed class GenerateForecastHandler : IRequestHandler<GenerateForecastCo
         var snapshots = data.Expenses.Select(e =>
             ExpenseSnapshot.Create(Guid.NewGuid(), e.ExpenseId, e.Name, e.Category, e.DayOfMonth, e.IsSpread, e.Amount, e.IsExcluded)
         ).ToList();
-        var forecast = ForecastCalculator.Generate(cmd.BudgetId, cmd.HouseholdId, cmd.StartBalance, monthDays, snapshots);
+        var forecast = ForecastCalculator.Generate(cmd.BudgetId, cmd.HouseholdId, data.TotalIncome, monthDays, snapshots);
         await _repo.SaveAsync(forecast, ct);
         return new GenerateForecastResult(forecast.ForecastId, forecast.VersionLabel, forecast.GetEndOfMonthBalance(), forecast.DailyEntries.Count);
     }

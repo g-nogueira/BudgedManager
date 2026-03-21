@@ -69,6 +69,11 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
         Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
         var body = await resp.Content.ReadFromJsonAsync<ForecastBody>();
         Assert.NotEqual(Guid.Empty, body!.ForecastId);
+
+        var detailResp = await client.GetAsync($"/api/v1/budgets/{budgetId}/forecasts/{body.ForecastId}");
+        detailResp.EnsureSuccessStatusCode();
+        var detail = await detailResp.Content.ReadFromJsonAsync<ForecastDetailBody>();
+        Assert.Equal(5000m, detail!.StartBalance);
     }
 
     [Fact]
@@ -157,7 +162,7 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
     private sealed record BudgetBody(Guid BudgetId, string Status);
     private sealed record ForecastBody(Guid ForecastId, string VersionLabel, decimal EndOfMonthBalance, int DayCount);
     private sealed record SnapshotBody(Guid ForecastId, bool IsSnapshot);
-    private sealed record ForecastDetailBody(Guid ForecastId, bool IsSnapshot);
+    private sealed record ForecastDetailBody(Guid ForecastId, bool IsSnapshot, decimal StartBalance);
     private sealed record ForecastSummaryBody(Guid ForecastId, string VersionLabel);
     private sealed record ComparisonBody(
         Guid ForecastAId, Guid ForecastBId, string LabelA, string LabelB,

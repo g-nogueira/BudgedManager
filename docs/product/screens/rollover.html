@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Month Rollover Review - MonthlyBudget</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#9116c4",
+              "primary-container": "#d67aff",
+              "background": "#f5f7fa",
+              "surface": "#ffffff",
+              "surface-container-low": "#f8fafc",
+              "surface-container-lowest": "#ffffff",
+              "on-surface": "#1b1b1e",
+              "on-surface-variant": "#64748b",
+              "brand-light": "#eef1f4"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans", "sans-serif"],
+              "body": ["Be Vietnam Pro", "sans-serif"],
+              "label": ["Be Vietnam Pro", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+            boxShadow: {
+              'sidebar': '0 30px 60px -15px rgba(145,22,196,0.08)',
+              'navbar': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #f5f7fa; }
+      h1, h2, h3, h4, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .material-symbols-outlined.fill-1 {
+        font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-on-surface min-h-screen flex">
+<!-- Sidebar -->
+<aside class="fixed left-0 top-0 h-screen w-64 bg-white rounded-r-xl shadow-sidebar z-40 flex flex-col">
+<div class="mb-10 px-6 pt-8">
+<span class="text-2xl font-black text-[#9116c4] tracking-tight">MonthlyBudget</span>
+</div>
+<nav class="flex-1 space-y-2 px-4">
+<button class="w-full flex items-center gap-4 text-slate-500 hover:bg-[#eef1f4] rounded-full px-6 py-3 transition-colors">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-semibold">Dashboard</span>
+</button>
+<button class="w-full flex items-center gap-4 bg-[#9116c4] text-white rounded-full px-6 py-3 shadow-lg">
+<span class="material-symbols-outlined fill-1">account_balance_wallet</span>
+<span class="font-semibold">Budget</span>
+</button>
+<button class="w-full flex items-center gap-4 text-slate-500 hover:bg-[#eef1f4] rounded-full px-6 py-3 transition-colors">
+<span class="material-symbols-outlined">query_stats</span>
+<span class="font-semibold">Forecast</span>
+</button>
+<button class="w-full flex items-center gap-4 text-slate-500 hover:bg-[#eef1f4] rounded-full px-6 py-3 transition-colors">
+<span class="material-symbols-outlined">group</span>
+<span class="font-semibold">Household Settings</span>
+</button>
+</nav>
+<div class="bg-[#eef1f4] rounded-lg p-4 mx-4 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-[#9116c4] flex items-center justify-center text-white font-bold text-sm">GN</div>
+<div class="overflow-hidden">
+<p class="font-bold text-sm truncate">Guilherme Nogueira</p>
+<p class="text-[10px] text-slate-500 font-medium">Owner</p>
+</div>
+</div>
+</aside>
+<!-- Top Navbar -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] z-40 bg-white/70 backdrop-blur-md border-b border-slate-100 py-6 px-12 flex justify-between items-center">
+<h1 class="text-2xl font-extrabold text-[#9116c4] tracking-tight">Month Rollover</h1>
+<div class="flex items-center gap-6">
+<div class="relative">
+<input class="bg-[#eef1f4] border-none rounded-full px-4 py-2 pl-10 text-sm focus:ring-2 focus:ring-[#9116c4] w-64" placeholder="Search..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+</div>
+<button class="text-slate-500 hover:text-[#9116c4] transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-slate-500 hover:text-[#9116c4] transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 pt-32 pb-40 px-12">
+<div class="max-w-4xl mx-auto space-y-12">
+<!-- Hero Header -->
+<section class="text-center space-y-4">
+<h2 class="text-5xl font-black tracking-tight text-on-surface">Welcome to April 2026! 🎊</h2>
+<p class="text-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed font-medium">
+                We've carried forward your recurring expenses from March. Review and adjust anything that changed, then hit Go.
+            </p>
+</section>
+<!-- Bento Grid - Income & Variable Notes -->
+<div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+<!-- Income Card -->
+<div class="md:col-span-3 bg-white rounded-lg p-8 shadow-sm border border-slate-100">
+<div class="flex justify-between items-end mb-8">
+<div>
+<span class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-60">Total Projected</span>
+<h3 class="text-3xl font-black text-on-surface">Income Sources</h3>
+</div>
+<div class="text-4xl font-black text-emerald-500">€5,200.00</div>
+</div>
+<div class="space-y-4">
+<div class="group flex items-center justify-between p-4 bg-surface-container-low rounded-xl hover:bg-slate-100 transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<span class="font-bold text-on-surface">Salary</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-bold text-on-surface">€4,200.00</span>
+<button class="opacity-0 group-hover:opacity-100 text-on-surface-variant hover:text-red-500 transition-all">
+<span class="material-symbols-outlined text-xl">delete</span>
+</button>
+</div>
+</div>
+<div class="group flex items-center justify-between p-4 bg-surface-container-low rounded-xl hover:bg-slate-100 transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+<span class="material-symbols-outlined">work</span>
+</div>
+<span class="font-bold text-on-surface">Freelance</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-bold text-on-surface">€1,000.00</span>
+<button class="opacity-0 group-hover:opacity-100 text-on-surface-variant hover:text-red-500 transition-all">
+<span class="material-symbols-outlined text-xl">delete</span>
+</button>
+</div>
+</div>
+<button class="w-full mt-4 flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-200 rounded-xl text-on-surface-variant font-bold hover:border-primary hover:text-primary transition-all group">
+<span class="material-symbols-outlined transition-transform group-hover:rotate-90">add</span>
+                        Add Income
+                    </button>
+</div>
+</div>
+<!-- Variable Note Card -->
+<div class="md:col-span-2 bg-[#9116c4] rounded-lg p-8 text-white flex flex-col justify-between overflow-hidden relative">
+<div class="relative z-10">
+<h3 class="text-xl font-black mb-4">Variable Spends</h3>
+<p class="text-sm opacity-90 leading-relaxed mb-8">
+                        Don't forget to set aside buffers for dining out, groceries, and leisure. These are flexible but crucial for your forecast.
+                    </p>
+</div>
+<button class="relative z-10 w-full bg-white/20 backdrop-blur-md hover:bg-white/30 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 border border-white/20">
+<span class="material-symbols-outlined">analytics</span>
+                    Add Variable Expense
+                </button>
+<div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+</div>
+</div>
+<!-- Fixed Expenses Card -->
+<section class="bg-white rounded-lg p-8 shadow-sm border border-slate-100">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-2xl font-black text-on-surface">Fixed Expenses</h3>
+<div class="px-6 py-2 bg-slate-100 rounded-full font-bold text-sm text-slate-700">
+                    Total: €1,380.00
+                </div>
+</div>
+<div class="space-y-2">
+<div class="grid grid-cols-12 px-4 pb-2 text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-50">
+<div class="col-span-6">Merchant &amp; Date</div>
+<div class="col-span-3 text-right">Amount</div>
+<div class="col-span-3 text-right">Actions</div>
+</div>
+<!-- Expense Item 1 -->
+<div class="grid grid-cols-12 items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-all group">
+<div class="col-span-6 flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[#9116c4]">home</span>
+</div>
+<div>
+<div class="font-black text-on-surface">Rent</div>
+<div class="text-xs text-on-surface-variant font-bold uppercase tracking-tighter">Day 1 • Monthly</div>
+</div>
+</div>
+<div class="col-span-3 text-right font-black text-on-surface">€1,200.00</div>
+<div class="col-span-3 flex justify-end items-center gap-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#9116c4]"></div>
+</label>
+<button class="p-2 text-slate-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+</div>
+<!-- Expense Item 2 -->
+<div class="grid grid-cols-12 items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-all group">
+<div class="col-span-6 flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[#9116c4]">health_and_safety</span>
+</div>
+<div>
+<div class="font-black text-on-surface">Insurance</div>
+<div class="text-xs text-on-surface-variant font-bold uppercase tracking-tighter">Day 5 • Monthly</div>
+</div>
+</div>
+<div class="col-span-3 text-right font-black text-on-surface">€180.00</div>
+<div class="col-span-3 flex justify-end items-center gap-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#9116c4]"></div>
+</label>
+<button class="p-2 text-slate-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Subscriptions Card -->
+<section class="bg-white rounded-lg p-8 shadow-sm border border-slate-100">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-[#9116c4] text-3xl">subscriptions</span>
+<h3 class="text-2xl font-black text-on-surface">Active Subscriptions</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex items-center justify-between p-6 bg-slate-50 rounded-2xl border border-slate-100">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-red-600">movie</span>
+</div>
+<div>
+<p class="font-black text-on-surface">Netflix</p>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">Day 15</p>
+</div>
+</div>
+<p class="font-black text-on-surface">€15.99</p>
+</div>
+<div class="flex items-center justify-between p-6 bg-slate-50 rounded-2xl border border-slate-100">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-emerald-600">music_note</span>
+</div>
+<div>
+<p class="font-black text-on-surface">Spotify</p>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">Day 15</p>
+</div>
+</div>
+<p class="font-black text-on-surface">€9.99</p>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Floating Bottom Summary Bar -->
+<footer class="fixed bottom-8 left-[calc(50%+4rem)] -translate-x-1/2 z-50 flex justify-between items-center gap-12 bg-white/80 backdrop-blur-2xl w-auto min-w-[800px] rounded-full px-10 py-5 shadow-[0_20px_50px_rgba(145,22,196,0.12)] border border-[#9116c4]/10">
+<div class="flex items-center gap-10">
+<div class="flex flex-col">
+<span class="text-[9px] font-black uppercase tracking-widest text-slate-400">Total Income</span>
+<span class="font-headline font-black text-emerald-600 flex items-center gap-2 text-lg">
+<span class="material-symbols-outlined text-xl">payments</span>
+                €5,200.00
+            </span>
+</div>
+<div class="w-px h-8 bg-slate-100"></div>
+<div class="flex flex-col">
+<span class="text-[9px] font-black uppercase tracking-widest text-slate-400">Total Expenses</span>
+<span class="font-headline font-black text-slate-800 flex items-center gap-2 text-lg">
+<span class="material-symbols-outlined text-xl">event_repeat</span>
+                €2,890.98
+            </span>
+</div>
+<div class="w-px h-8 bg-slate-100"></div>
+<div class="flex flex-col">
+<span class="text-[9px] font-black uppercase tracking-widest text-slate-400">Remaining</span>
+<span class="font-headline font-black text-[#9116c4] flex items-center gap-2 text-lg">
+<span class="material-symbols-outlined text-xl">account_balance</span>
+                €2,309.02
+            </span>
+</div>
+</div>
+<button class="bg-[#9116c4] text-white px-8 py-4 rounded-full font-black text-base hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95 flex items-center gap-3">
+        Finalize &amp; Generate Forecast
+        <span class="material-symbols-outlined text-xl">arrow_forward</span>
+</button>
+</footer>
+</body></html>

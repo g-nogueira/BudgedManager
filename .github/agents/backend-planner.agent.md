@@ -1,7 +1,7 @@
 ---
 name: Backend Planner
 description: "Reads issue context from memory, analyzes the .NET codebase, and produces a precise file-level implementation plan. Hands off to the Backend Implementor."
-user-invokable: true
+user-invocable: true
 disable-model-invocation: true
 model: Claude Opus 4.6 (copilot)
 tools: ['search', 'read', 'execute', 'edit/createFile', 'todo', 'vscode/askQuestions']

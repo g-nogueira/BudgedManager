@@ -45,6 +45,7 @@
 | INV-F5 | Daily entries must be chronologically ordered | `generate()` ensures ordering |
 | INV-F6 | Start balance for ORIGINAL equals total income | Validated against budget income sum at generation time |
 | INV-F7 | Only one ORIGINAL forecast per budget | Repository enforces unique constraint on `(budgetId, forecastType=ORIGINAL)` |
+| INV-F8 | Reforecast expense adjustments must reference valid parent snapshots | `MODIFY` and `REMOVE` actions require `originalExpenseId` matching an existing parent `ExpenseSnapshot`. `ADD` must provide all required expense fields. Validated in `ReforecastValidator`. |
 
 ### Corrective Policies
 

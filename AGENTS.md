@@ -72,6 +72,53 @@ dotnet run --project src/MonthlyBudget.Api
 
 ---
 
+## Custom Agent Workflows
+
+The repository now uses two distinct custom-agent loops under `.github/agents/`:
+
+### 1. Product Discovery & UI Alignment
+
+`Product Manager → UI Designer → Software Architect → Product Manager`
+
+- **Product Manager** writes PRDs and user stories to `docs/product/<feature>-prd.md`
+- **UI Designer** uses Google Stitch MCP to generate full UI screens and records them in `docs/product/<feature>-screens.md`
+- **Software Architect** validates feasibility, API/data-model alignment, and bounded-context fit before implementation starts
+
+These agents must use `docs/product/` artifacts as the source of truth for product/design decisions rather than chat-only context.
+
+### 3. Project Startup (Architecture → Issues)
+
+`Product Manager → UI Designer → Software Architect → Issue Writer → Issue Reader → Planner → Implementor`
+
+Full pipeline from product definition to trackable implementation work:
+1. **Product Manager** writes PRD → **UI Designer** generates screens → **Software Architect** creates architecture docs
+2. **Issue Writer** (Mode A) reads PRD user stories + arch docs → creates one GitHub issue per user story on Project #6
+3. **Issue Reader** picks up an issue and feeds it into the delivery pipeline
+
+### 4. Post-Implementation Design Review (Gaps → Issues)
+
+`Software Architect → Issue Writer → Issue Reader → Planner → Implementor`
+
+Used when UI designs are created after backend implementation has started:
+1. **Software Architect** reviews designs vs. codebase → produces/updates `docs/arch/design-gaps.md`
+2. **Issue Writer** (Mode B) reads `design-gaps.md` → creates one issue per GAP on Project #6
+3. **Issue Reader** picks up a gap issue and feeds it into the delivery pipeline
+
+### 2. Delivery Pipeline
+
+`Issue Reader → Backend/Frontend Planner → Backend/Frontend Implementor → Backend/Frontend Reviewer`
+
+- Memory files live in `.github/agents/memory/`
+- Naming convention:
+	- `issue-reader-<issue-number>.md`
+	- `plan-<issue-number>.md`
+	- `implementation-<issue-number>.md`
+	- `code-reviewer-<issue-number>.md`
+
+Use the product/design loop first when the team needs to define or align the UX before implementation. Use the delivery pipeline when executing scoped engineering work from an issue or review. Use the project startup flow (3) when going from zero to implementation. Use the design review flow (4) when designs arrive after implementation has started.
+
+---
+
 ## Critical Domain Invariants
 
 These must be enforced in the Aggregate Root, not in handlers or controllers:

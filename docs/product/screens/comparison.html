@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MonthlyBudget | Forecast Comparison</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill-1 {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .chart-gradient-purple {
+            background: linear-gradient(180deg, rgba(145, 22, 196, 0.1) 0%, rgba(145, 22, 196, 0) 100%);
+        }
+        .chart-gradient-green {
+            background: linear-gradient(180deg, rgba(0, 204, 153, 0.1) 0%, rgba(0, 204, 153, 0) 100%);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e5e8ec;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "inverse-surface": "#0b0f11",
+                "tertiary-fixed-dim": "#fc7d78",
+                "surface-container-low": "#eef1f4",
+                "surface-container-highest": "#d9dde1",
+                "surface-dim": "#d0d5d9",
+                "on-secondary": "#ffeefa",
+                "on-tertiary-fixed-variant": "#711518",
+                "primary-fixed-dim": "#ce63ff",
+                "surface": "#ffffff",
+                "on-tertiary-fixed": "#3a0004",
+                "tertiary": "#a03837",
+                "secondary-container": "#ffbbfe",
+                "inverse-primary": "#cc5eff",
+                "on-primary-fixed-variant": "#4b0069",
+                "on-tertiary-container": "#650a11",
+                "surface-variant": "#d9dde1",
+                "on-primary-container": "#3d0056",
+                "on-secondary-container": "#72257a",
+                "on-primary": "#feeeff",
+                "on-error-container": "#510017",
+                "on-error": "#ffefef",
+                "surface-container": "#e5e8ec",
+                "secondary": "#8a3b90",
+                "error": "#b41340",
+                "inverse-on-surface": "#9a9da0",
+                "primary": "#9116c4",
+                "tertiary-dim": "#902c2c",
+                "on-surface-variant": "#595c5e",
+                "on-tertiary": "#ffefee",
+                "outline-variant": "#abadb0",
+                "on-background": "#2c2f32",
+                "on-surface": "#2c2f32",
+                "on-secondary-fixed": "#5c0b65",
+                "surface-container-high": "#dfe3e7",
+                "outline": "#74777a",
+                "error-dim": "#a70138",
+                "surface-container-lowest": "#ffffff",
+                "error-container": "#f74b6d",
+                "tertiary-container": "#ff928c",
+                "primary-fixed": "#d67aff",
+                "secondary-dim": "#7c2e83",
+                "primary-container": "#d67aff",
+                "on-primary-fixed": "#000000",
+                "tertiary-fixed": "#ff928c",
+                "on-secondary-fixed-variant": "#7d2f84",
+                "primary-dim": "#8100b3",
+                "secondary-fixed": "#ffbbfe",
+                "secondary-fixed-dim": "#fda5ff",
+                "surface-bright": "#f5f7fa",
+                "surface-tint": "#9116c4",
+                "background": "#f5f7fa",
+                "comparison-green": "#00CC99"
+              },
+              fontFamily: {
+                "headline": ["Plus Jakarta Sans"],
+                "body": ["Be Vietnam Pro"],
+                "label": ["Be Vietnam Pro"]
+              },
+              borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background font-body text-on-background min-h-screen">
+<!-- SideNavBar Component -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-white rounded-r-xl shadow-[30px_0_60px_-15px_rgba(145,22,196,0.08)] z-40 flex flex-col py-8 overflow-y-auto">
+<div class="mb-10 px-6">
+<h1 class="text-2xl font-black text-[#9116c4] tracking-tight">MonthlyBudget</h1>
+</div>
+<nav class="flex flex-col space-y-2 px-4 flex-1">
+<a class="flex items-center gap-4 text-slate-500 hover:bg-[#eef1f4] rounded-full px-6 py-3 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-semibold text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 text-slate-500 hover:bg-[#eef1f4] rounded-full px-6 py-3 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-semibold text-sm">Budget</span>
+</a>
+<a class="flex items-center gap-4 bg-[#9116c4] text-white rounded-full px-6 py-3 shadow-lg transition-all duration-300" href="#">
+<span class="material-symbols-outlined fill-1">query_stats</span>
+<span class="font-semibold text-sm">Forecast</span>
+</a>
+<a class="flex items-center gap-4 text-slate-500 hover:bg-[#eef1f4] rounded-full px-6 py-3 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-semibold text-sm">Household Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-4">
+<div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+<div class="w-10 h-10 rounded-full bg-[#9116c4] flex items-center justify-center text-white font-bold text-sm">GN</div>
+<div class="flex flex-col min-w-0">
+<span class="text-sm font-bold text-on-surface truncate">Guilherme Nogueira</span>
+<span class="text-[10px] text-on-surface-variant font-medium uppercase tracking-wider">Owner</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Top Navbar -->
+<nav class="fixed top-0 right-0 w-[calc(100%-16rem)] z-40 bg-transparent backdrop-blur-md py-6 px-12 flex items-center justify-between">
+<h2 class="text-2xl font-extrabold text-[#9116c4]">Forecast Comparison</h2>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
+<input class="pl-10 pr-4 py-2 bg-[#eef1f4] border-none rounded-full text-sm focus:ring-primary/20 w-64" placeholder="Search..." type="text"/>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-24 p-12 max-w-[1440px] mx-auto">
+<!-- Header/Version Selection Section -->
+<header class="flex flex-col lg:flex-row lg:items-center justify-between mb-12 gap-6">
+<div class="space-y-1">
+<nav class="flex items-center text-on-surface-variant text-xs font-medium space-x-2">
+<span>Forecasts</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">Comparison</span>
+</nav>
+<h1 class="text-3xl font-headline font-extrabold tracking-tight text-on-surface">Compare Forecasts</h1>
+</div>
+<!-- Version Selectors -->
+<div class="flex items-center gap-3 bg-surface-container-low p-2 rounded-full shadow-sm">
+<!-- Version A -->
+<div class="flex items-center gap-3 px-4 py-2 bg-surface rounded-full shadow-sm border border-slate-100">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-wider text-on-surface-variant font-bold">Version A</span>
+<span class="text-sm font-semibold">Original Mar 1</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_more</span>
+</div>
+<button class="w-10 h-10 flex items-center justify-center bg-primary-container text-primary rounded-full hover:rotate-180 transition-transform duration-500">
+<span class="material-symbols-outlined">swap_horiz</span>
+</button>
+<!-- Version B -->
+<div class="flex items-center gap-3 px-4 py-2 bg-surface rounded-full shadow-sm border border-slate-100">
+<div class="w-2 h-2 rounded-full bg-comparison-green"></div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-wider text-on-surface-variant font-bold">Version B</span>
+<span class="text-sm font-semibold text-comparison-green">Re-forecast Mar 15</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_more</span>
+</div>
+</div>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Chart Section (Spans 12) -->
+<section class="col-span-12 bg-surface rounded-lg p-8 relative overflow-hidden shadow-sm border border-slate-100">
+<div class="flex justify-between items-start mb-10">
+<div class="flex flex-wrap gap-10">
+<div>
+<p class="text-xs font-medium text-on-surface-variant mb-1">Projected End Balance (A)</p>
+<h3 class="text-2xl font-headline font-bold text-primary">€2,847.50</h3>
+</div>
+<div>
+<p class="text-xs font-medium text-on-surface-variant mb-1">Projected End Balance (B)</p>
+<h3 class="text-2xl font-headline font-bold text-comparison-green">€2,420.00</h3>
+</div>
+<div class="lg:border-l border-outline-variant/20 lg:pl-10">
+<p class="text-xs font-medium text-on-surface-variant mb-1">Net Drift (Δ)</p>
+<h3 class="text-2xl font-headline font-bold text-error">-€427.50</h3>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-low p-1.5 rounded-full">
+<label class="flex items-center gap-2 px-3 py-1.5 bg-surface rounded-full cursor-pointer shadow-sm">
+<input checked="" class="rounded-sm text-primary focus:ring-primary/20 border-none bg-surface-container" type="checkbox"/>
+<span class="text-xs font-bold text-on-surface">Original</span>
+</label>
+<label class="flex items-center gap-2 px-3 py-1.5 cursor-pointer">
+<input checked="" class="rounded-sm text-comparison-green focus:ring-comparison-green/20 border-none bg-surface-container" type="checkbox"/>
+<span class="text-xs font-bold text-on-surface-variant">Adjusted</span>
+</label>
+</div>
+</div>
+<!-- Chart Visual -->
+<div class="h-80 w-full relative flex items-end">
+<!-- Today Marker -->
+<div class="absolute left-1/3 top-0 bottom-0 border-l-2 border-dashed border-outline-variant/30 z-10 flex flex-col items-center">
+<span class="bg-inverse-surface text-surface text-[10px] px-2 py-0.5 rounded-full mt-2 font-bold uppercase tracking-tighter">Today</span>
+</div>
+<!-- SVG Lines & Fills -->
+<svg class="absolute inset-0 w-full h-full" preserveaspectratio="none" viewbox="0 0 1000 300">
+<path d="M0,250 L150,230 L333,210 L500,190 L750,150 L1000,120 L1000,160 L750,190 L500,220 L333,240 L150,260 L0,270 Z" fill="rgba(145, 22, 196, 0.05)"></path>
+<path d="M0,270 Q150,260 333,240 T500,220 T750,190 T1000,160" fill="none" stroke="#9116c4" stroke-linecap="round" stroke-width="4"></path>
+<path d="M0,250 Q150,230 333,210 T500,190 T750,150 T1000,120" fill="none" stroke="#00CC99" stroke-linecap="round" stroke-width="4"></path>
+</svg>
+<div class="absolute bottom-0 w-full flex justify-between text-[10px] font-bold text-outline uppercase pt-4 border-t border-outline-variant/10">
+<span>Mar 01</span>
+<span>Mar 08</span>
+<span>Mar 15</span>
+<span>Mar 22</span>
+<span>Mar 31</span>
+</div>
+</div>
+</section>
+<!-- Expense Drift Section (Spans 7) -->
+<section class="col-span-12 lg:col-span-7 space-y-6">
+<div class="bg-surface rounded-lg p-8 shadow-sm border border-slate-100">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h2 class="text-xl font-headline font-extrabold text-on-surface">What Changed?</h2>
+<p class="text-sm text-on-surface-variant mt-1 font-medium">Total impact: <span class="text-error font-bold">-€427.50</span></p>
+</div>
+<button class="bg-surface-container-low p-2 rounded-full text-on-surface-variant hover:bg-primary-container hover:text-primary transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+<div class="space-y-4">
+<!-- Drift Item -->
+<div class="group flex items-center justify-between p-5 bg-surface-container-low rounded-md hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined">electric_bolt</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Electricity</h4>
+<p class="text-xs text-on-surface-variant font-medium">Utility Variable Rate</p>
+</div>
+</div>
+<div class="flex items-center gap-8 text-right">
+<div class="hidden sm:block">
+<p class="text-[10px] font-bold text-outline-variant uppercase">Old vs New</p>
+<p class="text-sm font-semibold">€85.00 <span class="text-outline-variant">→</span> €95.00</p>
+</div>
+<div>
+<p class="text-[10px] font-bold text-outline-variant uppercase">Impact</p>
+<p class="text-sm font-extrabold text-error">+€10.00</p>
+</div>
+</div>
+</div>
+<!-- Drift Item -->
+<div class="group flex items-center justify-between p-5 bg-surface-container-low rounded-md hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined">directions_car</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Car Repair <span class="ml-2 text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full uppercase tracking-tighter">New Entry</span></h4>
+<p class="text-xs text-on-surface-variant font-medium">Unplanned maintenance</p>
+</div>
+</div>
+<div class="flex items-center gap-8 text-right">
+<div class="hidden sm:block">
+<p class="text-[10px] font-bold text-outline-variant uppercase">Old vs New</p>
+<p class="text-sm font-semibold">€0.00 <span class="text-outline-variant">→</span> €200.00</p>
+</div>
+<div>
+<p class="text-[10px] font-bold text-outline-variant uppercase">Impact</p>
+<p class="text-sm font-extrabold text-error">+€200.00</p>
+</div>
+</div>
+</div>
+<!-- Drift Item -->
+<div class="group flex items-center justify-between p-5 bg-surface-container-low rounded-md hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Dining Out</h4>
+<p class="text-xs text-on-surface-variant font-medium">Monthly allocation</p>
+</div>
+</div>
+<div class="flex items-center gap-8 text-right">
+<div class="hidden sm:block">
+<p class="text-[10px] font-bold text-outline-variant uppercase">Old vs New</p>
+<p class="text-sm font-semibold">€400.00 <span class="text-outline-variant">→</span> €350.00</p>
+</div>
+<div>
+<p class="text-[10px] font-bold text-outline-variant uppercase">Impact</p>
+<p class="text-sm font-extrabold text-comparison-green">-€50.00</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Variance Table Section (Spans 5) -->
+<section class="col-span-12 lg:col-span-5 bg-surface rounded-lg p-8 overflow-hidden flex flex-col max-h-[600px] shadow-sm border border-slate-100">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-xl font-headline font-extrabold text-on-surface">Daily Drift</h2>
+<span class="text-[10px] font-bold bg-surface-container-low px-3 py-1 rounded-full text-on-surface-variant">March 2026</span>
+</div>
+<div class="flex-1 overflow-y-auto pr-2">
+<table class="w-full text-left border-separate border-spacing-y-2">
+<thead class="sticky top-0 bg-surface z-10">
+<tr>
+<th class="pb-4 text-[10px] font-bold text-outline-variant uppercase pl-4">Day</th>
+<th class="pb-4 text-[10px] font-bold text-outline-variant uppercase text-right">Ver A</th>
+<th class="pb-4 text-[10px] font-bold text-outline-variant uppercase text-right">Ver B</th>
+<th class="pb-4 text-[10px] font-bold text-outline-variant uppercase text-right pr-4">Δ</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="bg-surface-container-low rounded-md">
+<td class="py-4 pl-4 font-bold rounded-l-md">Mar 01</td>
+<td class="py-4 text-right font-medium">€4,500.00</td>
+<td class="py-4 text-right font-medium">€4,500.00</td>
+<td class="py-4 text-right font-bold text-on-surface-variant pr-4 rounded-r-md">€0.00</td>
+</tr>
+<tr class="bg-surface rounded-md border border-slate-100">
+<td class="py-4 pl-4 font-bold rounded-l-md">Mar 05</td>
+<td class="py-4 text-right font-medium">€4,250.00</td>
+<td class="py-4 text-right font-medium text-comparison-green">€4,310.00</td>
+<td class="py-4 text-right font-bold text-comparison-green pr-4 rounded-r-md">+€60.00</td>
+</tr>
+<tr class="bg-surface-container-low rounded-md">
+<td class="py-4 pl-4 font-bold rounded-l-md">Mar 12</td>
+<td class="py-4 text-right font-medium">€3,800.00</td>
+<td class="py-4 text-right font-medium text-comparison-green">€3,650.00</td>
+<td class="py-4 text-right font-bold text-error pr-4 rounded-r-md">-€150.00</td>
+</tr>
+<tr class="bg-surface rounded-md border border-slate-100">
+<td class="py-4 pl-4 font-bold rounded-l-md">Mar 18</td>
+<td class="py-4 text-right font-medium">€3,100.00</td>
+<td class="py-4 text-right font-medium text-comparison-green">€2,850.00</td>
+<td class="py-4 text-right font-bold text-error pr-4 rounded-r-md">-€250.00</td>
+</tr>
+<tr class="bg-surface-container-low rounded-md">
+<td class="py-4 pl-4 font-bold rounded-l-md">Mar 25</td>
+<td class="py-4 text-right font-medium">€2,950.00</td>
+<td class="py-4 text-right font-medium text-comparison-green">€2,550.00</td>
+<td class="py-4 text-right font-bold text-error pr-4 rounded-r-md">-€400.00</td>
+</tr>
+<tr class="bg-surface rounded-md border border-slate-100">
+<td class="py-4 pl-4 font-bold rounded-l-md">Mar 31</td>
+<td class="py-4 text-right font-medium">€2,847.50</td>
+<td class="py-4 text-right font-medium text-comparison-green">€2,420.00</td>
+<td class="py-4 text-right font-bold text-error pr-4 rounded-r-md">-€427.50</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</main>
+</body></html>

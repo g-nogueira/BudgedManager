@@ -64,11 +64,16 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
     public async Task GenerateForecast_ActiveBudget_Returns201WithForecastId()
     {
         var (client, budgetId) = await SetupActiveBudgetAsync("2026-09");
-        var resp = await client.PostAsJsonAsync(
-            $"/api/v1/budgets/{budgetId}/forecasts", new { startBalance = 3000m });
+        var resp = await client.PostAsync(
+            $"/api/v1/budgets/{budgetId}/forecasts", null);
         Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
         var body = await resp.Content.ReadFromJsonAsync<ForecastBody>();
         Assert.NotEqual(Guid.Empty, body!.ForecastId);
+
+        var detailResp = await client.GetAsync($"/api/v1/budgets/{budgetId}/forecasts/{body.ForecastId}");
+        detailResp.EnsureSuccessStatusCode();
+        var detail = await detailResp.Content.ReadFromJsonAsync<ForecastDetailBody>();
+        Assert.Equal(5000m, detail!.StartBalance);
     }
 
     [Fact]
@@ -76,8 +81,8 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
     {
         var (client, budgetId) = await SetupActiveBudgetAsync("2026-10");
 
-        var genResp = await client.PostAsJsonAsync(
-            $"/api/v1/budgets/{budgetId}/forecasts", new { startBalance = 2500m });
+        var genResp = await client.PostAsync(
+            $"/api/v1/budgets/{budgetId}/forecasts", null);
         genResp.EnsureSuccessStatusCode();
         var forecast = await genResp.Content.ReadFromJsonAsync<ForecastBody>();
 
@@ -94,8 +99,8 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
         var (client, budgetId) = await SetupActiveBudgetAsync("2026-11");
 
         // Generate original forecast
-        var genResp = await client.PostAsJsonAsync(
-            $"/api/v1/budgets/{budgetId}/forecasts", new { startBalance = 3000m });
+        var genResp = await client.PostAsync(
+            $"/api/v1/budgets/{budgetId}/forecasts", null);
         genResp.EnsureSuccessStatusCode();
         var original = await genResp.Content.ReadFromJsonAsync<ForecastBody>();
 
@@ -117,7 +122,7 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
     public async Task GetAllForecasts_AfterGenerate_ReturnsNonEmptyList()
     {
         var (client, budgetId) = await SetupActiveBudgetAsync("2026-12");
-        await client.PostAsJsonAsync($"/api/v1/budgets/{budgetId}/forecasts", new { startBalance = 4000m });
+        await client.PostAsync($"/api/v1/budgets/{budgetId}/forecasts", null);
         var resp = await client.GetAsync($"/api/v1/budgets/{budgetId}/forecasts");
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
         var list = await resp.Content.ReadFromJsonAsync<List<ForecastSummaryBody>>();
@@ -130,8 +135,8 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
         var (client, budgetId) = await SetupActiveBudgetAsync("2027-01");
 
         // Generate original forecast
-        var genResp1 = await client.PostAsJsonAsync(
-            $"/api/v1/budgets/{budgetId}/forecasts", new { startBalance = 3000m });
+        var genResp1 = await client.PostAsync(
+            $"/api/v1/budgets/{budgetId}/forecasts", null);
         genResp1.EnsureSuccessStatusCode();
         var forecastA = await genResp1.Content.ReadFromJsonAsync<ForecastBody>();
 
@@ -157,7 +162,7 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
     private sealed record BudgetBody(Guid BudgetId, string Status);
     private sealed record ForecastBody(Guid ForecastId, string VersionLabel, decimal EndOfMonthBalance, int DayCount);
     private sealed record SnapshotBody(Guid ForecastId, bool IsSnapshot);
-    private sealed record ForecastDetailBody(Guid ForecastId, bool IsSnapshot);
+    private sealed record ForecastDetailBody(Guid ForecastId, bool IsSnapshot, decimal StartBalance);
     private sealed record ForecastSummaryBody(Guid ForecastId, string VersionLabel);
     private sealed record ComparisonBody(
         Guid ForecastAId, Guid ForecastBId, string LabelA, string LabelB,

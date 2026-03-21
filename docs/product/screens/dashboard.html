@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MonthlyBudget Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Be+Vietnam+Pro:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#9116c4",
+              "background": "#f5f7fa",
+              "primary-container": "#d67aff",
+              "on-primary": "#ffffff",
+              "on-surface": "#2c2f32",
+              "on-surface-variant": "#595c5e",
+              "surface-container-low": "#eef1f4",
+              "surface-container-lowest": "#ffffff",
+              "outline": "#74777a",
+              "error": "#b41340"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans", "sans-serif"],
+              "body": ["Be Vietnam Pro", "sans-serif"],
+              "label": ["Be Vietnam Pro", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+            boxShadow: {
+              'sidebar': '30px 0 60px -15px rgba(145,22,196,0.08)',
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #f5f7fa; }
+        h1, h2, h3, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .filled-icon {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #9116c4 0%, #d67aff 100%);
+        }
+    </style>
+</head>
+<body class="text-on-surface selection:bg-primary-container selection:text-on-primary">
+<!-- Sidebar -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-white rounded-r-xl shadow-sidebar z-50 flex flex-col py-8 overflow-y-auto">
+<!-- Logo Area -->
+<div class="px-8 mb-10">
+<span class="text-2xl font-black text-primary tracking-tight">MonthlyBudget</span>
+</div>
+<!-- Nav Items -->
+<nav class="flex-1 px-4 space-y-2">
+<!-- Dashboard (Active) -->
+<a class="flex items-center gap-4 px-6 py-3 bg-primary text-white rounded-full shadow-lg transition-all" href="#">
+<span class="material-symbols-outlined filled-icon" data-icon="dashboard">dashboard</span>
+<span class="font-semibold">Dashboard</span>
+</a>
+<!-- Budget -->
+<a class="flex items-center gap-4 px-6 py-3 text-slate-500 hover:bg-surface-container-low hover:text-primary rounded-full transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-medium">Budget</span>
+</a>
+<!-- Forecast -->
+<a class="flex items-center gap-4 px-6 py-3 text-slate-500 hover:bg-surface-container-low hover:text-primary rounded-full transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="query_stats">query_stats</span>
+<span class="font-medium">Forecast</span>
+</a>
+<!-- Household Settings -->
+<a class="flex items-center gap-4 px-6 py-3 text-slate-500 hover:bg-surface-container-low hover:text-primary rounded-full transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="group">group</span>
+<span class="font-medium">Household Settings</span>
+</a>
+</nav>
+<!-- User Profile Card -->
+<div class="px-4 mt-auto">
+<div class="bg-surface-container-low rounded-lg p-4 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-[#9116c4] flex items-center justify-center text-white font-bold text-sm">GN</div>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-on-surface">Guilherme Nogueira</span>
+<span class="text-[11px] text-on-surface-variant font-medium">Owner</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Top Navbar -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] z-40 bg-transparent backdrop-blur-md py-6 px-12 flex justify-between items-center">
+<h1 class="text-2xl font-extrabold text-primary tracking-tight">Dashboard</h1>
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-xl" data-icon="search">search</span>
+<input class="bg-surface-container-low border-none rounded-full py-2.5 pl-12 pr-6 text-sm w-64 focus:ring-2 focus:ring-primary/20 placeholder:text-outline font-body" placeholder="Search..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2.5 text-on-surface hover:bg-surface-container-low rounded-full transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2.5 right-2.5 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2.5 text-on-surface hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 pt-24 p-12 min-h-screen">
+<div class="max-w-6xl mx-auto space-y-10">
+<!-- Hero Section: Forecast (Preserved) -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-6 pl-4 border-l-8 border-primary/20">
+<div class="space-y-2">
+<div class="flex items-center gap-3">
+<span class="text-on-surface-variant font-label text-sm uppercase tracking-wider">End-of-Month Forecast</span>
+<span class="px-3 py-1 bg-[#00CC99]/10 text-[#00CC99] rounded-full text-xs font-bold uppercase">On Track</span>
+</div>
+<div class="flex flex-col">
+<span class="text-5xl md:text-7xl font-headline font-extrabold text-[#00CC99] tracking-tighter">€2,847.50</span>
+<div class="flex items-center gap-2 mt-2">
+<span class="text-on-surface-variant text-lg">Today's Balance: <span class="font-semibold text-on-surface">€4,125.00</span></span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-3xl font-headline font-bold text-on-surface-variant">March 2026</span>
+<span class="text-sm text-outline">12 days remaining</span>
+</div>
+</section>
+<!-- Forecast Chart Area (Preserved) -->
+<section class="bg-surface-container-lowest rounded-lg p-8 shadow-[0px_20px_40px_rgba(44,47,50,0.06)] relative overflow-hidden group">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="text-xl font-headline font-bold">Balance Projection</h3>
+<p class="text-sm text-on-surface-variant">Based on recurring expenses and spending habits</p>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 bg-surface-container-low rounded-full text-xs font-bold hover:bg-surface-container-high transition-colors">Daily</button>
+<button class="px-4 py-2 bg-primary text-on-primary rounded-full text-xs font-bold">Weekly</button>
+</div>
+</div>
+<!-- Abstract Chart Visualization -->
+<div class="h-64 w-full relative">
+<div class="absolute inset-0 flex flex-col justify-between opacity-10">
+<div class="h-px bg-outline"></div>
+<div class="h-px bg-outline"></div>
+<div class="h-px bg-outline"></div>
+<div class="h-px bg-outline"></div>
+</div>
+<svg class="absolute inset-0 w-full h-full drop-shadow-xl" preserveaspectratio="none" viewbox="0 0 1000 200">
+<defs>
+<lineargradient id="gradient" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#9116c4" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#9116c4" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,80 C100,60 200,100 300,90 C400,80 500,120 600,110 C700,100 800,150 900,140 C1000,130 1000,200 1000,200 L0,200 Z" fill="url(#gradient)"></path>
+<path d="M0,80 C100,60 200,100 300,90 C400,80 500,120 600,110 C700,100 800,150 900,140 C1000,130 1000,130" fill="none" stroke="#9116c4" stroke-linecap="round" stroke-width="4"></path>
+<line opacity="0.4" stroke="#9116c4" stroke-dasharray="8 4" stroke-width="2" x1="600" x2="600" y1="0" y2="200"></line>
+<circle cx="600" cy="110" fill="#9116c4" r="6"></circle>
+<circle class="animate-pulse" cx="600" cy="110" fill="none" r="12" stroke="#9116c4" stroke-width="2"></circle>
+</svg>
+<div class="absolute left-[60%] top-[-10px] transform -translate-x-1/2 bg-on-surface text-white px-3 py-1 rounded-sm text-[10px] font-bold z-10">
+                    TODAY: €4,125
+                </div>
+</div>
+<div class="flex justify-between mt-4 px-2 text-[10px] font-bold text-outline uppercase tracking-widest">
+<span>Day 1</span>
+<span>Day 7</span>
+<span>Day 14</span>
+<span>Day 21</span>
+<span>Day 31</span>
+</div>
+</section>
+<!-- Quick Actions (Preserved) -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<button class="primary-gradient p-6 rounded-lg text-left flex items-center justify-between group hover:scale-[1.02] transition-transform duration-300">
+<div class="space-y-1">
+<span class="text-on-primary/80 text-xs font-bold uppercase tracking-wider">Simulation</span>
+<h4 class="text-xl font-headline font-bold text-on-primary">Re-Forecast</h4>
+</div>
+<div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary" data-icon="refresh">refresh</span>
+</div>
+</button>
+<button class="bg-surface-container-lowest p-6 rounded-lg text-left flex items-center justify-between border-2 border-primary/10 group hover:border-primary/30 transition-colors">
+<div class="space-y-1">
+<span class="text-on-surface-variant text-xs font-bold uppercase tracking-wider">Archive</span>
+<h4 class="text-xl font-headline font-bold text-primary">Save Snapshot</h4>
+</div>
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="bookmark">bookmark</span>
+</div>
+</button>
+<button class="bg-surface-container-lowest p-6 rounded-lg text-left flex items-center justify-between border-2 border-primary/10 group hover:border-primary/30 transition-colors">
+<div class="space-y-1">
+<span class="text-on-surface-variant text-xs font-bold uppercase tracking-wider">Analysis</span>
+<h4 class="text-xl font-headline font-bold text-primary">Compare Forecasts</h4>
+</div>
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="compare_arrows">compare_arrows</span>
+</div>
+</button>
+</section>
+<!-- Upcoming Expenses & Activity (Preserved) -->
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+<div class="bg-surface-container-low rounded-lg p-8">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xl font-headline font-bold">Upcoming Expenses</h3>
+<a class="text-primary text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all" href="#">
+                        View Full Budget <span class="material-symbols-outlined text-xs" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="electric_bolt">electric_bolt</span>
+</div>
+<div>
+<p class="font-bold">Utility Bill</p>
+<p class="text-xs text-on-surface-variant">Due in 3 days</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-error">€142.00</p>
+<p class="text-[10px] text-outline uppercase font-black">March 24</p>
+</div>
+</div>
+<div class="flex items-center justify-between bg-surface-container-lowest p-4 rounded-md shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="home">home</span>
+</div>
+<div>
+<p class="font-bold">Mortgage Payment</p>
+<p class="text-xs text-on-surface-variant">Automated</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-error">€1,250.00</p>
+<p class="text-[10px] text-outline uppercase font-black">March 28</p>
+</div>
+</div>
+<div class="flex items-center justify-between bg-surface-container-lowest p-4 rounded-md shadow-sm opacity-60">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="shopping_cart">shopping_cart</span>
+</div>
+<div>
+<p class="font-bold">Subscription Renewal</p>
+<p class="text-xs text-on-surface-variant">Adobe Creative Cloud</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-error">€59.99</p>
+<p class="text-[10px] text-outline uppercase font-black">April 01</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Monthly Summary Card -->
+<div class="bg-primary-container rounded-lg p-8 relative overflow-hidden flex flex-col justify-between">
+<div class="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+<div>
+<span class="material-symbols-outlined text-white text-4xl mb-4 filled-icon" data-icon="calendar_month">calendar_month</span>
+<h3 class="text-2xl font-headline font-extrabold text-white mb-2">Monthly Summary</h3>
+<p class="text-white/90 text-lg leading-relaxed">
+                        You have <span class="font-bold">12 days</span> remaining in March. Your forecast shows <span class="font-bold">€2,847.50</span> end-of-month balance with <span class="font-bold">4 expenses</span> still to come.
+                    </p>
+</div>
+<a class="mt-6 self-start px-6 py-3 bg-white text-primary font-bold rounded-full hover:bg-white/90 transition-colors" href="#">
+                    View Full Forecast
+                </a>
+</div>
+</section>
+</div>
+</main>
+</body></html>

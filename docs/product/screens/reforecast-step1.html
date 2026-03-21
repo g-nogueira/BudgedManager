@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MonthlyBudget - Enter Actual Balance</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#9116c4",
+              "primary-container": "#d67aff",
+              "background": "#f5f7fa",
+              "on-surface": "#2c2f32",
+              "on-secondary": "#ffffff",
+              "surface-variant": "#e3e2e6",
+              "inverse-surface": "#303033",
+              "surface-container": "#efedf1",
+              "surface": "#faf9fc",
+              "surface-container-highest": "#e3e2e6",
+              "on-error": "#ffffff",
+              "error-container": "#ffdad6",
+              "on-surface-variant": "#4f4253",
+              "outline": "#817284",
+              "on-primary": "#ffffff",
+              "inverse-on-surface": "#f2f0f4",
+              "surface-bright": "#faf9fc",
+              "surface-container-high": "#e9e7eb",
+              "secondary": "#7d4895",
+              "outline-variant": "#d3c1d5",
+              "surface-container-low": "#f5f3f7",
+              "surface-dim": "#dbd9dd",
+              "surface-container-lowest": "#ffffff",
+              "error": "#ba1a1a",
+              "secondary-container": "#e7aaff",
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans", "sans-serif"],
+              "body": ["Be Vietnam Pro", "sans-serif"],
+              "label": ["Be Vietnam Pro", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      body { font-family: 'Be Vietnam Pro', sans-serif; }
+      h1, h2, h3, h4, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .material-symbols-outlined.fill-1 {
+        font-variation-settings: 'FILL' 1;
+      }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary-container/30 selection:text-primary">
+<!-- Top Navigation -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] z-40 bg-transparent backdrop-blur-md flex justify-between items-center py-6 px-12">
+<div class="text-2xl font-extrabold text-primary tracking-tight">Re-Forecast</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="bg-[#eef1f4] border-none rounded-full py-2 pl-12 pr-6 w-64 focus:ring-2 focus:ring-primary/20 transition-all text-sm" placeholder="Search..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-slate-500 hover:bg-[#eef1f4] p-2 rounded-full transition-colors">notifications</button>
+<button class="material-symbols-outlined text-slate-500 hover:bg-[#eef1f4] p-2 rounded-full transition-colors">help_outline</button>
+</div>
+</header>
+<!-- Side Navigation -->
+<nav class="fixed left-0 top-0 h-full w-64 bg-white rounded-r-xl shadow-[30px_0_60px_-15px_rgba(145,22,196,0.08)] z-40 flex flex-col py-8 overflow-hidden">
+<div class="mb-10 px-8">
+<div class="text-2xl font-black text-[#9116c4] tracking-tight">MonthlyBudget</div>
+</div>
+<div class="flex-1 px-4 space-y-2">
+<div class="flex items-center gap-4 px-6 py-3 text-slate-500 hover:bg-[#eef1f4] rounded-full cursor-pointer transition-colors group">
+<span class="material-symbols-outlined shrink-0">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</div>
+<div class="flex items-center gap-4 px-6 py-3 text-slate-500 hover:bg-[#eef1f4] rounded-full cursor-pointer transition-colors group">
+<span class="material-symbols-outlined shrink-0">account_balance_wallet</span>
+<span class="font-medium">Budget</span>
+</div>
+<div class="flex items-center gap-4 px-6 py-3 bg-[#9116c4] text-white rounded-full shadow-lg cursor-pointer transition-all">
+<span class="material-symbols-outlined fill-1 shrink-0">query_stats</span>
+<span class="font-medium">Forecast</span>
+</div>
+<div class="flex items-center gap-4 px-6 py-3 text-slate-500 hover:bg-[#eef1f4] rounded-full cursor-pointer transition-colors group">
+<span class="material-symbols-outlined shrink-0">group</span>
+<span class="font-medium">Household Settings</span>
+</div>
+</div>
+<!-- User Profile Area -->
+<div class="mt-auto px-6 py-6 border-t border-slate-100 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-[#9116c4] flex items-center justify-center text-white font-bold text-sm">GN</div>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-on-surface">Guilherme Nogueira</span>
+<span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Owner</span>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="ml-64 pt-24 pb-32 px-12 min-h-screen flex flex-col items-center">
+<!-- Stepper Component -->
+<div class="w-full max-w-3xl mb-12">
+<div class="flex justify-between items-center relative">
+<!-- Progress Line -->
+<div class="absolute top-1/2 left-0 w-full h-[2px] bg-slate-200 -z-10 -translate-y-1/2"></div>
+<div class="absolute top-1/2 left-0 w-1/3 h-[2px] bg-primary -z-10 -translate-y-1/2"></div>
+<!-- Step 1: Active -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold shadow-lg shadow-primary/20">1</div>
+<span class="text-sm font-bold text-primary">Enter Balance</span>
+</div>
+<!-- Step 2: Inactive -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold">2</div>
+<span class="text-sm font-medium text-slate-500">Adjust Expenses</span>
+</div>
+<!-- Step 3: Inactive -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold">3</div>
+<span class="text-sm font-medium text-slate-500">Review &amp; Generate</span>
+</div>
+</div>
+</div>
+<!-- Main Input Card -->
+<div class="w-full max-w-3xl bg-white rounded-xl p-12 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.03)] flex flex-col items-center text-center">
+<div class="mb-2 uppercase tracking-[0.2em] text-primary font-extrabold text-[10px]">Step 1 of 3</div>
+<h1 class="text-4xl md:text-5xl font-extrabold text-on-surface tracking-tight mb-4">What's your actual bank balance today?</h1>
+<p class="text-slate-500 body-lg mb-12 max-w-lg">Your original forecast will be automatically saved as a snapshot, allowing you to track variance over time.</p>
+<!-- Currency Input Area -->
+<div class="w-full max-w-md relative mb-8 group">
+<div class="absolute left-6 top-1/2 -translate-y-1/2 text-4xl font-light text-slate-300">€</div>
+<input class="w-full bg-[#f5f7fa] border-none rounded-xl py-8 pl-16 pr-8 text-5xl font-black text-on-surface focus:ring-4 focus:ring-primary/10 focus:bg-white transition-all text-center tracking-tight" type="text" value="3,100.00"/>
+</div>
+<!-- Date Selection Row -->
+<div class="flex items-center gap-4 mb-10 px-6 py-3 bg-[#f5f7fa] rounded-full cursor-pointer hover:bg-slate-200 transition-colors">
+<span class="text-slate-500 font-medium text-sm">Re-forecast from:</span>
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined text-lg">calendar_today</span>
+<span>March 20, 2026</span>
+</div>
+</div>
+<!-- Info Callout -->
+<div class="w-full bg-primary/5 rounded-xl p-6 flex gap-4 items-start text-left mb-12 border border-primary/10">
+<span class="material-symbols-outlined text-primary mt-0.5">info</span>
+<p class="text-sm text-slate-500 leading-relaxed">
+                Days before <span class="font-bold text-on-surface">March 20</span> will keep their original forecast values. The new forecast starts from your entered balance.
+            </p>
+</div>
+<!-- Action Cluster -->
+<div class="flex flex-col sm:flex-row items-center gap-6 w-full justify-center">
+<button class="bg-[#9116c4] text-white px-12 py-5 rounded-full font-bold text-lg shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+                Next Step
+            </button>
+<button class="text-slate-500 font-semibold hover:text-on-surface transition-colors px-6">
+                Cancel
+            </button>
+</div>
+</div>
+<!-- Tonal Nesting Background Elements -->
+<div class="fixed -bottom-20 -right-20 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl -z-20"></div>
+<div class="fixed -top-20 -left-20 w-[400px] h-[400px] bg-primary-container/10 rounded-full blur-3xl -z-20"></div>
+</main>
+</body></html>

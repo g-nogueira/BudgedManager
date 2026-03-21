@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MonthlyBudget | March 2026 Budget Setup</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "background": "#f5f7fa",
+              "on-secondary": "#ffeefa",
+              "error-dim": "#a70138",
+              "error": "#b41340",
+              "on-primary-fixed": "#000000",
+              "outline": "#74777a",
+              "on-surface": "#2c2f32",
+              "on-secondary-fixed": "#5c0b65",
+              "surface-container-high": "#dfe3e7",
+              "on-tertiary": "#ffefee",
+              "primary-fixed-dim": "#ce63ff",
+              "surface-variant": "#d9dde1",
+              "secondary-dim": "#7c2e83",
+              "tertiary-dim": "#902c2c",
+              "on-secondary-container": "#72257a",
+              "on-error-container": "#510017",
+              "on-primary": "#feeeff",
+              "secondary-fixed": "#ffbbfe",
+              "surface": "#f5f7fa",
+              "inverse-surface": "#0b0f11",
+              "surface-dim": "#d0d5d9",
+              "on-primary-fixed-variant": "#4b0069",
+              "surface-container": "#e5e8ec",
+              "error-container": "#f74b6d",
+              "surface-tint": "#9116c4",
+              "primary-container": "#d67aff",
+              "secondary": "#8a3b90",
+              "surface-container-highest": "#d9dde1",
+              "tertiary-container": "#ff928c",
+              "outline-variant": "#abadb0",
+              "inverse-primary": "#cc5eff",
+              "primary-dim": "#8100b3",
+              "surface-bright": "#f5f7fa",
+              "surface-container-low": "#eef1f4",
+              "inverse-on-surface": "#9a9da0",
+              "secondary-fixed-dim": "#fda5ff",
+              "tertiary-fixed": "#ff928c",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-fixed-variant": "#711518",
+              "on-primary-container": "#3d0056",
+              "on-secondary-fixed-variant": "#7d2f84",
+              "on-error": "#ffefef",
+              "tertiary-fixed-dim": "#fc7d78",
+              "primary": "#9116c4",
+              "on-tertiary-container": "#650a11",
+              "secondary-container": "#ffbbfe",
+              "on-tertiary-fixed": "#3a0004",
+              "on-surface-variant": "#595c5e",
+              "tertiary": "#a03837",
+              "primary-fixed": "#d67aff",
+              "on-background": "#2c2f32"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Be Vietnam Pro"],
+              "label": ["Be Vietnam Pro"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #f5f7fa; }
+      .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+      .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+      .primary-gradient { background: linear-gradient(135deg, #9116c4 0%, #d67aff 100%); }
+      .sidebar-shadow { shadow: 30px 0 60px -15px rgba(145,22,196,0.08); }
+    </style>
+</head>
+<body class="text-on-surface antialiased bg-background">
+<div class="flex min-h-screen">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-white rounded-r-xl z-40 flex flex-col py-8 transition-all" style="box-shadow: 30px 0 60px -15px rgba(145,22,196,0.08);">
+<div class="px-8 mb-10">
+<span class="text-2xl font-black text-[#9116c4] tracking-tight font-headline">MonthlyBudget</span>
+</div>
+<nav class="flex-1 px-4 space-y-2">
+<a class="flex items-center gap-4 px-6 py-3 text-slate-500 hover:bg-[#eef1f4] rounded-full transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 bg-[#9116c4] text-white rounded-full shadow-lg" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<span class="font-medium">Budget</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-slate-500 hover:bg-[#eef1f4] rounded-full transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+<span class="font-medium">Forecast</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-slate-500 hover:bg-[#eef1f4] rounded-full transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-medium">Household Settings</span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<div class="bg-[#eef1f4] rounded-lg p-4 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-[#9116c4] flex items-center justify-center text-white font-bold text-sm">GN</div>
+<div class="overflow-hidden">
+<p class="text-sm font-bold truncate">Guilherme Nogueira</p>
+<p class="text-xs text-on-surface-variant truncate opacity-70">Owner</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 pt-24 pb-32">
+<!-- Top Navbar -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] z-40 bg-[#f5f7fa]/70 backdrop-blur-md flex justify-between items-center py-6 px-12 border-b border-purple-500/5">
+<div class="flex items-center gap-4">
+<h1 class="text-2xl font-extrabold text-[#9116c4] tracking-tight font-headline">March 2026 Budget</h1>
+<span class="px-3 py-1 bg-surface-container rounded-full text-[10px] font-bold text-on-surface-variant tracking-wider uppercase">DRAFT</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm" data-icon="search">search</span>
+<input class="bg-[#eef1f4] border-none rounded-full py-2 pl-10 pr-6 text-sm w-64 focus:ring-1 focus:ring-primary/20" placeholder="Search..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2.5 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2.5 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+<button class="px-6 py-2.5 rounded-full primary-gradient text-on-primary font-bold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity">
+                    Activate Budget
+                </button>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-12 space-y-12">
+<!-- Income Section -->
+<section>
+<div class="flex justify-between items-end mb-6">
+<div>
+<h2 class="text-3xl font-extrabold font-headline text-on-surface mb-1">Income Sources</h2>
+<p class="text-on-surface-variant font-medium">Tracking your monthly inflows</p>
+</div>
+<div class="text-right">
+<p class="text-xs font-bold text-primary tracking-widest uppercase mb-1">Total Inflow</p>
+<p class="text-3xl font-black font-headline text-on-surface">€5,200.00</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Salary Item -->
+<div class="bg-surface-container-lowest p-6 rounded-lg flex items-center justify-between group hover:shadow-xl hover:shadow-purple-500/5 transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+</div>
+<div>
+<p class="font-bold text-lg text-on-surface">Salary</p>
+<p class="text-sm text-on-surface-variant">Primary Employment</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-xl font-bold text-on-surface">€4,200.00</p>
+<div class="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity mt-2">
+<span class="material-symbols-outlined text-sm cursor-pointer hover:text-primary" data-icon="edit">edit</span>
+<span class="material-symbols-outlined text-sm cursor-pointer hover:text-error" data-icon="delete">delete</span>
+</div>
+</div>
+</div>
+<!-- Freelance Item -->
+<div class="bg-surface-container-lowest p-6 rounded-lg flex items-center justify-between group hover:shadow-xl hover:shadow-purple-500/5 transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="work">work</span>
+</div>
+<div>
+<p class="font-bold text-lg text-on-surface">Freelance</p>
+<p class="text-sm text-on-surface-variant">Side Projects</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-xl font-bold text-on-surface">€1,000.00</p>
+<div class="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity mt-2">
+<span class="material-symbols-outlined text-sm cursor-pointer hover:text-primary" data-icon="edit">edit</span>
+<span class="material-symbols-outlined text-sm cursor-pointer hover:text-error" data-icon="delete">delete</span>
+</div>
+</div>
+</div>
+<!-- Add Button -->
+<button class="md:col-span-2 py-4 border-2 border-dashed border-outline-variant/30 rounded-lg text-on-surface-variant font-bold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+                        Add Income
+                    </button>
+</div>
+</section>
+<!-- Expenses Section -->
+<section class="space-y-6">
+<div>
+<h2 class="text-3xl font-extrabold font-headline text-on-surface mb-1">Expenses</h2>
+<p class="text-on-surface-variant font-medium">Categorized monthly spending</p>
+</div>
+<!-- Expense Category: Fixed -->
+<div class="bg-surface-container-low rounded-lg overflow-hidden">
+<div class="flex items-center justify-between p-6 bg-surface-container-low cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="expand_more">expand_more</span>
+<h3 class="font-bold text-lg text-on-surface">Fixed Expenses</h3>
+<span class="bg-white/50 px-2 py-0.5 rounded text-xs font-bold text-on-surface-variant">3 ITEMS</span>
+</div>
+<p class="font-black text-lg text-on-surface">€1,380.00</p>
+</div>
+<div class="px-6 pb-6 space-y-3">
+<div class="bg-surface-container-lowest p-5 rounded-md flex items-center gap-4 shadow-sm">
+<div class="flex-1 flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="home">home</span>
+<div>
+<p class="font-bold text-on-surface">Rent</p>
+<span class="text-[10px] font-black uppercase tracking-tighter bg-surface-container px-2 py-0.5 rounded text-on-surface-variant">Day 1</span>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<p class="font-bold text-lg text-on-surface">€1,200.00</p>
+<div class="flex items-center gap-3 border-l border-surface-container pl-6">
+<div class="w-10 h-5 bg-primary/20 rounded-full relative cursor-pointer">
+<div class="absolute right-0.5 top-0.5 w-4 h-4 bg-primary rounded-full shadow-sm"></div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-5 rounded-md flex items-center gap-4 shadow-sm">
+<div class="flex-1 flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="security">security</span>
+<div>
+<p class="font-bold text-on-surface">Insurance</p>
+<span class="text-[10px] font-black uppercase tracking-tighter bg-surface-container px-2 py-0.5 rounded text-on-surface-variant">Day 5</span>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<p class="font-bold text-lg text-on-surface">€180.00</p>
+<div class="flex items-center gap-3 border-l border-surface-container pl-6">
+<div class="w-10 h-5 bg-primary/20 rounded-full relative cursor-pointer">
+<div class="absolute right-0.5 top-0.5 w-4 h-4 bg-primary rounded-full shadow-sm"></div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Expense Category: Subscriptions -->
+<div class="bg-surface-container-low rounded-lg overflow-hidden">
+<div class="flex items-center justify-between p-6 cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="expand_more">expand_more</span>
+<h3 class="font-bold text-lg text-on-surface">Subscriptions</h3>
+<span class="bg-white/50 px-2 py-0.5 rounded text-xs font-bold text-on-surface-variant">2 ITEMS</span>
+</div>
+<p class="font-black text-lg text-on-surface">€25.98</p>
+</div>
+<div class="px-6 pb-6 space-y-3">
+<div class="bg-surface-container-lowest p-5 rounded-md flex items-center gap-4 shadow-sm">
+<div class="flex-1 flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="movie">movie</span>
+<div>
+<p class="font-bold text-on-surface">Netflix</p>
+<span class="text-[10px] font-black uppercase tracking-tighter bg-surface-container px-2 py-0.5 rounded text-on-surface-variant">Day 15</span>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<p class="font-bold text-lg text-on-surface">€15.99</p>
+<div class="flex items-center gap-3 border-l border-surface-container pl-6">
+<div class="w-10 h-5 bg-primary/20 rounded-full relative cursor-pointer">
+<div class="absolute right-0.5 top-0.5 w-4 h-4 bg-primary rounded-full shadow-sm"></div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-5 rounded-md flex items-center gap-4 shadow-sm">
+<div class="flex-1 flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="music_note">music_note</span>
+<div>
+<p class="font-bold text-on-surface">Spotify</p>
+<span class="text-[10px] font-black uppercase tracking-tighter bg-surface-container px-2 py-0.5 rounded text-on-surface-variant">Day 15</span>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<p class="font-bold text-lg text-on-surface">€9.99</p>
+<div class="flex items-center gap-3 border-l border-surface-container pl-6">
+<div class="w-10 h-5 bg-primary/20 rounded-full relative cursor-pointer">
+<div class="absolute right-0.5 top-0.5 w-4 h-4 bg-primary rounded-full shadow-sm"></div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Expense Category: Variable -->
+<div class="bg-surface-container-low rounded-lg overflow-hidden">
+<div class="flex items-center justify-between p-6 cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="expand_more">expand_more</span>
+<h3 class="font-bold text-lg text-on-surface">Variable</h3>
+<span class="bg-white/50 px-2 py-0.5 rounded text-xs font-bold text-on-surface-variant">2 ITEMS</span>
+</div>
+<p class="font-black text-lg text-on-surface">€485.00</p>
+</div>
+<div class="px-6 pb-6 space-y-3">
+<div class="bg-surface-container-lowest p-5 rounded-md flex items-center gap-4 shadow-sm">
+<div class="flex-1 flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="shopping_basket">shopping_basket</span>
+<div>
+<p class="font-bold text-on-surface">Groceries</p>
+<span class="text-[10px] font-black uppercase tracking-tighter bg-primary/10 px-2 py-0.5 rounded text-primary">Spread</span>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<p class="font-bold text-lg text-on-surface">€400.00</p>
+<div class="flex items-center gap-3 border-l border-surface-container pl-6">
+<div class="w-10 h-5 bg-primary/20 rounded-full relative cursor-pointer">
+<div class="absolute right-0.5 top-0.5 w-4 h-4 bg-primary rounded-full shadow-sm"></div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+</div>
+<!-- Excluded Item -->
+<div class="bg-surface-container p-5 rounded-md flex items-center gap-4 opacity-60">
+<div class="flex-1 flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="bolt">bolt</span>
+<div>
+<p class="font-bold line-through text-on-surface">Electricity</p>
+<span class="text-[10px] font-black uppercase tracking-tighter bg-surface-container-high px-2 py-0.5 rounded text-on-surface-variant">Day 19</span>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<p class="font-bold text-lg line-through text-on-surface">€85.00</p>
+<div class="flex items-center gap-3 border-l border-surface-container-high pl-6">
+<div class="w-10 h-5 bg-surface-variant rounded-full relative cursor-pointer">
+<div class="absolute left-0.5 top-0.5 w-4 h-4 bg-on-surface-variant/40 rounded-full"></div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Add Expense Form -->
+<section class="bg-white rounded-lg p-8 border-2 border-primary/20 bg-gradient-to-br from-white to-purple-50/30">
+<h4 class="text-xl font-bold font-headline mb-6 flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-primary" data-icon="add_box">add_box</span>
+                    Quick Add Expense
+                </h4>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="space-y-1">
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-widest ml-1">Expense Name</label>
+<input class="w-full bg-surface-container border-none rounded-sm focus:ring-2 focus:ring-primary/40 text-on-surface font-medium py-3" placeholder="e.g. Gym Membership" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-widest ml-1">Category</label>
+<select class="w-full bg-surface-container border-none rounded-sm focus:ring-2 focus:ring-primary/40 text-on-surface font-medium py-3">
+<option>Fixed</option>
+<option>Subscriptions</option>
+<option>Variable</option>
+</select>
+</div>
+<div class="space-y-1">
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-widest ml-1">Frequency/Day</label>
+<input class="w-full bg-surface-container border-none rounded-sm focus:ring-2 focus:ring-primary/40 text-on-surface font-medium py-3" placeholder="Day 15 or 'Spread'" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-widest ml-1">Amount</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-on-surface-variant">€</span>
+<input class="w-full bg-surface-container border-none rounded-sm focus:ring-2 focus:ring-primary/40 text-on-surface font-medium py-3 pl-8" placeholder="0.00" type="number"/>
+</div>
+</div>
+</div>
+<div class="mt-8 flex justify-end">
+<button class="px-10 py-3 rounded-full primary-gradient text-on-primary font-bold shadow-lg shadow-primary/30 hover:scale-[1.02] transition-transform">
+                        Save Expense
+                    </button>
+</div>
+</section>
+</div>
+</main>
+<!-- Bottom Summary Bar -->
+<footer class="fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-2xl border-t border-purple-100/30 px-8 py-5 ml-64">
+<div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 md:gap-0">
+<div class="flex items-center gap-10">
+<div class="text-center md:text-left">
+<p class="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] mb-1">Total Income</p>
+<p class="text-xl font-black font-headline text-on-surface">€5,200.00</p>
+</div>
+<div class="w-px h-8 bg-surface-container-high hidden md:block"></div>
+<div class="text-center md:text-left">
+<p class="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] mb-1">Total Expenses</p>
+<p class="text-xl font-black font-headline text-error">€2,890.98</p>
+</div>
+<div class="w-px h-8 bg-surface-container-high hidden md:block"></div>
+<div class="text-center md:text-left">
+<p class="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-1">Projected Remaining</p>
+<div class="flex items-center gap-2">
+<p class="text-2xl font-black font-headline text-primary">€2,309.02</p>
+<span class="material-symbols-outlined text-primary text-xl" data-icon="trending_up">trending_up</span>
+</div>
+</div>
+</div>
+<button class="w-full md:w-auto px-8 py-4 rounded-full primary-gradient text-on-primary font-bold shadow-xl shadow-primary/25 hover:opacity-90 transition-opacity flex items-center justify-center gap-3">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+                Generate Forecast
+            </button>
+</div>
+</footer>
+</div>
+</body></html>

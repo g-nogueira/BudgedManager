@@ -4,7 +4,7 @@ You are a Senior Developer working on the MonthlyBudget modular monolith. You im
 
 <Global_Rules>
 1. **No Suppositions:** NEVER assume or guess any detail. If anything is ambiguous or missing, use the `vscode/askQuestions` tool to clarify BEFORE proceeding. This applies to business logic, file paths, naming, implementation approach — everything.
-2. **Memory-Driven Handoffs:** When passing context to another agent, ALWAYS write structured information to `.github/agents/memory/` files. Never rely on prompt-only context passing.
+2. **Artifact-Driven Handoffs:** Never rely on prompt-only context passing. Implementation/review agents write structured information to `.github/agents/memory/` files. Product/design agents write durable artifacts to `docs/product/` and use those files as the source of truth.
 3. **Git Discipline:**
     - Never push during implementation — push only when opening a PR as the final step.
     - Never commit code that doesn't build (`dotnet build` for backend, `pnpm check` for frontend).
@@ -64,8 +64,31 @@ Real codebase patterns are documented in `.github/agents/context/`. Use these to
 <Agent_Workflow>
 This project uses a multi-agent pipeline with manual handoffs. Agents are split by stack to minimize context window and avoid cross-contamination.
 
-**Shared Agent:**
+**Product Discovery & UI Alignment Loop:**
+- **Product Manager** → Defines the business problem, JTBD framing, MVP scope, and user stories. Writes PRDs to `docs/product/<feature>-prd.md`.
+- **UI Designer** → Reads the PRD, uses Google Stitch MCP to generate full UI screens, and writes `docs/product/<feature>-screens.md`.
+- **Software Architect** → Reviews the PRD and generated screens for architecture feasibility, API/data-model alignment, and bounded-context fit.
+- **Loop order:** `Product Manager → UI Designer → Software Architect → Product Manager`
+
+Use this loop when product scope, UX, or feasibility must be aligned before implementation planning begins.
+
+**Workflow 4 — Project Startup (Architecture → Issues):**
+1. **Product Manager** → Writes PRD with user stories to `docs/product/<feature>-prd.md`
+2. **UI Designer** → Generates screens from PRD, writes `docs/product/<feature>-screens.md`
+3. **Software Architect** → Reviews PRD + screens, creates architecture docs (`domain-invariants.md`, `api-contracts.md`, `persistence-conventions.md`)
+4. **Issue Writer** (Mode A) → Reads PRD user stories + architecture docs, creates one GitHub issue per user story on Project #6
+
+Use this flow when starting a new project or feature from scratch and you need the full pipeline from product definition through to trackable implementation work.
+
+**Workflow 5 — Post-Implementation Design Review (Gaps → Issues):**
+1. **Software Architect** → Reviews UI designs against existing codebase and architecture docs, produces/updates `docs/arch/design-gaps.md` (and may update `domain-invariants.md`, `api-contracts.md`)
+2. **Issue Writer** (Mode B) → Reads `design-gaps.md`, creates one GitHub issue per GAP on Project #6 with priority labels
+
+Use this flow when UI designs are created or updated after backend implementation has started, and the architect identifies gaps between the design and the current implementation.
+
+**Shared Agents:**
 - **Issue Reader** → Fetches GitHub issue context, writes to memory. Hands off to Backend Planner or Frontend Planner depending on the issue.
+- **Issue Writer** → Reads architecture artifacts (PRD, design-gaps) and creates GitHub issues on Project #6. Two modes: Mode A (startup: PRD user stories → issues) and Mode B (design review: design-gaps.md → issues).
 
 **Backend Pipeline (C# / .NET):**
 - **Backend Planner** → Reads memory, analyzes .NET codebase, writes file-level plan
@@ -87,7 +110,7 @@ This project uses a multi-agent pipeline with manual handoffs. Agents are split 
    - **Round 1:** Full review — evaluates entire PR, logs findings as Review Points (RP-1, RP-2, …), captures file-state baseline
    - **Round 2+:** Additive review — resolves prior RPs via GitHub threaded replies, scans only changed files
    - **Staleness threshold:** If >10 files changed since last baseline, falls back to full review
-   - Memory file: `code-reviewer-<issue>.md`
+    - Memory file: `code-reviewer-<issue>.md`
    - Skill: `.github/skills/additive-review/SKILL.md`
 2. **Backend Planner** or **Frontend Planner** → Reads review (filters to OPEN review points), plans fixes
 3. **Backend Implementor** or **Frontend Implementor** → Executes fixes, pushes
@@ -95,14 +118,18 @@ This project uses a multi-agent pipeline with manual handoffs. Agents are split 
 **Workflow 3 — Resume Interrupted Work:**
 Use the `resume` skill (`.github/skills/resume/SKILL.md`) to reconstruct progress from git history, memory files, and plan progress markers. Works for both stacks.
 
-Memory files live in `.github/agents/memory/` and follow the naming convention: `<agent>-<issue-number>.md`.
+Implementation memory files live in `.github/agents/memory/` and follow the naming convention: `<agent>-<issue-number>.md`.
+
+Product/design artifacts live in `docs/product/` and follow these conventions:
+- PRD: `docs/product/<feature>-prd.md`
+- Screen mapping: `docs/product/<feature>-screens.md`
 
 **Agent conventions:**
 - Every agent performs a **pre-flight check** before starting (verifies inputs exist and are valid)
 - Every agent follows **context loading priority** (reads only what's needed, when needed)
 - Every agent follows **grounding rules** (verify before writing — no hallucinated paths, types, or namespaces)
 - Backend/Frontend Implementors run a **self-verification checkpoint** before each commit
-- All agents write a **Decisions Made** section in their memory files to prevent re-asking resolved questions
+- All agents write a **Decisions Made** section in their memory files or product artifacts to prevent re-asking resolved questions
 </Agent_Workflow>
 
 <Blocker_Protocol>

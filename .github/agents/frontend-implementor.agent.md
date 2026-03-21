@@ -1,4 +1,3 @@
-```chatagent
 ---
 name: Frontend Implementor
 description: "Executes the frontend implementation plan: writes SvelteKit/TypeScript code + tests per feature, commits incrementally, builds, tests, lints, and opens a PR."

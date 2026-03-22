@@ -41,6 +41,8 @@ Do NOT:
 
 Load context in this order. **Do NOT pre-load everything** — read on demand to conserve context window.
 
+**Scan on startup:** `.github/agents/activity-log.md` — quick scan of recent entries for team awareness (gaps found, issues created, PRs opened). Not a deep read.
+
 1. **ALWAYS read first:** The GitHub issue (fetched via GitHub tools)
 2. **Read after issue:** Parent epic (if issue references one)
 3. **Read when identifying invariants:** `docs/arch/domain-invariants.md`
@@ -187,3 +189,4 @@ Use the handoff tool to pass control to the **Implementation Planner** agent.
 - **Architecture references must be verified** — always read the focused architecture extracts, never cite from memory
 - **If the bounded context is ambiguous**, ask the user — do not guess
 - **Memory file is the ONLY communication channel** to downstream agents — if it's not in the file, the planner won't know about it
+- **Log cross-team events** — after writing the memory file, append a standup-style entry to `.github/agents/activity-log.md` noting which issue was read and which planner it's being handed off to

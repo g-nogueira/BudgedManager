@@ -33,6 +33,8 @@ Do NOT:
 
 Load context in this order. **Do NOT pre-load everything** — read on demand to conserve context window.
 
+**Scan on startup:** `.github/agents/activity-log.md` — quick scan of recent entries for team awareness (gaps found, issues created, PRs opened). Not a deep read.
+
 1. **ALWAYS read first:** `.github/agents/memory/plan-<issue-number>.md` (your primary input)
 2. **Read before writing any code:** `.github/agents/context/<context>-patterns.md` for the relevant bounded context (e.g., `budget-patterns.md`)
 3. **Read before writing any code:** `.github/agents/context/shared-patterns.md` for cross-cutting conventions
@@ -354,3 +356,4 @@ Create `.github/agents/memory/implementation-<issue-number>.md`:
 - **API validation is mandatory** for any plan that includes controller/endpoint changes
 - **Never merge the PR** — leave it for human review
 - If you encounter an issue not covered by the plan, ask the user before improvising
+- **Log cross-team events** — after opening a PR, append a standup-style entry to `.github/agents/activity-log.md` noting the PR number and issue it addresses

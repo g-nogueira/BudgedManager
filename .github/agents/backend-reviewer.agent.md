@@ -43,6 +43,8 @@ Do NOT:
 
 Load context in this order. **Do NOT pre-load everything** — read on demand to conserve context window.
 
+**Scan on startup:** `.github/agents/activity-log.md` — quick scan of recent entries for team awareness (gaps found, issues created, PRs opened). Not a deep read.
+
 1. **ALWAYS read first:** The PR diff (via GitHub tools)
 2. **Read immediately:** `.github/agents/memory/code-reviewer-<issue-number>.md` (prior review state — determines review mode)
 3. **Read with PR:** `.github/agents/memory/issue-reader-<issue-number>.md` (acceptance criteria)
@@ -449,3 +451,4 @@ After writing the review:
 - **Additive reviews reply to existing threads** — never duplicate a finding that already has a Review Point
 - **The memory file is the source of truth** for review state — GitHub comments are published output
 - **Honor human thread resolutions** — if a human resolved a GitHub thread, treat the RP as addressed
+- **Log cross-team events** — after completing a review, append a standup-style entry to `.github/agents/activity-log.md` noting the PR reviewed and summary of findings (e.g., "3 issues found, 1 critical")

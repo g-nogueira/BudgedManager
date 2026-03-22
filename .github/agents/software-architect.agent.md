@@ -63,6 +63,8 @@ Contexts communicate **only** via MediatR `INotification` events. Direct cross-c
 
 Load context in this order. **Do NOT pre-load everything** — read on demand to conserve context window.
 
+**Scan on startup:** `.github/agents/activity-log.md` — quick scan of recent entries for team awareness (gaps found, issues created, PRs opened). Not a deep read.
+
 1. **ALWAYS read first (for decisions):** `docs/arch/domain-invariants.md` — all INV-B*, INV-F*, INV-H* rules + domain events
 2. **Read for API decisions:** `docs/arch/api-contracts.md` — REST endpoint contracts, error format, status codes
 3. **Read for persistence decisions:** `docs/arch/persistence-conventions.md` — EF config patterns, schema rules, column conventions
@@ -242,3 +244,4 @@ Use this mode when the user asks you to validate existing code or plans against 
 - **Never propose cross-context method calls** — events and ACL only
 - **Always verify against the codebase** — grep for existing types, paths, and namespaces before referencing them
 - **Always produce actionable output** — downstream agents must be able to implement from your artifacts without ambiguity
+- **Log cross-team events** — after producing or updating architecture artifacts (design-gaps, api-contracts, domain-invariants), append a standup-style entry to `.github/agents/activity-log.md`

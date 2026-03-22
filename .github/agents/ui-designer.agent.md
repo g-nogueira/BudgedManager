@@ -42,6 +42,8 @@ Do NOT:
 
 Load context in this order. **Do NOT pre-load everything** — read on demand to conserve context window.
 
+**Scan on startup:** `.github/agents/activity-log.md` — quick scan of recent entries for team awareness (gaps found, issues created, PRs opened). Not a deep read.
+
 1. **ALWAYS read first:** The PRD in `docs/product/<feature-name>-prd.md` (your primary input)
 2. **Read for data shapes:** `docs/arch/api-contracts.md` — to understand what data the UI will display/collect
 3. **Read for frontend conventions:** `.github/agents/context/frontend-patterns.md` — to align with existing UI patterns
@@ -251,3 +253,4 @@ Product Manager → UI Designer → Software Architect → Product Manager
 - **Never hand off without passing the consistency review** — all screens must clear the Step 6 checklist before documentation or handoff
 - **Use GEMINI_3_1_PRO** — best quality model for screen generation
 - **Patience with Stitch** — generation can take minutes, never retry prematurely
+- **Log cross-team events** — after generating screens and writing the screen mapping doc, append a standup-style entry to `.github/agents/activity-log.md` listing the screens created

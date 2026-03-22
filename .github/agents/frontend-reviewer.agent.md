@@ -42,6 +42,8 @@ Do NOT:
 
 Load context in this order. **Do NOT pre-load everything** — read on demand to conserve context window.
 
+**Scan on startup:** `.github/agents/activity-log.md` — quick scan of recent entries for team awareness (gaps found, issues created, PRs opened). Not a deep read.
+
 1. **ALWAYS read first:** The PR diff (via GitHub tools)
 2. **Read immediately:** `.github/agents/memory/code-reviewer-<issue-number>.md` (prior review state — determines review mode)
 3. **Read with PR:** `.github/agents/memory/issue-reader-<issue-number>.md` (acceptance criteria)
@@ -235,4 +237,5 @@ After writing the review:
 - **Every claim must be verified by reading code** — never mark something as "✅" based on expectation alone
 - **Cite file paths and line numbers** for every issue found
 - **Never merge the PR** — only review it
+- **Log cross-team events** — after completing a review, append a standup-style entry to `.github/agents/activity-log.md` noting the PR reviewed and summary of findings
 ```

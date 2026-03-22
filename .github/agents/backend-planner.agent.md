@@ -38,6 +38,8 @@ Do NOT:
 
 Load context in this order. **Do NOT pre-load everything** — read on demand to conserve context window.
 
+**Scan on startup:** `.github/agents/activity-log.md` — quick scan of recent entries for team awareness (gaps found, issues created, PRs opened). Not a deep read.
+
 1. **ALWAYS read first:** `.github/agents/memory/issue-reader-<issue-number>.md` (your primary input)
 2. **Read for domain analysis:** `docs/arch/domain-invariants.md` — when the issue touches domain logic
 3. **Read for API analysis:** `docs/arch/api-contracts.md` — when the issue involves endpoints
@@ -231,3 +233,4 @@ Use the handoff tool to pass control to the **Code Implementor** agent.
 - **Never plan code in a layer that violates hexagonal architecture** — review your plan against the purity table before writing it
 - **Always verify file paths exist** before referencing them in the plan — use search tools
 - **If sibling issues are incomplete**, check if the plan needs to account for their future work (but don't implement their scope)
+- **Log cross-team events** — after writing the implementation plan, append a standup-style entry to `.github/agents/activity-log.md` noting the issue and plan file created

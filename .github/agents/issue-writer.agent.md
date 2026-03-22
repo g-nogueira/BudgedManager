@@ -41,6 +41,8 @@ Do NOT:
 
 Load context in this order. **Do NOT pre-load everything** — read on demand to conserve context window.
 
+**Scan on startup:** `.github/agents/activity-log.md` — quick scan of recent entries for team awareness (gaps found, issues created, PRs opened). Not a deep read.
+
 **Mode A (Startup):**
 1. **ALWAYS read first:** `docs/product/<feature>-prd.md` — user stories and acceptance criteria
 2. **Read for technical enrichment:** `docs/arch/domain-invariants.md` — relevant invariants per user story
@@ -257,3 +259,4 @@ After all issues are created, present a summary:
 - **Never skip adding to Project #6** — the project board is the single source of work tracking
 - **Always apply labels** — labels enable filtering and triage by the human and downstream agents
 - **Always include the "Source" section** — traceability back to the architecture artifact is mandatory
+- **Log cross-team events** — after creating issues (both Mode A and Mode B), append a standup-style entry to `.github/agents/activity-log.md` listing the issues created and their source

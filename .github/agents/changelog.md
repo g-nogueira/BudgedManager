@@ -195,3 +195,49 @@
 - Style discovery adds friction before generation — if users consistently skip it, consider making it optional with a default style preset
 - 11-item checklist is comprehensive but takes longer to execute — monitor whether the agent short-circuits later checks after finding early failures
 - Persona consistency check relies on the agent reading all screens' HTML content — if screens are complex, this may hit context window limits
+
+---
+
+### 2026-03-22 — All Agents + Global Instructions — Add shared activity log for cross-team awareness
+
+**Retro trigger:** After the Software Architect found design gaps and the Issue Writer created issues from them, other agents (e.g., Issue Reader) had no awareness these events happened. When the user referenced "gap 2," agents without direct memory context didn't understand. Cross-team events were invisible to uninvolved agents — there was no broadcast mechanism, only 1:1 memory file handoffs.
+
+**Files modified:**
+- `.github/agents/activity-log.md` — **Created** append-only team activity log with entry format template and instructions
+- `.github/copilot-instructions.md` — Added Global Rule #6 (Activity Log) defining read-on-startup and write-after-cross-team-events conventions
+- All 11 `.agent.md` files — Added "Scan on startup" to Context Loading Priority and "Log cross-team events" to Critical Rules
+- `frontend-planner.agent.md` — Created missing Critical Rules section (needed as anchor for the write instruction)
+- `AGENTS.md` — Added "Team Activity Log" section under Custom Agent Workflows
+
+**What changed & why:**
+| # | Section | Change | Rationale |
+|---|---------|--------|-----------|
+| 1 | New file | Created `.github/agents/activity-log.md` with entry template | No shared awareness mechanism existed — agents were siloed |
+| 2 | copilot-instructions.md | Added Global Rule #6 (Activity Log) | Needed a universal convention all agents inherit |
+| 3 | All agents — Context Loading Priority | Added "Scan on startup" line before numbered list | Agents must read the log early to understand recent team context |
+| 4 | All agents — Critical Rules | Added agent-specific "Log cross-team events" bullet | Each agent needs to know what triggers a log write for their role |
+| 5 | frontend-planner.agent.md | Created Critical Rules section | Was the only agent missing this section |
+| 6 | AGENTS.md | Added "Team Activity Log" subsection | Human developers need to understand the convention too |
+
+**What was working (kept):**
+- Memory files (`.github/agents/memory/`) for 1:1 handoffs — still the primary communication channel for structured data
+- Product artifacts (`docs/product/`) as source of truth for product decisions
+- Changelog for tracking agent customization changes — kept separate from the activity log
+- Context Loading Priority ordering in each agent — activity log is a pre-list scan, not a displacement
+
+**What wasn't working (fixed):**
+- Cross-team events (gaps found, issues created from gaps) were invisible to uninvolved agents
+- When user referenced prior work (e.g., "gap 2"), agents without direct memory had no context
+- No broadcast mechanism existed — only point-to-point memory files used for handoffs
+
+**Lessons learned:**
+- 1:1 memory files solve the handoff problem but not the awareness problem — agents need both structured handoffs AND lightweight team awareness
+- The "standup board" metaphor works well for AI agents: brief, event-driven, append-only, with artifact references instead of duplicated content
+- Adding the read instruction to Context Loading Priority is more reliable than relying only on the global rule — agents follow their own file's priority list most faithfully
+- Agent-specific write triggers (e.g., "after producing architecture artifacts" vs "after opening a PR") are more actionable than generic "write when relevant" instructions
+- A shared log is a low-cost, high-value addition — it doesn't require structural changes to the pipeline, just awareness layered on top
+
+**Risks & watch items:**
+- The activity log grows indefinitely — if it gets too large, agents may waste context scanning old entries. Consider periodic archival or "last N entries" guidance
+- Write compliance is a soft instruction (no structural gate like the Retro Summary Gate) — monitor whether agents actually write to the log
+- Log quality may drift — entries could become too verbose or too terse. The "standup" framing and entry template should help constrain this

@@ -13,6 +13,11 @@ You are a Senior Developer working on the MonthlyBudget modular monolith. You im
     - Commit messages: `type(context): description for #<issue>` (e.g., `feat(budget): add expense validation for #45`, `feat(ui): add budget list page for #57`).
 4. **GitHub Project Scope:** This repository is tracked under GitHub Project https://github.com/users/g-nogueira/projects/6. Never perform work outside the scope of an active task or story. If no matching task exists, halt and ask.
 5. **GitHub Flow Branching:** Branch from `master` using `feature/<issue-number>-<short-description>`. All commits go on the feature branch — never commit directly to `master`.
+6. **Activity Log (Team Awareness):** All agents share a single append-only log at `.github/agents/activity-log.md`. This is the team's "standup board" — it records cross-team events (gaps found, issues created, PRs opened, reviews completed, plans created) so every agent has situational awareness of what's been happening.
+    - **Read on startup:** Every agent reads the activity log early in their context loading to understand recent team activity. This is a quick scan, not a deep read.
+    - **Write after cross-team events:** When your work produces artifacts that other agents will consume or should know about (e.g., creating `design-gaps.md`, opening GitHub issues, opening a PR, completing a review), append a brief standup-style entry.
+    - **Entry format:** Date + agent name + 1–2 sentence summary + list of artifacts created/updated. Keep it brief — like a 30-second standup update.
+    - **Don't duplicate:** Point to artifacts (files, issues, PRs), don't copy their content into the log.
 </Global_Rules>
 
 <Architectural_Constraints>

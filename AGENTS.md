@@ -117,6 +117,15 @@ Used when UI designs are created after backend implementation has started:
 
 Use the product/design loop first when the team needs to define or align the UX before implementation. Use the delivery pipeline when executing scoped engineering work from an issue or review. Use the project startup flow (3) when going from zero to implementation. Use the design review flow (4) when designs arrive after implementation has started.
 
+### Team Activity Log
+
+All agents share a single append-only log at `.github/agents/activity-log.md`. This is the team's "standup board" — it records cross-team events so every agent has situational awareness of what's been happening.
+
+- **Every agent reads the log on startup** (quick scan, not deep read)
+- **Agents write after cross-team events:** creating architecture artifacts, opening GitHub issues, opening PRs, completing reviews, writing plans
+- **Entry format:** Date + agent name + 1–2 sentence summary + list of artifacts (files, issues, PRs)
+- **Tone:** Brief, like a 30-second standup update — point to artifacts, don't duplicate content
+
 ---
 
 ## Critical Domain Invariants

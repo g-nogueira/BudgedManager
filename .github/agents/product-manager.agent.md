@@ -44,6 +44,8 @@ Do NOT:
 
 Load context in this order. **Do NOT pre-load everything** — read on demand to conserve context window.
 
+**Scan on startup:** `.github/agents/activity-log.md` — quick scan of recent entries for team awareness (gaps found, issues created, PRs opened). Not a deep read.
+
 1. **ALWAYS read first:** Any existing PRDs in `docs/product/` to avoid contradicting prior decisions
 2. **Read for feature context:** GitHub issue (if the task originates from an issue)
 3. **Read only when reviewing UI feedback:** Stitch project screen summaries (provided by UI Designer handoff)
@@ -196,3 +198,4 @@ If the user introduces technical implementation details (tech stacks, database c
 - **Verbatim when possible** — copy user's exact words for pain points and goals when they express them clearly
 - **Always write to file** — PRDs go to `docs/product/`, never just chat output
 - **Never skip confirmation** — always get user approval before generating the final artifact
+- **Log cross-team events** — after writing or updating a PRD, append a standup-style entry to `.github/agents/activity-log.md` summarizing the feature and user stories defined

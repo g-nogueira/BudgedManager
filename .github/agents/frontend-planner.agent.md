@@ -38,6 +38,8 @@ Do NOT:
 
 Load context in this order. **Do NOT pre-load everything** — read on demand to conserve context window.
 
+**Scan on startup:** `.github/agents/activity-log.md` — quick scan of recent entries for team awareness (gaps found, issues created, PRs opened). Not a deep read.
+
 1. **ALWAYS read first:** `.github/agents/memory/issue-reader-<issue-number>.md` (your primary input)
 2. **Read for API integration:** `docs/arch/api-contracts.md` — when the issue involves API calls
 3. **Read for pattern reference:** `.github/agents/context/frontend-patterns.md` — to understand existing conventions
@@ -201,3 +203,10 @@ The plan MUST follow this exact structure:
 ## Scope Guard
 <What is explicitly OUT of scope for this issue>
 ```
+
+## Critical Rules
+
+- **Never produce a plan with vague steps** — specify the exact file, component, and what it should do
+- **Never plan more than what the issue requires** — MVP only
+- **Always verify file paths exist** before referencing them in the plan — use search tools
+- **Log cross-team events** — after writing the implementation plan, append a standup-style entry to `.github/agents/activity-log.md` noting the issue and plan file created

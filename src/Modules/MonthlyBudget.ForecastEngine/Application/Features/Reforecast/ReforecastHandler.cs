@@ -22,8 +22,66 @@ public sealed class ReforecastHandler : IRequestHandler<ReforecastCommand, Refor
             parent.MarkAsSnapshot();
             await _repo.SaveAsync(parent, ct);
         }
-        // Use parent snapshots as base � allow future adjustment via explicit snapshot updates
         var snapshots = parent.ExpenseSnapshots.ToList();
+
+        if (cmd.ExpenseAdjustments is { Count: > 0 })
+        {
+            var existingIds = snapshots.Select(s => s.OriginalExpenseId).ToHashSet();
+
+            foreach (var adjustment in cmd.ExpenseAdjustments)
+            {
+                var isModify = string.Equals(adjustment.Action, "MODIFY", StringComparison.OrdinalIgnoreCase);
+                var isRemove = string.Equals(adjustment.Action, "REMOVE", StringComparison.OrdinalIgnoreCase);
+                if ((isModify || isRemove) && adjustment.OriginalExpenseId.HasValue && !existingIds.Contains(adjustment.OriginalExpenseId.Value))
+                {
+                    throw new InvalidReforecastException($"Expense '{adjustment.OriginalExpenseId}' not found in parent forecast snapshots.");
+                }
+            }
+
+            var adjustedSnapshots = new List<ExpenseSnapshot>();
+            var removedIds = cmd.ExpenseAdjustments
+                .Where(a => string.Equals(a.Action, "REMOVE", StringComparison.OrdinalIgnoreCase) && a.OriginalExpenseId.HasValue)
+                .Select(a => a.OriginalExpenseId!.Value)
+                .ToHashSet();
+
+            foreach (var snapshot in snapshots)
+            {
+                if (removedIds.Contains(snapshot.OriginalExpenseId))
+                {
+                    continue;
+                }
+
+                var modify = cmd.ExpenseAdjustments.FirstOrDefault(a =>
+                    string.Equals(a.Action, "MODIFY", StringComparison.OrdinalIgnoreCase) &&
+                    a.OriginalExpenseId == snapshot.OriginalExpenseId);
+
+                if (modify is not null)
+                {
+                    adjustedSnapshots.Add(ExpenseSnapshot.CreateAdjusted(Guid.Empty, snapshot, modify.NewAmount));
+                }
+                else
+                {
+                    adjustedSnapshots.Add(snapshot);
+                }
+            }
+
+            foreach (var add in cmd.ExpenseAdjustments.Where(a => string.Equals(a.Action, "ADD", StringComparison.OrdinalIgnoreCase)))
+            {
+                var category = Enum.Parse<SnapshotCategory>(add.Category!, true);
+                adjustedSnapshots.Add(ExpenseSnapshot.Create(
+                    Guid.Empty,
+                    Guid.NewGuid(),
+                    add.Name!,
+                    category,
+                    add.DayOfMonth,
+                    add.IsSpread ?? false,
+                    add.NewAmount ?? 0m,
+                    false));
+            }
+
+            snapshots = adjustedSnapshots;
+        }
+
         var forecast = ForecastCalculator.Reforecast(cmd.BudgetId, cmd.HouseholdId, cmd.ParentForecastId,
             cmd.StartDay, cmd.ActualBalance, monthDays, snapshots, cmd.VersionLabel);
         await _repo.SaveAsync(forecast, ct);

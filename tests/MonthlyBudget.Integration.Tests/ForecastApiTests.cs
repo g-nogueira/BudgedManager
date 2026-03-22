@@ -108,7 +108,7 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
         var rfResp = await client.PostAsJsonAsync(
             $"/api/v1/budgets/{budgetId}/forecasts/{original!.ForecastId}/reforecast",
             new { startDay = 10, actualBalance = 2000m, versionLabel = "RF-1" });
-        Assert.Equal(HttpStatusCode.OK, rfResp.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, rfResp.StatusCode);
 
         // Verify parent is now a snapshot
         var parentResp = await client.GetAsync(

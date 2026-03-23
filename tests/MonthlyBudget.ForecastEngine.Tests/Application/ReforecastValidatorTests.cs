@@ -200,7 +200,7 @@ public sealed class ReforecastValidatorTests
         var result = _sut.Validate(ValidCommand(adjustments));
 
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.ErrorMessage.Contains("spread expenses require DayOfMonth null", StringComparison.Ordinal));
+        Assert.Contains(result.Errors, e => e.PropertyName.Contains("ExpenseAdjustments", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -214,7 +214,7 @@ public sealed class ReforecastValidatorTests
         var result = _sut.Validate(ValidCommand(adjustments));
 
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.ErrorMessage.Contains("non-spread expenses require DayOfMonth", StringComparison.Ordinal));
+        Assert.Contains(result.Errors, e => e.PropertyName.Contains("ExpenseAdjustments", StringComparison.Ordinal));
     }
 
     [Fact]

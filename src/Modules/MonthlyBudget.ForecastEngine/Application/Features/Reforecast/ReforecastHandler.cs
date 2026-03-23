@@ -61,7 +61,7 @@ public sealed class ReforecastHandler : IRequestHandler<ReforecastCommand, Refor
                 }
                 else
                 {
-                    adjustedSnapshots.Add(snapshot);
+                    adjustedSnapshots.Add(ExpenseSnapshot.CreateAdjusted(Guid.Empty, snapshot, null));
                 }
             }
 

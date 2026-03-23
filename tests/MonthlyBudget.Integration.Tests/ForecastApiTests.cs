@@ -161,32 +161,7 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
     [Fact]
     public async Task Reforecast_WithExpenseAdjustments_ModifiesEndBalance()
     {
-        var client = _fixture.CreateClient();
-        var email = $"fc_{Guid.NewGuid():N}@test.com";
-
-        await client.PostAsJsonAsync("/api/v1/auth/register",
-            new { email, displayName = "Forecast User", password = "P@ssword123!" });
-
-        var tok1 = await LoginAsync(client, email);
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tok1);
-
-        var hResp = await client.PostAsJsonAsync("/api/v1/households", new { name = "FC Household" });
-        hResp.EnsureSuccessStatusCode();
-
-        var tok2 = await LoginAsync(client, email);
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tok2);
-
-        var bResp = await client.PostAsJsonAsync("/api/v1/budgets", new { yearMonth = "2027-02" });
-        bResp.EnsureSuccessStatusCode();
-        var budget = await bResp.Content.ReadFromJsonAsync<BudgetBody>();
-        var budgetId = budget!.BudgetId;
-
-        var incomeResp = await client.PostAsJsonAsync($"/api/v1/budgets/{budgetId}/income",
-            new { name = "Salary", amount = 5000m });
-        Assert.Equal(HttpStatusCode.Created, incomeResp.StatusCode);
-
-        var activateResp = await client.PostAsync($"/api/v1/budgets/{budgetId}/activate", null);
-        Assert.Equal(HttpStatusCode.OK, activateResp.StatusCode);
+        var (client, budgetId) = await SetupActiveBudgetAsync("2027-02");
 
         var genResp = await client.PostAsync(
             $"/api/v1/budgets/{budgetId}/forecasts", null);

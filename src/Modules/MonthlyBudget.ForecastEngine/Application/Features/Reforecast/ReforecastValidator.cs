@@ -12,7 +12,7 @@ public sealed class ReforecastValidator : AbstractValidator<ReforecastCommand>
         RuleFor(x => x.ParentForecastId).NotEmpty();
         RuleFor(x => x.StartDay).GreaterThan(0);
         RuleFor(x => x.ActualBalance).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.VersionLabel).NotEmpty().MaximumLength(100);
+        RuleFor(x => x.VersionLabel).NotEmpty().MaximumLength(50);
 
         RuleForEach(x => x.ExpenseAdjustments!).SetValidator(new ExpenseAdjustmentValidator())
             .When(x => x.ExpenseAdjustments is not null);

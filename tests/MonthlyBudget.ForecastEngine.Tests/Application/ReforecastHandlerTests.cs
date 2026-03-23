@@ -23,8 +23,8 @@ public sealed class ReforecastHandlerTests
         await sut.Handle(new ReforecastCommand(budgetId, householdId, parent.ForecastId, 10, 3000m, "RF-1", null), CancellationToken.None);
 
         Assert.NotNull(repo.SavedReforecast);
-        Assert.Equal(1, repo.SavedReforecast!.ExpenseSnapshots.Count);
-        Assert.Equal(1200m, repo.SavedReforecast.ExpenseSnapshots.Single().Amount);
+        var snapshot = Assert.Single(repo.SavedReforecast!.ExpenseSnapshots);
+        Assert.Equal(1200m, snapshot.Amount);
     }
 
     [Fact]
@@ -41,8 +41,8 @@ public sealed class ReforecastHandlerTests
         await sut.Handle(new ReforecastCommand(budgetId, householdId, parent.ForecastId, 10, 3000m, "RF-1", Array.Empty<ExpenseAdjustment>()), CancellationToken.None);
 
         Assert.NotNull(repo.SavedReforecast);
-        Assert.Equal(1, repo.SavedReforecast!.ExpenseSnapshots.Count);
-        Assert.Equal(1200m, repo.SavedReforecast.ExpenseSnapshots.Single().Amount);
+        var snapshot = Assert.Single(repo.SavedReforecast!.ExpenseSnapshots);
+        Assert.Equal(1200m, snapshot.Amount);
     }
 
     [Fact]
@@ -93,8 +93,8 @@ public sealed class ReforecastHandlerTests
         await sut.Handle(new ReforecastCommand(budgetId, householdId, parent.ForecastId, 10, 3000m, "RF-1", adjustments), CancellationToken.None);
 
         Assert.NotNull(repo.SavedReforecast);
-        Assert.Equal(1, repo.SavedReforecast!.ExpenseSnapshots.Count);
-        Assert.Equal(expenseA, repo.SavedReforecast.ExpenseSnapshots.Single().OriginalExpenseId);
+        var snapshot = Assert.Single(repo.SavedReforecast!.ExpenseSnapshots);
+        Assert.Equal(expenseA, snapshot.OriginalExpenseId);
     }
 
     [Fact]

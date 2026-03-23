@@ -241,7 +241,7 @@ All forecast endpoints are nested under the budget: `/api/v1/budgets/{budgetId}/
       "category": "VARIABLE",
       "dayOfMonth": 22,
       "isSpread": false,
-      "amount": 200.00
+      "newAmount": 200.00
     }
   ]
 }
@@ -250,7 +250,7 @@ All forecast endpoints are nested under the budget: `/api/v1/budgets/{budgetId}/
 > `action` enum: `"MODIFY"`, `"REMOVE"`, `"ADD"`
 > For `MODIFY`: `originalExpenseId` + `newAmount` required. All other expense fields preserved from parent snapshot.
 > For `REMOVE`: `originalExpenseId` required. Expense excluded from re-forecast simulation.
-> For `ADD`: `name`, `category`, `dayOfMonth`/`isSpread`, `amount` required. Creates a new `ExpenseSnapshot`.
+> For `ADD`: `name`, `category`, `dayOfMonth`/`isSpread`, `newAmount` required. Creates a new `ExpenseSnapshot`.
 > **CHANGED:** Previous impl had no `expenseAdjustments`. Must be added to `ReforecastRequest`, `ReforecastCommand`, and `ReforecastHandler`.
 
 ### Forecast Engine — Responses

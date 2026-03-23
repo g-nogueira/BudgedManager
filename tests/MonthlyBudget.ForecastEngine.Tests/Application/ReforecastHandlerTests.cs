@@ -17,7 +17,7 @@ public sealed class ReforecastHandlerTests
         var parent = CreateParentForecast(budgetId, householdId, FixedExpense(Guid.NewGuid(), 10, 1200m));
 
         var repo = new FakeForecastRepository(parent);
-        var budgetPort = new FakeBudgetDataPort(CreateBudgetData(budgetId, householdId));
+        var budgetPort = new FakeBudgetDataPort(budgetId, householdId, CreateBudgetData(budgetId, householdId));
         var sut = new ReforecastHandler(repo, budgetPort);
 
         await sut.Handle(new ReforecastCommand(budgetId, householdId, parent.ForecastId, 10, 3000m, "RF-1", null), CancellationToken.None);
@@ -35,7 +35,7 @@ public sealed class ReforecastHandlerTests
         var parent = CreateParentForecast(budgetId, householdId, FixedExpense(Guid.NewGuid(), 10, 1200m));
 
         var repo = new FakeForecastRepository(parent);
-        var budgetPort = new FakeBudgetDataPort(CreateBudgetData(budgetId, householdId));
+        var budgetPort = new FakeBudgetDataPort(budgetId, householdId, CreateBudgetData(budgetId, householdId));
         var sut = new ReforecastHandler(repo, budgetPort);
 
         await sut.Handle(new ReforecastCommand(budgetId, householdId, parent.ForecastId, 10, 3000m, "RF-1", Array.Empty<ExpenseAdjustment>()), CancellationToken.None);
@@ -54,7 +54,7 @@ public sealed class ReforecastHandlerTests
         var parent = CreateParentForecast(budgetId, householdId, FixedExpense(expenseId, 10, 1200m));
 
         var repo = new FakeForecastRepository(parent);
-        var budgetPort = new FakeBudgetDataPort(CreateBudgetData(budgetId, householdId));
+        var budgetPort = new FakeBudgetDataPort(budgetId, householdId, CreateBudgetData(budgetId, householdId));
         var sut = new ReforecastHandler(repo, budgetPort);
 
         var adjustments = new[]
@@ -82,7 +82,7 @@ public sealed class ReforecastHandlerTests
             FixedExpense(expenseB, 15, 100m));
 
         var repo = new FakeForecastRepository(parent);
-        var budgetPort = new FakeBudgetDataPort(CreateBudgetData(budgetId, householdId));
+        var budgetPort = new FakeBudgetDataPort(budgetId, householdId, CreateBudgetData(budgetId, householdId));
         var sut = new ReforecastHandler(repo, budgetPort);
 
         var adjustments = new[]
@@ -106,7 +106,7 @@ public sealed class ReforecastHandlerTests
         var parent = CreateParentForecast(budgetId, householdId, FixedExpense(expenseA, 10, 1200m));
 
         var repo = new FakeForecastRepository(parent);
-        var budgetPort = new FakeBudgetDataPort(CreateBudgetData(budgetId, householdId));
+        var budgetPort = new FakeBudgetDataPort(budgetId, householdId, CreateBudgetData(budgetId, householdId));
         var sut = new ReforecastHandler(repo, budgetPort);
 
         var adjustments = new[]
@@ -135,7 +135,7 @@ public sealed class ReforecastHandlerTests
             FixedExpense(expenseB, 15, 100m));
 
         var repo = new FakeForecastRepository(parent);
-        var budgetPort = new FakeBudgetDataPort(CreateBudgetData(budgetId, householdId));
+        var budgetPort = new FakeBudgetDataPort(budgetId, householdId, CreateBudgetData(budgetId, householdId));
         var sut = new ReforecastHandler(repo, budgetPort);
 
         var adjustments = new[]
@@ -161,7 +161,7 @@ public sealed class ReforecastHandlerTests
         var parent = CreateParentForecast(budgetId, householdId, FixedExpense(Guid.NewGuid(), 10, 1200m));
 
         var repo = new FakeForecastRepository(parent);
-        var budgetPort = new FakeBudgetDataPort(CreateBudgetData(budgetId, householdId));
+        var budgetPort = new FakeBudgetDataPort(budgetId, householdId, CreateBudgetData(budgetId, householdId));
         var sut = new ReforecastHandler(repo, budgetPort);
 
         var adjustments = new[]
@@ -181,7 +181,7 @@ public sealed class ReforecastHandlerTests
         var parent = CreateParentForecast(budgetId, householdId, FixedExpense(Guid.NewGuid(), 10, 1200m));
 
         var repo = new FakeForecastRepository(parent);
-        var budgetPort = new FakeBudgetDataPort(CreateBudgetData(budgetId, householdId));
+        var budgetPort = new FakeBudgetDataPort(budgetId, householdId, CreateBudgetData(budgetId, householdId));
         var sut = new ReforecastHandler(repo, budgetPort);
 
         var adjustments = new[]
@@ -202,7 +202,7 @@ public sealed class ReforecastHandlerTests
         Assert.False(parent.IsSnapshot);
 
         var repo = new FakeForecastRepository(parent);
-        var budgetPort = new FakeBudgetDataPort(CreateBudgetData(budgetId, householdId));
+        var budgetPort = new FakeBudgetDataPort(budgetId, householdId, CreateBudgetData(budgetId, householdId));
         var sut = new ReforecastHandler(repo, budgetPort);
 
         await sut.Handle(new ReforecastCommand(budgetId, householdId, parent.ForecastId, 10, 3000m, "RF-1", null), CancellationToken.None);
@@ -241,15 +241,24 @@ public sealed class ReforecastHandlerTests
 
     private sealed class FakeBudgetDataPort : IBudgetDataPort
     {
+        private readonly Guid _expectedBudgetId;
+        private readonly Guid _expectedHouseholdId;
         private readonly BudgetData? _data;
 
-        public FakeBudgetDataPort(BudgetData? data)
+        public FakeBudgetDataPort(Guid expectedBudgetId, Guid expectedHouseholdId, BudgetData? data)
         {
+            _expectedBudgetId = expectedBudgetId;
+            _expectedHouseholdId = expectedHouseholdId;
             _data = data;
         }
 
         public Task<BudgetData?> GetBudgetDataAsync(Guid budgetId, Guid householdId, CancellationToken ct = default)
         {
+            if (budgetId != _expectedBudgetId || householdId != _expectedHouseholdId)
+            {
+                return Task.FromResult<BudgetData?>(null);
+            }
+
             return Task.FromResult(_data);
         }
     }

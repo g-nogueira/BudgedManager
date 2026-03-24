@@ -8,6 +8,7 @@ using MonthlyBudget.ForecastEngine.Application.Features.Reforecast;
 using MonthlyBudget.ForecastEngine.Application.Features.SaveSnapshot;
 using MonthlyBudget.ForecastEngine.Infrastructure.Dto;
 using System.Security.Claims;
+using System.Linq;
 namespace MonthlyBudget.ForecastEngine.Infrastructure.Controllers;
 [ApiController]
 [Route("api/v1/budgets/{budgetId:guid}/forecasts")]
@@ -50,7 +51,14 @@ public sealed class ForecastController : ControllerBase
     [HttpPost("{forecastId:guid}/reforecast")]
     public async Task<IActionResult> Reforecast(Guid budgetId, Guid forecastId, [FromBody] ReforecastRequest req, CancellationToken ct)
     {
-        var result = await _mediator.Send(new ReforecastCommand(budgetId, HouseholdId, forecastId, req.StartDay, req.ActualBalance, req.VersionLabel), ct);
-        return Ok(result);
+        var adjustments = req.ExpenseAdjustments?
+            .Select(a => new ExpenseAdjustment(a.OriginalExpenseId, a.Action, a.NewAmount, a.Name, a.Category, a.DayOfMonth, a.IsSpread))
+            .ToList();
+
+        var result = await _mediator.Send(
+            new ReforecastCommand(budgetId, HouseholdId, forecastId, req.StartDay, req.ActualBalance, req.VersionLabel, adjustments),
+            ct);
+
+        return CreatedAtAction(nameof(GetById), new { budgetId, forecastId = result.ForecastId }, result);
     }
 }

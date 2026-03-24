@@ -108,7 +108,7 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
         var rfResp = await client.PostAsJsonAsync(
             $"/api/v1/budgets/{budgetId}/forecasts/{original!.ForecastId}/reforecast",
             new { startDay = 10, actualBalance = 2000m, versionLabel = "RF-1" });
-        Assert.Equal(HttpStatusCode.OK, rfResp.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, rfResp.StatusCode);
 
         // Verify parent is now a snapshot
         var parentResp = await client.GetAsync(
@@ -156,6 +156,44 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
         Assert.Equal(forecastA.ForecastId, result!.ForecastAId);
         Assert.Equal(forecastB.ForecastId, result.ForecastBId);
         Assert.NotEmpty(result.DayVariances);
+    }
+
+    [Fact]
+    public async Task Reforecast_WithExpenseAdjustments_ModifiesEndBalance()
+    {
+        var (client, budgetId) = await SetupActiveBudgetAsync("2027-02");
+
+        var genResp = await client.PostAsync(
+            $"/api/v1/budgets/{budgetId}/forecasts", null);
+        Assert.Equal(HttpStatusCode.Created, genResp.StatusCode);
+        var original = await genResp.Content.ReadFromJsonAsync<ForecastBody>();
+
+        var rfResp = await client.PostAsJsonAsync(
+            $"/api/v1/budgets/{budgetId}/forecasts/{original!.ForecastId}/reforecast",
+            new
+            {
+                startDay = 10,
+                actualBalance = 5000m,
+                versionLabel = "RF-adjust",
+                expenseAdjustments = new[]
+                {
+                    new
+                    {
+                        action = "ADD",
+                        newAmount = 200m,
+                        name = "Car Repair",
+                        category = "VARIABLE",
+                        dayOfMonth = 20,
+                        isSpread = false
+                    }
+                }
+            });
+
+        var reforecastRaw = await rfResp.Content.ReadAsStringAsync();
+        Assert.True(rfResp.StatusCode == HttpStatusCode.Created,
+            $"Expected Created but got {(int)rfResp.StatusCode} {rfResp.StatusCode}. Body: {reforecastRaw}");
+        var reforecast = await rfResp.Content.ReadFromJsonAsync<ForecastBody>();
+        Assert.True(reforecast!.EndOfMonthBalance < original.EndOfMonthBalance);
     }
 
     private sealed record LoginBody(string AccessToken, string RefreshToken);

@@ -13,6 +13,7 @@ using MonthlyBudget.IdentityHousehold.Infrastructure.Auth;
 using MonthlyBudget.IdentityHousehold.Infrastructure.Email;
 using MonthlyBudget.IdentityHousehold.Infrastructure.Events;
 using MonthlyBudget.ForecastEngine.Infrastructure.Events;
+using MonthlyBudget.ForecastEngine.Application.Features.Reforecast;
 using MonthlyBudget.Infrastructure.Acl;
 using MonthlyBudget.Infrastructure.Database;
 using MonthlyBudget.Infrastructure.Repositories;
@@ -63,6 +64,7 @@ public static class ServiceCollectionExtensions
             BudgetManagement.Application.Features.CreateBudget.CreateBudgetValidator>();
         services.AddValidatorsFromAssemblyContaining<
             IdentityHousehold.Application.Features.RegisterUser.RegisterUserValidator>();
+        services.AddValidatorsFromAssemblyContaining<ReforecastValidator>();
 
         // ── Background Services ───────────────────────────────────────────────
         services.AddHostedService<ExpireStaleInvitationsService>();

@@ -94,6 +94,24 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
     }
 
     [Fact]
+    public async Task SaveSnapshot_WithActualBalance_ReturnsOkAndPersistsBalance()
+    {
+        var (client, budgetId) = await SetupActiveBudgetAsync("2026-10");
+
+        var genResp = await client.PostAsync(
+            $"/api/v1/budgets/{budgetId}/forecasts", null);
+        genResp.EnsureSuccessStatusCode();
+        var forecast = await genResp.Content.ReadFromJsonAsync<ForecastBody>();
+
+        var snapResp = await client.PostAsJsonAsync(
+            $"/api/v1/budgets/{budgetId}/forecasts/{forecast!.ForecastId}/snapshot",
+            new { actualBalance = 3100m });
+        Assert.Equal(HttpStatusCode.OK, snapResp.StatusCode);
+        var snapBody = await snapResp.Content.ReadFromJsonAsync<SnapshotBody>();
+        Assert.True(snapBody!.IsSnapshot);
+    }
+
+    [Fact]
     public async Task ReforecastFlow_ParentIsAutoSnapshotted()
     {
         var (client, budgetId) = await SetupActiveBudgetAsync("2026-11");

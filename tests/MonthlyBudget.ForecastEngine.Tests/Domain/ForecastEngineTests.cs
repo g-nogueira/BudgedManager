@@ -107,6 +107,25 @@ public class ForecastCalculatorTests
         Assert.True(forecast.IsSnapshot);
     }
 
+    [Fact]
+    public void SetActualBalance_NonSnapshot_SetsBalance()
+    {
+        var forecast = ForecastCalculator.Generate(BudgetId, HouseholdId, 5000m, 31, new List<ExpenseSnapshot>());
+
+        forecast.SetActualBalance(3100m);
+
+        Assert.Equal(3100m, forecast.ActualBalance);
+    }
+
+    [Fact]
+    public void SetActualBalance_OnSnapshot_ThrowsSnapshotImmutableException()
+    {
+        var forecast = ForecastCalculator.Generate(BudgetId, HouseholdId, 5000m, 31, new List<ExpenseSnapshot>());
+        forecast.MarkAsSnapshot();
+
+        Assert.Throws<SnapshotImmutableException>(() => forecast.SetActualBalance(3100m));
+    }
+
     // --- CompareForecasts --------------------------------------------------------
     [Fact]
     public void CompareForecasts_SameForecasts_ZeroDrift()

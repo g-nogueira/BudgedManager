@@ -43,9 +43,9 @@ public sealed class ForecastController : ControllerBase
         return Ok(result);
     }
     [HttpPost("{forecastId:guid}/snapshot")]
-    public async Task<IActionResult> SaveSnapshot(Guid budgetId, Guid forecastId, CancellationToken ct)
+    public async Task<IActionResult> SaveSnapshot(Guid budgetId, Guid forecastId, [FromBody] SaveSnapshotRequest? req, CancellationToken ct)
     {
-        var result = await _mediator.Send(new SaveSnapshotCommand(forecastId, HouseholdId), ct);
+        var result = await _mediator.Send(new SaveSnapshotCommand(forecastId, HouseholdId, req?.ActualBalance), ct);
         return Ok(result);
     }
     [HttpPost("{forecastId:guid}/reforecast")]

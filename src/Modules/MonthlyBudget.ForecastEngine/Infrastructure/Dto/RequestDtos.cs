@@ -1,4 +1,6 @@
 namespace MonthlyBudget.ForecastEngine.Infrastructure.Dto;
+public record SaveSnapshotRequest(decimal? ActualBalance);
+
 public record ExpenseAdjustmentDto(
 	Guid? OriginalExpenseId,
 	string Action,

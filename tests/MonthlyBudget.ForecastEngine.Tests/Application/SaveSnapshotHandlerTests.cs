@@ -78,6 +78,44 @@ public sealed class SaveSnapshotHandlerTests
             sut.Handle(new SaveSnapshotCommand(forecast.ForecastId, requestHouseholdId, 3100m), CancellationToken.None));
     }
 
+    [Fact]
+    public async Task Handle_AlreadySnapshot_ReturnsIdempotentWithoutMutation()
+    {
+        var budgetId = Guid.NewGuid();
+        var householdId = Guid.NewGuid();
+        var forecast = ForecastCalculator.Generate(budgetId, householdId, 5000m, 31, new List<ExpenseSnapshot>());
+        forecast.MarkAsSnapshot();
+
+        var repo = new FakeForecastRepository(forecast);
+        var publisher = new FakeForecastEventPublisher();
+        var sut = new SaveSnapshotHandler(repo, publisher);
+
+        var result = await sut.Handle(new SaveSnapshotCommand(forecast.ForecastId, householdId, 3100m), CancellationToken.None);
+
+        Assert.True(result.IsSnapshot);
+        Assert.Null(repo.SavedForecast);
+        Assert.Empty(publisher.PublishedEvents);
+    }
+
+    [Fact]
+    public async Task Handle_AlreadySnapshot_NoBody_ReturnsIdempotent()
+    {
+        var budgetId = Guid.NewGuid();
+        var householdId = Guid.NewGuid();
+        var forecast = ForecastCalculator.Generate(budgetId, householdId, 5000m, 31, new List<ExpenseSnapshot>());
+        forecast.MarkAsSnapshot();
+
+        var repo = new FakeForecastRepository(forecast);
+        var publisher = new FakeForecastEventPublisher();
+        var sut = new SaveSnapshotHandler(repo, publisher);
+
+        var result = await sut.Handle(new SaveSnapshotCommand(forecast.ForecastId, householdId, null), CancellationToken.None);
+
+        Assert.True(result.IsSnapshot);
+        Assert.Null(repo.SavedForecast);
+        Assert.Empty(publisher.PublishedEvents);
+    }
+
     private sealed class FakeForecastRepository : IForecastRepository
     {
         private readonly ForecastVersion? _forecast;

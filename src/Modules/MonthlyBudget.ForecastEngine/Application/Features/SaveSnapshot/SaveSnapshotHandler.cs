@@ -15,6 +15,9 @@ public sealed class SaveSnapshotHandler : IRequestHandler<SaveSnapshotCommand, S
         if (forecast == null || forecast.HouseholdId != cmd.HouseholdId)
             throw new ForecastNotFoundException(cmd.ForecastId);
 
+        if (forecast.IsSnapshot)
+            return new SaveSnapshotResult(forecast.ForecastId, true);
+
         if (cmd.ActualBalance.HasValue)
             forecast.SetActualBalance(cmd.ActualBalance.Value);
 

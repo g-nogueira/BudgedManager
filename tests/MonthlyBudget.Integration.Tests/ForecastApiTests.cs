@@ -94,7 +94,7 @@ public sealed class ForecastApiTests : IClassFixture<IntegrationTestFixture>
     }
 
     [Fact]
-    public async Task SaveSnapshot_WithActualBalance_ReturnsOkAndPersistsBalance()
+    public async Task SaveSnapshot_WithActualBalance_ReturnsOkAndIsSnapshot()
     {
         var (client, budgetId) = await SetupActiveBudgetAsync("2026-10");
 

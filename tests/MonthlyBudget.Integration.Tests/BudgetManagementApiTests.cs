@@ -98,6 +98,23 @@ public sealed class BudgetManagementApiTests : IClassFixture<IntegrationTestFixt
     }
 
     [Fact]
+    public async Task ListBudgets_WithHouseholdToken_Returns200WithSummaries()
+    {
+        var (client, budgetId) = await SetupWithBudgetAsync("2026-11");
+
+        var response = await client.GetAsync("/api/v1/budgets");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var summaries = await response.Content.ReadFromJsonAsync<BudgetSummaryBody[]>();
+        Assert.NotNull(summaries);
+
+        var matching = summaries!.FirstOrDefault(x => x.BudgetId == budgetId);
+        Assert.NotNull(matching);
+        Assert.Equal("2026-11", matching!.YearMonth);
+        Assert.Equal("DRAFT", matching.Status);
+    }
+
+    [Fact]
     public async Task ActivateBudget_WithIncomeSources_Returns200Active()
     {
         var (client, budgetId) = await SetupWithBudgetAsync("2026-07");
@@ -126,5 +143,6 @@ public sealed class BudgetManagementApiTests : IClassFixture<IntegrationTestFixt
     // ── Response bodies ───────────────────────────────────────────────────────────
     private sealed record LoginBody(string AccessToken, string RefreshToken);
     private sealed record BudgetBody(Guid BudgetId, string Status);
+    private sealed record BudgetSummaryBody(Guid BudgetId, string YearMonth, string Status, decimal TotalIncome, decimal TotalExpenses, DateTime CreatedAt);
     private sealed record ActivateBody(Guid BudgetId, string Status);
 }

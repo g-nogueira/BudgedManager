@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MonthlyBudget.BudgetManagement.Application.Features.ActivateBudget;
+using MonthlyBudget.BudgetManagement.Application.Features.CloseBudget;
 using MonthlyBudget.BudgetManagement.Application.Features.CreateBudget;
 using MonthlyBudget.BudgetManagement.Application.Features.GetBudget;
 using MonthlyBudget.BudgetManagement.Application.Features.RolloverMonth;
@@ -50,6 +51,13 @@ public sealed class BudgetController : ControllerBase
     public async Task<IActionResult> Activate(Guid budgetId, CancellationToken ct)
     {
         var result = await _mediator.Send(new ActivateBudgetCommand(budgetId, HouseholdId), ct);
+        return Ok(result);
+    }
+
+    [HttpPost("{budgetId:guid}/close")]
+    public async Task<IActionResult> Close(Guid budgetId, CancellationToken ct)
+    {
+        var result = await _mediator.Send(new CloseBudgetCommand(budgetId, HouseholdId), ct);
         return Ok(result);
     }
 }

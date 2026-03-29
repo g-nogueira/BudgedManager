@@ -140,9 +140,40 @@ public sealed class BudgetManagementApiTests : IClassFixture<IntegrationTestFixt
         Assert.Equal(HttpStatusCode.BadRequest, dup.StatusCode);
     }
 
+    [Fact]
+    public async Task CloseBudget_ActiveBudget_Returns200Closed()
+    {
+        var (client, budgetId) = await SetupWithBudgetAsync("2026-09");
+
+        // Add income source and activate
+        var incResp = await client.PostAsJsonAsync(
+            $"/api/v1/budgets/{budgetId}/income", new { name = "Salary", amount = 3000 });
+        incResp.EnsureSuccessStatusCode();
+        var actResp = await client.PostAsync($"/api/v1/budgets/{budgetId}/activate", null);
+        actResp.EnsureSuccessStatusCode();
+
+        // Close
+        var closeResp = await client.PostAsync($"/api/v1/budgets/{budgetId}/close", null);
+        Assert.Equal(HttpStatusCode.OK, closeResp.StatusCode);
+        var result = await closeResp.Content.ReadFromJsonAsync<CloseBody>();
+        Assert.Equal(budgetId, result!.BudgetId);
+        Assert.Equal("CLOSED", result.Status);
+    }
+
+    [Fact]
+    public async Task CloseBudget_DraftBudget_Returns400()
+    {
+        var (client, budgetId) = await SetupWithBudgetAsync("2026-10");
+
+        // Attempt to close a DRAFT budget (not yet activated) — should fail INV-B6
+        var closeResp = await client.PostAsync($"/api/v1/budgets/{budgetId}/close", null);
+        Assert.Equal(HttpStatusCode.BadRequest, closeResp.StatusCode);
+    }
+
     // ── Response bodies ───────────────────────────────────────────────────────────
     private sealed record LoginBody(string AccessToken, string RefreshToken);
     private sealed record BudgetBody(Guid BudgetId, string Status);
     private sealed record BudgetSummaryBody(Guid BudgetId, string YearMonth, string Status, decimal TotalIncome, decimal TotalExpenses, DateTime CreatedAt);
     private sealed record ActivateBody(Guid BudgetId, string Status);
+    private sealed record CloseBody(Guid BudgetId, string Status);
 }

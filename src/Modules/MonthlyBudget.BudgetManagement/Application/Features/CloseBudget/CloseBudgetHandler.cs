@@ -2,7 +2,9 @@ using MediatR;
 using MonthlyBudget.BudgetManagement.Application.Ports;
 using MonthlyBudget.BudgetManagement.Domain.Exceptions;
 using MonthlyBudget.BudgetManagement.Domain.Repositories;
+
 namespace MonthlyBudget.BudgetManagement.Application.Features.CloseBudget;
+
 public sealed class CloseBudgetHandler : IRequestHandler<CloseBudgetCommand, CloseBudgetResult>
 {
     private readonly IBudgetRepository _repository;
@@ -18,7 +20,7 @@ public sealed class CloseBudgetHandler : IRequestHandler<CloseBudgetCommand, Clo
         if (budget == null || budget.HouseholdId != request.HouseholdId)
             throw new BudgetNotFoundException(request.BudgetId);
 
-        budget.Close(); // enforces INV-B6: ACTIVE → CLOSED only
+        budget.Close();
 
         await _repository.SaveAsync(budget, cancellationToken);
         foreach (var evt in budget.GetDomainEvents())

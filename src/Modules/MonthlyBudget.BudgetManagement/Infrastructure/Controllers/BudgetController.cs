@@ -22,6 +22,12 @@ public sealed class BudgetController : ControllerBase
         var result = await _mediator.Send(new CreateBudgetCommand(HouseholdId, req.YearMonth), ct);
         return CreatedAtAction(nameof(GetById), new { budgetId = result.BudgetId }, result);
     }
+    [HttpGet]
+    public async Task<IActionResult> GetAll(CancellationToken ct)
+    {
+        var result = await _mediator.Send(new GetBudgetsByHouseholdQuery(HouseholdId), ct);
+        return Ok(result);
+    }
     [HttpGet("{budgetId:guid}")]
     public async Task<IActionResult> GetById(Guid budgetId, CancellationToken ct)
     {

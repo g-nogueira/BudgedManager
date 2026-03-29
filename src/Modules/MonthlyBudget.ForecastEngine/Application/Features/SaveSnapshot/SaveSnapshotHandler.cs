@@ -14,6 +14,13 @@ public sealed class SaveSnapshotHandler : IRequestHandler<SaveSnapshotCommand, S
         var forecast = await _repo.FindByIdAsync(cmd.ForecastId, ct);
         if (forecast == null || forecast.HouseholdId != cmd.HouseholdId)
             throw new ForecastNotFoundException(cmd.ForecastId);
+
+        if (forecast.IsSnapshot)
+            return new SaveSnapshotResult(forecast.ForecastId, true);
+
+        if (cmd.ActualBalance.HasValue)
+            forecast.SetActualBalance(cmd.ActualBalance.Value);
+
         forecast.MarkAsSnapshot();
         await _repo.SaveAsync(forecast, ct);
         foreach (var evt in forecast.GetDomainEvents())

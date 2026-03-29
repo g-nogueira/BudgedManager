@@ -57,6 +57,15 @@ public class ForecastVersion
     {
         IsSnapshot = true;
     }
+
+    public void SetActualBalance(decimal balance)
+    {
+        if (IsSnapshot)
+            throw new SnapshotImmutableException();
+
+        ActualBalance = balance;
+    }
+
     public decimal GetEndOfMonthBalance()
         => _dailyEntries.OrderByDescending(e => e.DayNumber).FirstOrDefault()?.RemainingBalance ?? StartBalance;
     public IReadOnlyList<IDomainEvent> GetDomainEvents() => _domainEvents.AsReadOnly();

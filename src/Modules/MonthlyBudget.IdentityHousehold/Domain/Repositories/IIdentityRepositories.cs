@@ -22,3 +22,11 @@ public interface IInvitationRepository
     Task SaveAsync(Invitation invitation, CancellationToken ct = default);
     Task SaveAllAsync(IEnumerable<Invitation> invitations, CancellationToken ct = default);
 }
+
+public interface IRefreshTokenRepository
+{
+    Task<RefreshTokenEntry?> FindByTokenHashAsync(string tokenHash, CancellationToken ct = default);
+    Task SaveAsync(RefreshTokenEntry refreshToken, CancellationToken ct = default);
+    Task DeleteAsync(RefreshTokenEntry refreshToken, CancellationToken ct = default);
+    Task DeleteAllByUserIdAsync(Guid userId, CancellationToken ct = default);
+}

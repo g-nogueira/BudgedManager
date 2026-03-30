@@ -9,6 +9,7 @@ public interface ITokenService
 {
     string GenerateAccessToken(Guid userId, string email, string displayName, Guid? householdId);
     string GenerateRefreshToken();
+    string HashToken(string token);
 }
 public interface IEmailService
 {

@@ -25,6 +25,7 @@ public class AppDbContext : DbContext
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<Household> Households { get; set; } = null!;
     public DbSet<Invitation> Invitations { get; set; } = null!;
+    public DbSet<RefreshTokenEntry> RefreshTokens { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -42,6 +42,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserRepository, PostgresUserRepository>();
         services.AddScoped<IHouseholdRepository, PostgresHouseholdRepository>();
         services.AddScoped<IInvitationRepository, PostgresInvitationRepository>();
+        services.AddScoped<IRefreshTokenRepository, PostgresRefreshTokenRepository>();
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
         services.AddScoped<ITokenService, JwtTokenService>();
         services.AddScoped<IEmailService, ConsoleEmailService>();

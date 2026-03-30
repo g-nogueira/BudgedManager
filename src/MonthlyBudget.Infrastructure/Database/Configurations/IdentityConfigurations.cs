@@ -53,3 +53,19 @@ public class InvitationConfiguration : IEntityTypeConfiguration<Invitation>
         builder.HasIndex(i => i.Token).IsUnique();
     }
 }
+
+public class RefreshTokenEntryConfiguration : IEntityTypeConfiguration<RefreshTokenEntry>
+{
+    public void Configure(EntityTypeBuilder<RefreshTokenEntry> builder)
+    {
+        builder.ToTable("refresh_tokens", "identity");
+        builder.HasKey(r => r.Id);
+        builder.Property(r => r.Id).HasColumnName("id").ValueGeneratedNever();
+        builder.Property(r => r.UserId).HasColumnName("user_id").IsRequired();
+        builder.Property(r => r.TokenHash).HasColumnName("token_hash").HasMaxLength(128).IsRequired();
+        builder.Property(r => r.ExpiresAt).HasColumnName("expires_at").IsRequired();
+        builder.Property(r => r.CreatedAt).HasColumnName("created_at").IsRequired();
+        builder.HasIndex(r => r.TokenHash).IsUnique();
+        builder.HasIndex(r => r.UserId);
+    }
+}

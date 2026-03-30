@@ -110,3 +110,38 @@ public sealed class PostgresInvitationRepository : IInvitationRepository
         await _db.SaveChangesAsync(ct);
     }
 }
+
+public sealed class PostgresRefreshTokenRepository : IRefreshTokenRepository
+{
+    private readonly AppDbContext _db;
+
+    public PostgresRefreshTokenRepository(AppDbContext db)
+    {
+        _db = db;
+    }
+
+    public async Task<RefreshTokenEntry?> FindByTokenHashAsync(string tokenHash, CancellationToken ct = default)
+        => await _db.RefreshTokens.FirstOrDefaultAsync(r => r.TokenHash == tokenHash, ct);
+
+    public async Task SaveAsync(RefreshTokenEntry refreshToken, CancellationToken ct = default)
+    {
+        var existing = await _db.RefreshTokens.FindAsync(new object[] { refreshToken.Id }, ct);
+        if (existing == null) _db.RefreshTokens.Add(refreshToken);
+        else _db.Entry(existing).CurrentValues.SetValues(refreshToken);
+        await _db.SaveChangesAsync(ct);
+    }
+
+    public async Task DeleteAsync(RefreshTokenEntry refreshToken, CancellationToken ct = default)
+    {
+        _db.RefreshTokens.Remove(refreshToken);
+        await _db.SaveChangesAsync(ct);
+    }
+
+    public async Task DeleteAllByUserIdAsync(Guid userId, CancellationToken ct = default)
+    {
+        var tokens = await _db.RefreshTokens.Where(r => r.UserId == userId).ToListAsync(ct);
+        if (tokens.Count == 0) return;
+        _db.RefreshTokens.RemoveRange(tokens);
+        await _db.SaveChangesAsync(ct);
+    }
+}

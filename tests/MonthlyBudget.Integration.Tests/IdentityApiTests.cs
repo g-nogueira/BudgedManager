@@ -14,11 +14,17 @@ public sealed class IdentityApiTests : IClassFixture<IntegrationTestFixture>
 
     private static async Task<string> LoginAsync(HttpClient client, string email)
     {
+        var body = await LoginWithTokensAsync(client, email);
+        return body.AccessToken;
+    }
+
+    private static async Task<LoginBody> LoginWithTokensAsync(HttpClient client, string email)
+    {
         var resp = await client.PostAsJsonAsync("/api/v1/auth/login",
             new { email, password = "P@ssword123!" });
         resp.EnsureSuccessStatusCode();
         var body = await resp.Content.ReadFromJsonAsync<LoginBody>();
-        return body!.AccessToken;
+        return body!;
     }
 
     private async Task<(HttpClient Client, Guid HouseholdId)> RegisterAndCreateHouseholdAsync(string emailPrefix)
@@ -101,6 +107,70 @@ public sealed class IdentityApiTests : IClassFixture<IntegrationTestFixture>
             new { email = "nobody@example.com", password = "P@ssword123!" });
 
         Assert.Equal(HttpStatusCode.Unauthorized, resp.StatusCode);
+    }
+
+    [Fact]
+    public async Task RefreshToken_ValidToken_Returns200WithNewPair()
+    {
+        var client = _fixture.CreateClient();
+        var email = $"refresh_{Guid.NewGuid():N}@test.com";
+
+        await client.PostAsJsonAsync("/api/v1/auth/register",
+            new { email, displayName = "Refresh User", password = "P@ssword123!" });
+
+        var loginBody = await LoginWithTokensAsync(client, email);
+        var refreshResp = await client.PostAsJsonAsync("/api/v1/auth/refresh",
+            new { refreshToken = loginBody.RefreshToken });
+
+        Assert.Equal(HttpStatusCode.OK, refreshResp.StatusCode);
+        var refreshed = await refreshResp.Content.ReadFromJsonAsync<LoginBody>();
+        Assert.NotNull(refreshed);
+        Assert.False(string.IsNullOrWhiteSpace(refreshed!.AccessToken));
+        Assert.False(string.IsNullOrWhiteSpace(refreshed.RefreshToken));
+        Assert.NotEqual(loginBody.RefreshToken, refreshed.RefreshToken);
+    }
+
+    [Fact]
+    public async Task RefreshToken_InvalidToken_Returns401()
+    {
+        var client = _fixture.CreateClient();
+
+        var refreshResp = await client.PostAsJsonAsync("/api/v1/auth/refresh",
+            new { refreshToken = "invalid-refresh-token" });
+
+        Assert.Equal(HttpStatusCode.Unauthorized, refreshResp.StatusCode);
+    }
+
+    [Fact]
+    public async Task RefreshToken_UsedToken_Returns401()
+    {
+        var client = _fixture.CreateClient();
+        var email = $"refresh_used_{Guid.NewGuid():N}@test.com";
+
+        await client.PostAsJsonAsync("/api/v1/auth/register",
+            new { email, displayName = "Refresh User", password = "P@ssword123!" });
+
+        var loginBody = await LoginWithTokensAsync(client, email);
+
+        var first = await client.PostAsJsonAsync("/api/v1/auth/refresh",
+            new { refreshToken = loginBody.RefreshToken });
+        Assert.Equal(HttpStatusCode.OK, first.StatusCode);
+
+        var second = await client.PostAsJsonAsync("/api/v1/auth/refresh",
+            new { refreshToken = loginBody.RefreshToken });
+
+        Assert.Equal(HttpStatusCode.Unauthorized, second.StatusCode);
+    }
+
+    [Fact]
+    public async Task RefreshToken_EmptyToken_Returns422()
+    {
+        var client = _fixture.CreateClient();
+
+        var refreshResp = await client.PostAsJsonAsync("/api/v1/auth/refresh",
+            new { refreshToken = string.Empty });
+
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, refreshResp.StatusCode);
     }
 
     // ── Story #43: Household Creation & Management ───────────────────────────────

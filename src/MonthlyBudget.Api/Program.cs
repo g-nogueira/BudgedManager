@@ -56,6 +56,7 @@ app.UseExceptionHandler(errorApp =>
         {
             // ── Identity-specific codes (must precede base IdentityDomainException) ──
             InvalidCredentialsException   => StatusCodes.Status401Unauthorized,
+            InvalidRefreshTokenException  => StatusCodes.Status401Unauthorized,
             DuplicateEmailException       => StatusCodes.Status409Conflict,
             UserAlreadyInHouseholdException => StatusCodes.Status409Conflict,
             HouseholdFullException        => StatusCodes.Status409Conflict,

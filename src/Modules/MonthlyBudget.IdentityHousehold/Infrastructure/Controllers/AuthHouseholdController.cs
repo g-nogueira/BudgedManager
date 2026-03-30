@@ -6,6 +6,7 @@ using MonthlyBudget.IdentityHousehold.Application.Features.CreateHousehold;
 using MonthlyBudget.IdentityHousehold.Application.Features.GetHousehold;
 using MonthlyBudget.IdentityHousehold.Application.Features.InviteMember;
 using MonthlyBudget.IdentityHousehold.Application.Features.JoinHousehold;
+using MonthlyBudget.IdentityHousehold.Application.Features.RefreshToken;
 using MonthlyBudget.IdentityHousehold.Application.Features.RegisterUser;
 using MonthlyBudget.IdentityHousehold.Infrastructure.Dto;
 using System.Security.Claims;
@@ -28,6 +29,14 @@ public sealed class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginRequest req, CancellationToken ct)
     {
         var result = await _mediator.Send(new AuthenticateUserCommand(req.Email, req.Password), ct);
+        return Ok(result);
+    }
+
+    [HttpPost("refresh")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest req, CancellationToken ct)
+    {
+        var result = await _mediator.Send(new RefreshTokenCommand(req.RefreshToken), ct);
         return Ok(result);
     }
 }

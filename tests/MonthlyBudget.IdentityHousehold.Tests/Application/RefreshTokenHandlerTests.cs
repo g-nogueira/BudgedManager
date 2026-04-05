@@ -214,5 +214,14 @@ public sealed class RefreshTokenHandlerTests
             _entries.RemoveAll(e => e.UserId == userId);
             return Task.CompletedTask;
         }
+
+        public Task ReplaceAsync(RefreshTokenEntry oldToken, RefreshTokenEntry newToken, CancellationToken ct = default)
+        {
+            DeletedIds.Add(oldToken.Id);
+            _entries.RemoveAll(e => e.Id == oldToken.Id);
+            SavedEntries.Add(newToken);
+            _entries.Add(newToken);
+            return Task.CompletedTask;
+        }
     }
 }

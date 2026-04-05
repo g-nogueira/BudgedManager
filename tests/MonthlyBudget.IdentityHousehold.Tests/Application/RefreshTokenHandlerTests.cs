@@ -70,6 +70,27 @@ public sealed class RefreshTokenHandlerTests
     }
 
     [Fact]
+    public async Task Handle_ValidToken_UsesAtomicReplaceNotSeparateDeleteAndSave()
+    {
+        var user = User.Create("test@example.com", "Alice", "hash");
+        var existing = RefreshTokenEntry.Create(user.UserId, "hash:old-token", DateTime.UtcNow.AddMinutes(30));
+
+        var refreshRepo = new FakeRefreshTokenRepository(existing);
+        var sut = new RefreshTokenHandler(
+            refreshRepo,
+            new FakeUserRepository(user),
+            new FakeHouseholdRepository(Household.Create("Home", user.UserId)),
+            new FakeTokenService(),
+            BuildConfig());
+
+        await sut.Handle(new RefreshTokenCommand("old-token"), CancellationToken.None);
+
+        Assert.Equal(1, refreshRepo.ReplaceCallCount);
+        Assert.Equal(0, refreshRepo.DeleteCallCount);
+        Assert.Equal(0, refreshRepo.SaveCallCount);
+    }
+
+    [Fact]
     public async Task Handle_InvalidToken_ThrowsInvalidRefreshTokenException()
     {
         var user = User.Create("test@example.com", "Alice", "hash");
@@ -233,12 +254,16 @@ public sealed class RefreshTokenHandlerTests
 
         public List<Guid> DeletedIds { get; } = new();
         public List<RefreshTokenEntry> SavedEntries { get; } = new();
+        public int ReplaceCallCount { get; private set; }
+        public int DeleteCallCount { get; private set; }
+        public int SaveCallCount { get; private set; }
 
         public Task<RefreshTokenEntry?> FindByTokenHashAsync(string tokenHash, CancellationToken ct = default)
             => Task.FromResult(_entries.FirstOrDefault(e => e.TokenHash == tokenHash));
 
         public Task SaveAsync(RefreshTokenEntry refreshToken, CancellationToken ct = default)
         {
+            SaveCallCount++;
             SavedEntries.Add(refreshToken);
             _entries.Add(refreshToken);
             return Task.CompletedTask;
@@ -246,6 +271,7 @@ public sealed class RefreshTokenHandlerTests
 
         public Task DeleteAsync(RefreshTokenEntry refreshToken, CancellationToken ct = default)
         {
+            DeleteCallCount++;
             DeletedIds.Add(refreshToken.Id);
             _entries.RemoveAll(e => e.Id == refreshToken.Id);
             return Task.CompletedTask;
@@ -259,6 +285,7 @@ public sealed class RefreshTokenHandlerTests
 
         public Task ReplaceAsync(RefreshTokenEntry oldToken, RefreshTokenEntry newToken, CancellationToken ct = default)
         {
+            ReplaceCallCount++;
             DeletedIds.Add(oldToken.Id);
             _entries.RemoveAll(e => e.Id == oldToken.Id);
             SavedEntries.Add(newToken);

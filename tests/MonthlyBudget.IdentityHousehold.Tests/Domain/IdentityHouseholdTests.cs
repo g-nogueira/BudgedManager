@@ -210,6 +210,13 @@ public class IdentityExceptionsTests
         var ex = new PendingInvitationExistsException(id);
         Assert.Contains(id.ToString(), ex.Message);
     }
+
+    [Fact]
+    public void InvalidRefreshTokenException_HasExpectedMessage()
+    {
+        var ex = new InvalidRefreshTokenException();
+        Assert.Equal("Refresh token is invalid or expired.", ex.Message);
+    }
 }
 
 public class HouseholdAuthorizeInviteTests

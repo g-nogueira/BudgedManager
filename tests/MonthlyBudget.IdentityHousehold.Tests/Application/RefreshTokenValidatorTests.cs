@@ -21,4 +21,22 @@ public sealed class RefreshTokenValidatorTests
 
         Assert.True(result.IsValid);
     }
+
+    [Fact]
+    public void Validate_WhitespaceOnlyToken_FailsValidation()
+    {
+        var validator = new RefreshTokenValidator();
+        var result = validator.Validate(new RefreshTokenCommand("   "));
+
+        Assert.False(result.IsValid);
+    }
+
+    [Fact]
+    public void Validate_EmptyToken_ContainsExpectedErrorMessage()
+    {
+        var validator = new RefreshTokenValidator();
+        var result = validator.Validate(new RefreshTokenCommand(string.Empty));
+
+        Assert.Contains(result.Errors, e => e.ErrorMessage == "Refresh token is required.");
+    }
 }

@@ -37,8 +37,6 @@ public sealed class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, A
         if (existing is null || existing.IsExpired())
             throw new InvalidRefreshTokenException();
 
-        await _refreshTokens.DeleteAsync(existing, ct);
-
         var user = await _users.FindByIdAsync(existing.UserId, ct);
         if (user is null)
             throw new InvalidRefreshTokenException();
@@ -49,7 +47,7 @@ public sealed class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, A
         var newHash = _tokens.HashToken(refreshToken);
         var newEntry = RefreshTokenEntry.Create(user.UserId, newHash, DateTime.UtcNow.AddDays(_refreshTokenExpiryDays));
 
-        await _refreshTokens.SaveAsync(newEntry, ct);
+        await _refreshTokens.ReplaceAsync(existing, newEntry, ct);
 
         return new AuthenticateUserResult(accessToken, refreshToken);
     }

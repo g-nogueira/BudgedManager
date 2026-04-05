@@ -117,6 +117,48 @@ public sealed class RefreshTokenHandlerTests
             sut.Handle(new RefreshTokenCommand("old-token"), CancellationToken.None));
     }
 
+    [Fact]
+    public async Task Handle_ValidToken_UserWithoutHousehold_ReturnsNewTokenPair()
+    {
+        var user = User.Create("solo@example.com", "Solo", "hash");
+        var existing = RefreshTokenEntry.Create(user.UserId, "hash:old-token", DateTime.UtcNow.AddMinutes(30));
+
+        var sut = new RefreshTokenHandler(
+            new FakeRefreshTokenRepository(existing),
+            new FakeUserRepository(user),
+            new FakeHouseholdRepository(null), // user not in any household
+            new FakeTokenService(),
+            BuildConfig());
+
+        var result = await sut.Handle(new RefreshTokenCommand("old-token"), CancellationToken.None);
+
+        Assert.StartsWith("access-", result.AccessToken);
+        Assert.Equal("refresh-1", result.RefreshToken);
+    }
+
+    [Fact]
+    public async Task Handle_MissingRefreshTokenExpiryConfig_DefaultsTo30Days()
+    {
+        var user = User.Create("test@example.com", "Alice", "hash");
+        var existing = RefreshTokenEntry.Create(user.UserId, "hash:old-token", DateTime.UtcNow.AddMinutes(30));
+        var refreshRepo = new FakeRefreshTokenRepository(existing);
+        var emptyConfig = new ConfigurationBuilder().Build();
+
+        var sut = new RefreshTokenHandler(
+            refreshRepo,
+            new FakeUserRepository(user),
+            new FakeHouseholdRepository(null),
+            new FakeTokenService(),
+            emptyConfig);
+
+        var before = DateTime.UtcNow;
+        await sut.Handle(new RefreshTokenCommand("old-token"), CancellationToken.None);
+        var after = DateTime.UtcNow;
+
+        var newEntry = refreshRepo.SavedEntries[0];
+        Assert.InRange(newEntry.ExpiresAt, before.AddDays(29), after.AddDays(31));
+    }
+
     private static IConfiguration BuildConfig()
         => new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
@@ -212,6 +254,15 @@ public sealed class RefreshTokenHandlerTests
         public Task DeleteAllByUserIdAsync(Guid userId, CancellationToken ct = default)
         {
             _entries.RemoveAll(e => e.UserId == userId);
+            return Task.CompletedTask;
+        }
+
+        public Task ReplaceAsync(RefreshTokenEntry oldToken, RefreshTokenEntry newToken, CancellationToken ct = default)
+        {
+            DeletedIds.Add(oldToken.Id);
+            _entries.RemoveAll(e => e.Id == oldToken.Id);
+            SavedEntries.Add(newToken);
+            _entries.Add(newToken);
             return Task.CompletedTask;
         }
     }

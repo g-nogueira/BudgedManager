@@ -144,4 +144,11 @@ public sealed class PostgresRefreshTokenRepository : IRefreshTokenRepository
         _db.RefreshTokens.RemoveRange(tokens);
         await _db.SaveChangesAsync(ct);
     }
+
+    public async Task RotateAsync(RefreshTokenEntry old, RefreshTokenEntry replacement, CancellationToken ct = default)
+    {
+        _db.RefreshTokens.Remove(old);
+        _db.RefreshTokens.Add(replacement);
+        await _db.SaveChangesAsync(ct);
+    }
 }

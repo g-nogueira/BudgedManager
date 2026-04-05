@@ -29,4 +29,5 @@ public interface IRefreshTokenRepository
     Task SaveAsync(RefreshTokenEntry refreshToken, CancellationToken ct = default);
     Task DeleteAsync(RefreshTokenEntry refreshToken, CancellationToken ct = default);
     Task DeleteAllByUserIdAsync(Guid userId, CancellationToken ct = default);
+    Task RotateAsync(RefreshTokenEntry old, RefreshTokenEntry replacement, CancellationToken ct = default);
 }

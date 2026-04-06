@@ -22,6 +22,12 @@ public class ForecastVersion
     public IReadOnlyList<DailyEntry> DailyEntries => _dailyEntries.AsReadOnly();
     public IReadOnlyList<ExpenseSnapshot> ExpenseSnapshots => _expenseSnapshots.AsReadOnly();
     private ForecastVersion() { }
+    /// <summary>
+    /// Create a new original forecast version for the specified budget and household.
+    /// </summary>
+    /// <param name="snapshots">Expense snapshots to include in the forecast; each will have its ForecastId set to the newly generated forecast ID.</param>
+    /// <param name="entries">Daily entries to include in the forecast; each will have its ForecastId set to the newly generated forecast ID.</param>
+    /// <returns>A newly constructed ForecastVersion configured as an original forecast with a generated ForecastId and the provided snapshots and entries attached.</returns>
     public static ForecastVersion CreateOriginal(Guid budgetId, Guid householdId, decimal startBalance, List<ExpenseSnapshot> snapshots, List<DailyEntry> entries)
     {
         var forecast = new ForecastVersion
@@ -42,6 +48,19 @@ public class ForecastVersion
 
         return forecast;
     }
+    /// <summary>
+    /// Creates a reforecast ForecastVersion linked to an existing parent forecast.
+    /// </summary>
+    /// <param name="budgetId">Identifier of the budget the forecast belongs to.</param>
+    /// <param name="householdId">Identifier of the household the forecast belongs to.</param>
+    /// <param name="parentForecastId">Identifier of the parent forecast; must not be <see cref="Guid.Empty"/>.</param>
+    /// <param name="startDay">The starting day index for the forecast.</param>
+    /// <param name="actualBalance">The actual balance to set as both the start and actual balance for the reforecast.</param>
+    /// <param name="label">A human-readable label for this forecast version.</param>
+    /// <param name="snapshots">Expense snapshots to include in the forecast; their ForecastId will be set to the created forecast's ID.</param>
+    /// <param name="entries">Daily entries to include in the forecast; their ForecastId will be set to the created forecast's ID.</param>
+    /// <returns>The newly created ForecastVersion configured as a reforecast.</returns>
+    /// <exception cref="InvalidReforecastException">Thrown when <paramref name="parentForecastId"/> is <see cref="Guid.Empty"/>.</exception>
     public static ForecastVersion CreateReforecast(Guid budgetId, Guid householdId, Guid parentForecastId,
         int startDay, decimal actualBalance, string label, List<ExpenseSnapshot> snapshots, List<DailyEntry> entries)
     {

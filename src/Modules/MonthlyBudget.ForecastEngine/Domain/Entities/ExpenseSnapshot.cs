@@ -21,6 +21,13 @@ public class ExpenseSnapshot
         Category = category, DayOfMonth = dayOfMonth,
         IsSpread = isSpread, Amount = amount, IsExcluded = isExcluded
     };
+    /// <summary>
+    /// Creates a new expense snapshot based on an existing snapshot, optionally overriding its amount.
+    /// </summary>
+    /// <param name="forecastId">Identifier of the forecast to associate with the new snapshot.</param>
+    /// <param name="source">The source snapshot whose properties will be copied.</param>
+    /// <param name="newAmount">If provided, the amount to set on the new snapshot; otherwise the source's amount is used.</param>
+    /// <returns>An <see cref="ExpenseSnapshot"/> with a new <see cref="ExpenseSnapshot.SnapshotId"/>, <see cref="ExpenseSnapshot.ForecastId"/> set to <paramref name="forecastId"/>, other properties copied from <paramref name="source"/>, and the amount set as described.</returns>
     public static ExpenseSnapshot CreateAdjusted(Guid forecastId, ExpenseSnapshot source, decimal? newAmount) => new()
     {
         SnapshotId = Guid.NewGuid(), ForecastId = forecastId,
@@ -29,6 +36,10 @@ public class ExpenseSnapshot
         IsSpread = source.IsSpread, Amount = newAmount ?? source.Amount, IsExcluded = source.IsExcluded
     };
 
+    /// <summary>
+    /// Sets the snapshot's ForecastId to the provided forecast identifier.
+    /// </summary>
+    /// <param name="forecastId">The forecast identifier to assign to this snapshot.</param>
     internal void AssignForecastId(Guid forecastId)
     {
         ForecastId = forecastId;

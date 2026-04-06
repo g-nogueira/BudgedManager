@@ -8,7 +8,15 @@ public static class ForecastCalculator
 {
     /// <summary>
     /// Generates an ORIGINAL forecast from day 1 through <paramref name="monthDays"/>.
+    /// <summary>
+    /// Creates an original forecast version spanning day 1 through the specified month length.
     /// </summary>
+    /// <param name="budgetId">Identifier of the budget the forecast belongs to.</param>
+    /// <param name="householdId">Identifier of the household the forecast belongs to.</param>
+    /// <param name="startBalance">Starting end-of-day balance used on day 1.</param>
+    /// <param name="monthDays">Number of days in the month to project (forecast covers days 1..monthDays).</param>
+    /// <param name="snapshots">Expense snapshots to include in the forecast; these are cloned for the returned version.</param>
+    /// <returns>A ForecastVersion marked as the original forecast containing the provided metadata, cloned snapshots, and computed daily entries for each day from 1 to <paramref name="monthDays"/>.</returns>
     public static ForecastVersion Generate(
         Guid budgetId,
         Guid householdId,
@@ -22,7 +30,18 @@ public static class ForecastCalculator
     }
     /// <summary>
     /// Generates a REFORECAST starting from <paramref name="startDay"/> with <paramref name="actualBalance"/>.
+    /// <summary>
+    /// Creates a reforecast ForecastVersion that projects end-of-day balances and expense items from the specified start day through the end of the month using the provided actual balance and adjusted snapshots.
     /// </summary>
+    /// <param name="budgetId">The budget identifier associated with the forecast.</param>
+    /// <param name="householdId">The household identifier associated with the forecast.</param>
+    /// <param name="parentForecastId">The identifier of the parent forecast from which this reforecast is derived.</param>
+    /// <param name="startDay">The first day (inclusive) of the month for which the reforecast is produced.</param>
+    /// <param name="actualBalance">The starting balance to use on the start day.</param>
+    /// <param name="monthDays">The total number of days in the month used to calculate daily spreads and iterate days.</param>
+    /// <param name="adjustedSnapshots">Expense snapshots to apply for the reforecast; these will be cloned for inclusion in the returned version.</param>
+    /// <param name="versionLabel">A human-readable label for this reforecast version.</param>
+    /// <returns>A ForecastVersion representing the reforecast covering days from <paramref name="startDay"/> through <paramref name="monthDays"/>, containing cloned snapshots and computed daily entries.</returns>
     public static ForecastVersion Reforecast(
         Guid budgetId,
         Guid householdId,

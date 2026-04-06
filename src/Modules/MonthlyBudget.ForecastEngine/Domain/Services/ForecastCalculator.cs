@@ -2,7 +2,7 @@ using MonthlyBudget.ForecastEngine.Domain.Entities;
 namespace MonthlyBudget.ForecastEngine.Domain.Services;
 /// <summary>
 /// Core domain service: computes daily cashflow projection (INV-F1 through INV-F5).
-/// Pure functional � no external dependencies, easily unit-testable.
+/// Pure functional — no external dependencies, easily unit-testable.
 /// </summary>
 public static class ForecastCalculator
 {

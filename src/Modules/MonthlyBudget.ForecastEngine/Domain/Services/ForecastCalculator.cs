@@ -2,7 +2,7 @@ using MonthlyBudget.ForecastEngine.Domain.Entities;
 namespace MonthlyBudget.ForecastEngine.Domain.Services;
 /// <summary>
 /// Core domain service: computes daily cashflow projection (INV-F1 through INV-F5).
-/// Pure functional — no external dependencies, easily unit-testable.
+/// Pure functional ï¿½ no external dependencies, easily unit-testable.
 /// </summary>
 public static class ForecastCalculator
 {
@@ -16,8 +16,7 @@ public static class ForecastCalculator
         int monthDays,
         IReadOnlyList<ExpenseSnapshot> snapshots)
     {
-        var forecastId = Guid.NewGuid();
-        var entries = BuildDailyEntries(forecastId, startBalance, monthDays, snapshots, startDay: 1);
+        var entries = BuildDailyEntries(Guid.Empty, startBalance, monthDays, snapshots, startDay: 1);
         var clonedSnapshots = snapshots.ToList();
         return ForecastVersion.CreateOriginal(budgetId, householdId, startBalance, clonedSnapshots, entries);
     }
@@ -34,8 +33,7 @@ public static class ForecastCalculator
         IReadOnlyList<ExpenseSnapshot> adjustedSnapshots,
         string versionLabel)
     {
-        var forecastId = Guid.NewGuid();
-        var entries = BuildDailyEntries(forecastId, actualBalance, monthDays, adjustedSnapshots, startDay);
+        var entries = BuildDailyEntries(Guid.Empty, actualBalance, monthDays, adjustedSnapshots, startDay);
         var clonedSnapshots = adjustedSnapshots.ToList();
         return ForecastVersion.CreateReforecast(budgetId, householdId, parentForecastId,
             startDay, actualBalance, versionLabel, clonedSnapshots, entries);

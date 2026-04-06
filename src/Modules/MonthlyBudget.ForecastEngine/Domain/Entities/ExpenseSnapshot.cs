@@ -28,4 +28,9 @@ public class ExpenseSnapshot
         Category = source.Category, DayOfMonth = source.DayOfMonth,
         IsSpread = source.IsSpread, Amount = newAmount ?? source.Amount, IsExcluded = source.IsExcluded
     };
+
+    internal void AssignForecastId(Guid forecastId)
+    {
+        ForecastId = forecastId;
+    }
 }

@@ -20,4 +20,9 @@ public class DailyEntry
         entry.DailyExpenseTotal = items.Sum(i => i.Amount);
         return entry;
     }
+
+    internal void AssignForecastId(Guid forecastId)
+    {
+        ForecastId = forecastId;
+    }
 }

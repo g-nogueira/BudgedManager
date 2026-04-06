@@ -147,6 +147,72 @@ public class ForecastCalculatorTests
         Assert.Equal(-200m, drift); // A pays 500, B pays 300 → A has 200 less
     }
 
+    [Fact]
+    public void CreateOriginal_SnapshotsForecastId_MatchesParentForecastId()
+    {
+        var snapshots = new List<ExpenseSnapshot>
+        {
+            ExpenseSnapshot.Create(Guid.Empty, Guid.NewGuid(), "Rent", SnapshotCategory.FIXED, 5, false, 1200m, false),
+            ExpenseSnapshot.Create(Guid.Empty, Guid.NewGuid(), "Streaming", SnapshotCategory.SUBSCRIPTION, null, true, 31m, false)
+        };
+
+        var forecast = ForecastCalculator.Generate(BudgetId, HouseholdId, 3000m, 31, snapshots);
+
+        Assert.All(forecast.ExpenseSnapshots, s => Assert.Equal(forecast.ForecastId, s.ForecastId));
+    }
+
+    [Fact]
+    public void CreateOriginal_DailyEntriesForecastId_MatchesParentForecastId()
+    {
+        var snapshots = new List<ExpenseSnapshot> { FixedExpense(5, 200m) };
+        var forecast = ForecastCalculator.Generate(BudgetId, HouseholdId, 3000m, 31, snapshots);
+
+        Assert.All(forecast.DailyEntries, e => Assert.Equal(forecast.ForecastId, e.ForecastId));
+    }
+
+    [Fact]
+    public void Reforecast_AdjustedSnapshots_ForecastId_MatchesNewForecastId()
+    {
+        var adjustedSnapshots = new List<ExpenseSnapshot>
+        {
+            ExpenseSnapshot.CreateAdjusted(Guid.Empty, FixedExpense(7, 400m), 250m),
+            ExpenseSnapshot.Create(Guid.Empty, Guid.NewGuid(), "Car Repair", SnapshotCategory.VARIABLE, 20, false, 200m, false)
+        };
+
+        var reforecast = ForecastCalculator.Reforecast(
+            BudgetId,
+            HouseholdId,
+            Guid.NewGuid(),
+            10,
+            2200m,
+            31,
+            adjustedSnapshots,
+            "RF-1");
+
+        Assert.All(reforecast.ExpenseSnapshots, s => Assert.Equal(reforecast.ForecastId, s.ForecastId));
+    }
+
+    [Fact]
+    public void Reforecast_DailyEntries_ForecastId_MatchesNewForecastId()
+    {
+        var adjustedSnapshots = new List<ExpenseSnapshot>
+        {
+            ExpenseSnapshot.Create(Guid.Empty, Guid.NewGuid(), "Rent", SnapshotCategory.FIXED, 10, false, 500m, false)
+        };
+
+        var reforecast = ForecastCalculator.Reforecast(
+            BudgetId,
+            HouseholdId,
+            Guid.NewGuid(),
+            10,
+            2200m,
+            31,
+            adjustedSnapshots,
+            "RF-1");
+
+        Assert.All(reforecast.DailyEntries, e => Assert.Equal(reforecast.ForecastId, e.ForecastId));
+    }
+
     // --- AutoSnapshot on Reforecast policy ---------------------------------------
     [Fact]
     public void ForecastVersion_MarkAsSnapshot_IsSnapshot_BeforeReforecast()

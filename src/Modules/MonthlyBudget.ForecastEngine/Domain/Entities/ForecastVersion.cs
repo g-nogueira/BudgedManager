@@ -33,6 +33,13 @@ public class ForecastVersion
         };
         forecast._expenseSnapshots.AddRange(snapshots);
         forecast._dailyEntries.AddRange(entries);
+
+        foreach (var snapshot in forecast._expenseSnapshots)
+            snapshot.AssignForecastId(forecast.ForecastId);
+
+        foreach (var entry in forecast._dailyEntries)
+            entry.AssignForecastId(forecast.ForecastId);
+
         return forecast;
     }
     public static ForecastVersion CreateReforecast(Guid budgetId, Guid householdId, Guid parentForecastId,
@@ -50,6 +57,13 @@ public class ForecastVersion
         };
         forecast._expenseSnapshots.AddRange(snapshots);
         forecast._dailyEntries.AddRange(entries);
+
+        foreach (var snapshot in forecast._expenseSnapshots)
+            snapshot.AssignForecastId(forecast.ForecastId);
+
+        foreach (var entry in forecast._dailyEntries)
+            entry.AssignForecastId(forecast.ForecastId);
+
         return forecast;
     }
     // INV-F4: Snapshots are immutable

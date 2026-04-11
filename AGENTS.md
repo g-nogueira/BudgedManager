@@ -88,32 +88,33 @@ These agents must use `docs/product/` artifacts as the source of truth for produ
 
 ### 3. Project Startup (Architecture → Issues)
 
-`Product Manager → UI Designer → Software Architect → Issue Writer → Issue Reader → Planner → Implementor`
+`Product Manager → UI Designer → Software Architect → Planner (creates issues via github-issues skill) → Implementor`
 
 Full pipeline from product definition to trackable implementation work:
 1. **Product Manager** writes PRD → **UI Designer** generates screens → **Software Architect** creates architecture docs
-2. **Issue Writer** (Mode A) reads PRD user stories + arch docs → creates one GitHub issue per user story on Project #6
-3. **Issue Reader** picks up an issue and feeds it into the delivery pipeline
+2. **Planner** reads PRD user stories + arch docs → creates one GitHub issue per user story on Project #6 (using the `github-issues` skill)
+3. **Planner** picks up an issue, gathers context via the `task-context` skill, and plans implementation
 
 ### 4. Post-Implementation Design Review (Gaps → Issues)
 
-`Software Architect → Issue Writer → Issue Reader → Planner → Implementor`
+`Software Architect → creates issues directly (using github-issues skill) → Planner → Implementor`
 
 Used when UI designs are created after backend implementation has started:
 1. **Software Architect** reviews designs vs. codebase → produces/updates `docs/arch/design-gaps.md`
-2. **Issue Writer** (Mode B) reads `design-gaps.md` → creates one issue per GAP on Project #6
-3. **Issue Reader** picks up a gap issue and feeds it into the delivery pipeline
+2. **Software Architect** reads `design-gaps.md` → creates one issue per GAP on Project #6 (using the `github-issues` skill)
+3. **Planner** picks up a gap issue and feeds it into the delivery pipeline
 
 ### 2. Delivery Pipeline
 
-`Issue Reader → Backend/Frontend Planner → Backend/Frontend Implementor → Backend/Frontend Reviewer`
+`Backend/Frontend Planner (gathers context via task-context skill) → Backend/Frontend Implementor → Backend/Frontend Reviewer`
 
-- Memory files live in `.github/agents/memory/`
+- Memory files live in `.github/agents/memory/active/` (Tier 1 — Working Memory)
 - Naming convention:
-	- `issue-reader-<issue-number>.md`
+	- `task-context-<issue-number>.md`
 	- `plan-<issue-number>.md`
 	- `implementation-<issue-number>.md`
 	- `code-reviewer-<issue-number>.md`
+- Completed memory files are archived to `.github/agents/memory/archive/` when an issue is closed/merged
 
 Use the product/design loop first when the team needs to define or align the UX before implementation. Use the delivery pipeline when executing scoped engineering work from an issue or review. Use the project startup flow (3) when going from zero to implementation. Use the design review flow (4) when designs arrive after implementation has started.
 
@@ -125,6 +126,28 @@ All agents share a single append-only log at `.github/agents/activity-log.md`. T
 - **Agents write after cross-team events:** creating architecture artifacts, opening GitHub issues, opening PRs, completing reviews, writing plans
 - **Entry format:** Date + agent name + 1–2 sentence summary + list of artifacts (files, issues, PRs)
 - **Tone:** Brief, like a 30-second standup update — point to artifacts, don't duplicate content
+- **Rotation:** When the log exceeds ~100 entries, summarize oldest into a sprint summary and move raw entries to `archive/`
+
+### Memory Architecture — 3-Tier Model
+
+| Tier | Location | Purpose | Lifecycle |
+|---|---|---|---|
+| **1 — Active** | `.github/agents/memory/active/` | Current sprint’s working files (issue contexts, plans, reviews) | Created when work starts; archived when issue closes |
+| **2 — Distilled** | `.github/agents/memory/knowledge.md` | Compressed rules, decisions, and patterns from completed work | Updated after each issue via `distill-knowledge` skill; atomic facts only |
+| **3 — Archive** | `.github/agents/memory/archive/` | Raw completed memory files for auditing | Moved from active/ on issue close; never loaded on startup |
+
+The MCP Knowledge Graph (`@modelcontextprotocol/server-memory` configured in `.vscode/mcp.json`) stores structured entity-relationship data for codebase topology and cross-session decisions.
+
+### Instruction Layering
+
+Agent instructions are organized in a layered system to minimize duplication:
+
+| Layer | File | Scope | Always Loaded |
+|---|---|---|---|
+| Global | `.github/copilot-instructions.md` | All agents: grounding rules, git discipline, arch constraints, memory model | Yes |
+| Backend | `.github/instructions/backend.instructions.md` | C#/.NET files: hexagonal rules, build commands, persistence conventions | When editing `src/**/*.cs` or `tests/**/*.cs` |
+| Frontend | `.github/instructions/frontend.instructions.md` | SvelteKit/TS files: TypeScript rules, component patterns, build commands | When editing `frontend/**` |
+| Agent | `.github/agents/<name>.agent.md` | Per-agent: role-specific workflow, grounding rules, handoffs | When agent is active |
 
 ---
 

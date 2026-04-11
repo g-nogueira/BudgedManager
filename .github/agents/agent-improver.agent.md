@@ -4,7 +4,7 @@ description: "Reviews and improves VS Code agent customization files (.agent.md,
 user-invocable: true
 disable-model-invocation: true
 model: Claude Opus 4.6 (copilot)
-tools: ['search', 'read', 'edit/createFile', 'edit/editFiles', 'todo', 'vscode/askQuestions', 'web/fetch', 'google-search/*']
+tools: ['search', 'read', 'edit/createFile', 'edit/editFiles', 'todo', 'vscode/askQuestions', 'web/fetch', 'execute']
 ---
 
 # Agent Improver — Retrospective-Driven Customization Reviewer
@@ -260,7 +260,8 @@ These are the customization files in this repository. Use this as a reference wh
 - `frontend-implementor.agent.md` — Executes frontend implementation plans
 - `frontend-planner.agent.md` — Plans frontend implementation from issue context
 - `frontend-reviewer.agent.md` — Reviews frontend PRs
-- `issue-reader.agent.md` — Fetches GitHub issue context for handoff
+- `issue-writer.agent.md` — **Pending deletion** (replaced by github-issues skill)
+- `issue-reader.agent.md` — **Pending deletion** (replaced by task-context skill)
 - `product-manager.agent.md` — Defines product requirements and user stories
 - `software-architect.agent.md` — Architecture decisions and validation
 - `ui-designer.agent.md` — Generates UI screens from PRDs
@@ -268,10 +269,13 @@ These are the customization files in this repository. Use this as a reference wh
 **Skill files** (`.github/skills/`):
 - `additive-review/SKILL.md` — Additive PR review workflow
 - `api-exercise/SKILL.md` — API endpoint validation
+- `distill-knowledge/SKILL.md` — Compress Tier 1 memory into Tier 2 knowledge
 - `dotnet-tdd/SKILL.md` — .NET build/test/migration commands
+- `github-issues/SKILL.md` — Standardized issue creation workflow (replaces issue-writer agent)
 - `hexagonal-validation/SKILL.md` — Architecture purity checks
 - `resume/SKILL.md` — Resume interrupted work
 - `sveltekit-dev/SKILL.md` — SvelteKit development workflow
+- `task-context/SKILL.md` — Gather and verify issue context (replaces issue-reader agent)
 
 **Global files:**
 - `.github/copilot-instructions.md` — Project-wide rules and workflows

@@ -241,3 +241,271 @@
 - The activity log grows indefinitely — if it gets too large, agents may waste context scanning old entries. Consider periodic archival or "last N entries" guidance
 - Write compliance is a soft instruction (no structural gate like the Retro Summary Gate) — monitor whether agents actually write to the log
 - Log quality may drift — entries could become too verbose or too terse. The "standup" framing and entry template should help constrain this
+
+---
+
+### 2026-04-20 — All Agents + Global Instructions — Instruction deduplication, 3-tier memory, Staff Engineer persona
+
+**Retro trigger:** User identified massive instruction duplication across all 12 agent files — No Suppositions, Repository, Grounding Rules, Git Rules, and Hexagonal Rules were copy-pasted identically in every agent. Memory architecture was flat (37+ files in a single directory) with no tiering or compression. The MCP knowledge graph was configured but the `.vscode/mcp.json` was empty. Context window was wasted on repeated boilerplate instead of agent-specific content.
+
+**Files modified:**
+- `.github/copilot-instructions.md` — Full rewrite as "Staff Engineer" persona. Consolidated: No Suppositions, Repository info, 7 global Grounding Rules, Git Discipline, Architectural Constraints, Architecture Reference tables, 3-Tier Memory Model, Knowledge Graph (MCP) conventions, Activity Log rotation rules, Artifact-Driven Handoffs, 5 Agent Workflows, Agent Conventions, Blocker Protocol. Added "Know Your Limitations" section (context window decay, hallucination risk, error snowballing, semantic drift).
+- `.github/instructions/backend.instructions.md` — **Created** with `applyTo: 'src/**/*.cs,tests/**/*.cs'`. Contains: 6 backend-specific grounding rules, hexagonal layer table, build/test commands, persistence conventions, cross-context communication rules.
+- `.github/instructions/frontend.instructions.md` — **Created** with `applyTo: 'frontend/**/*.ts,frontend/**/*.svelte,frontend/**/*.js'`. Contains: 4 frontend-specific grounding rules, TypeScript rules, state handling, build commands, "Never Load Backend Files" list.
+- All 12 `.agent.md` files — Stripped: ⛔ No Suppositions section, Repository section, "Scan on startup: activity-log" line, "NEVER pre-load: Architecture.md" line. Trimmed Grounding Rules to agent-specific only (renamed to "Agent-Specific Grounding Rules"). Removed Git Rules and Hexagonal/Frontend Architecture quick-reference tables from implementor agents (now in `.instructions.md` files). Updated all memory paths from `memory/<type>-` to `memory/active/<type>-`.
+- `.vscode/mcp.json` — Added `@modelcontextprotocol/server-memory` configuration.
+- `AGENTS.md` — Updated Delivery Pipeline memory paths to `memory/active/`. Added "Memory Architecture — 3-Tier Model" section with tier table and MCP note. Added "Instruction Layering" section with 4-layer table. Added activity log rotation rule.
+
+**What changed & why:**
+| # | Section | Change | Rationale |
+|---|---------|--------|-----------|
+| 1 | copilot-instructions.md | Full rewrite as Staff Engineer with AI limitations awareness | Prior version used XML tags and duplicated agent-level content; needed a clear persona and centralized shared rules |
+| 2 | New: backend.instructions.md | Created conditional backend rules (applyTo glob) | Hexagonal rules, build commands, persistence conventions were duplicated in backend agents; conditional loading saves context window |
+| 3 | New: frontend.instructions.md | Created conditional frontend rules (applyTo glob) | Frontend architecture rules, TS rules, build commands were duplicated in frontend agents |
+| 4 | All agents: No Suppositions | Removed (now in global) | Identical block copy-pasted in all 12 agents |
+| 5 | All agents: Repository | Removed (now in global header) | Identical 4-line block in all 12 agents |
+| 6 | All agents: Grounding Rules | Trimmed to agent-specific only | Generic rules (verify paths, types, namespaces) now in global; agent keeps only role-specific rules |
+| 7 | Implementors: Git/Arch Rules | Removed quick-reference sections | Now in conditional .instructions.md files loaded automatically |
+| 8 | All agents: Memory paths | Changed `memory/` to `memory/active/` | 3-tier model requires active files in `active/` subdirectory |
+| 9 | .vscode/mcp.json | Added memory server config | Was empty; knowledge graph tools now available to agents |
+| 10 | AGENTS.md | Added Memory Architecture + Instruction Layering | Human developers need to understand the new organization |
+
+**What was working (kept):**
+- Agent-specific execution workflows (Step 1-7 per agent) — untouched, these are role-specific
+- Memory file templates (exact markdown structure for issue-reader, plan, implementation, code-reviewer) — preserved
+- Context Loading Priority ordering per agent — only removed scan/never-preload lines that moved to global
+- Skills integration (dotnet-tdd, api-exercise, hexagonal-validation, additive-review, sveltekit-dev) — untouched
+- Handoff chain definitions in agent frontmatter — preserved
+- Critical Rules section per agent — preserved with agent-specific content
+- Activity log convention — preserved, added rotation rule
+
+**What wasn't working (fixed):**
+- 12 copies of No Suppositions (4-6 bullet points each) wasted context window in every agent invocation
+- 12 copies of Repository block (4 lines each) consumed tokens for static info
+- Generic grounding rules (verify file paths, types, namespaces, invariants, endpoints) repeated in every agent — ~7 rules × 12 agents = ~84 rule instances that were identical
+- Git Rules in implementor agents duplicated copilot-instructions.md Git Discipline
+- Hexagonal Architecture and Frontend Architecture quick-reference tables duplicated backend/frontend .instructions.md content
+- Memory files stored flat in single directory — no lifecycle management, no archival, no tiered access
+- MCP knowledge graph configured in copilot-instructions.md but .vscode/mcp.json was empty — tools were unavailable
+- No conditional instruction loading — all rules loaded regardless of whether editing .cs or .svelte files
+
+**Lessons learned:**
+- Instruction deduplication follows the DRY principle but for prompts: shared rules in `copilot-instructions.md` (always loaded), stack-specific rules in `.instructions.md` (conditionally loaded via `applyTo` globs), and only role-specific rules in `.agent.md`. This 3-layer instruction model mirrors the 3-tier memory model.
+- The `applyTo` glob pattern in `.instructions.md` files is powerful for context-aware loading — backend rules only load when editing `.cs` files, saving ~30 lines of context window during frontend work.
+- AI agent limitations (context decay, hallucination, error snowballing, semantic drift) should be stated explicitly in the system prompt — agents that "know their weaknesses" can self-correct more effectively than agents given only positive instructions.
+- Memory tiering (active → distilled → archive) prevents the indefinite linear growth problem that append-only systems suffer. The key insight from cognitive memory research: working memory should be small and fast, semantic memory should be compressed facts, episodic archives should never load on startup.
+- Renaming "Grounding Rules" to "Agent-Specific Grounding Rules" in each agent file makes the layering explicit — agents understand that generic rules come from globals, and their section adds agent-unique rules on top.
+- Existing files at the old `memory/` root need manual triage to move to `archive/` — the structural change in references means new files go to the right place, but legacy files require a one-time cleanup.
+
+**Risks & watch items:**
+- 37+ legacy memory files still at `memory/` root (not in `active/` or `archive/`) — agents referencing `memory/active/` paths won't find these old files. Manual triage needed to move completed issue files to `archive/`.
+- Agent-specific grounding rules may be too thin for some agents — if an agent skips generic verification because it assumes globals handle it, but globals aren't loaded in that context, the agent may hallucinate. Monitor for this failure mode.
+- The `applyTo` glob in `.instructions.md` depends on VS Code's file context detection — verify it works when agents read files outside the glob pattern.
+- MCP knowledge graph tools are now available but no entity/relation data exists yet — agents need to start populating the graph during their next execution runs.
+
+---
+
+### 2026-04-27 — All Agents + Skills — Replace issue-writer agent with shared github-issues skill
+
+**Retro trigger:** Backport from thermo-replacer repo. The Issue Writer was a dedicated agent that only created GitHub issues — too narrow for a full agent. The same capability is better expressed as a shared skill invocable by any agent (Planner, Software Architect, PM) that needs to create issues, eliminating the handoff bottleneck of routing through a dedicated agent.
+
+**Files modified:**
+- `.github/skills/github-issues/SKILL.md` — **Created** shared skill with 7-step workflow: select template → read template → enrich with project docs → verify context quality → search duplicates → HITL gate → create issues. Supports batch creation and Project #6 integration. Labels use bounded context conventions (`budget-management`, `forecast-engine`, `identity-household`, `shared-kernel`, `frontend`).
+- `.github/ISSUE_TEMPLATE/feature.md` — **Created** user story format with bounded context, invariant, and API endpoint references
+- `.github/ISSUE_TEMPLATE/bug.md` — **Created** repro steps template with bounded context reference
+- `.github/ISSUE_TEMPLATE/tech-debt.md` — **Created** with affected components checklist
+- `.github/ISSUE_TEMPLATE/spike.md` — **Created** with goal, timebox, research questions, expected output
+- `.github/agents/software-architect.agent.md` — Removed "Hand off to Issue Writer" from YAML frontmatter handoffs; added `github-issues` skill reference for creating issues directly from design gaps
+- `.github/agents/backend-planner.agent.md` — Added `github-issues` skill to skills list
+- `.github/agents/frontend-planner.agent.md` — Added `github-issues` skill to skills list
+- `.github/agents/backend-implementor.agent.md` — Added `github-issues` skill for follow-up issue creation
+- `.github/agents/frontend-implementor.agent.md` — Added `github-issues` skill for follow-up issue creation
+- `.github/agents/backend-reviewer.agent.md` — Added `github-issues` skill for filing issues from reviews
+- `.github/agents/frontend-reviewer.agent.md` — Added `github-issues` skill for filing issues from reviews
+- `.github/copilot-instructions.md` — Updated Workflow 4 and 5 to reference `github-issues` skill instead of Issue Writer agent
+- `AGENTS.md` — Updated sections 3 (Project Startup) and 4 (Design Review) to replace Issue Writer with skill references
+- `.github/agents/agent-improver.agent.md` — Marked `issue-writer.agent.md` as "Pending deletion"; added `github-issues/SKILL.md` to inventory
+
+**What changed & why:**
+| # | Section | Change | Rationale |
+|---|---------|--------|-----------|
+| 1 | New skill | Created `github-issues` skill with template-driven workflow | Issue creation is a capability, not a role — any agent that discovers work should be able to file issues without a dedicated handoff |
+| 2 | Issue templates | Created 4 templates (feature, bug, tech-debt, spike) | Standardize issue format across all creation paths — agents and humans use the same templates |
+| 3 | Architect handoffs | Removed Issue Writer handoff; added skill reference | Architect can now create issues directly via skill instead of handing off to a separate agent |
+| 4 | All planners/implementors/reviewers | Added `github-issues` skill | Any agent that discovers follow-up work can file issues inline |
+| 5 | Workflows 4 & 5 | Replaced "Issue Writer" with "github-issues skill" | Pipeline is shorter — no dedicated agent hop for issue creation |
+
+**What was working (kept):**
+- HITL confirmation gate before bulk issue creation (carried forward from Issue Writer)
+- Label conventions for bounded contexts
+- Duplicate detection before creation
+- Software Architect's design-gaps.md format as input for issue creation
+
+**What wasn't working (fixed):**
+- Dedicated Issue Writer agent was a bottleneck — every issue creation required routing through it
+- Agents that discovered follow-up work (reviewers finding bugs, implementors discovering tech debt) had no mechanism to file issues inline
+- Issue format was ad-hoc when different agents created issues — no shared templates
+
+**Lessons learned:**
+- When a capability is used by multiple agents but doesn't require persistent state or a unique execution workflow, it's a skill — not an agent. The litmus test: if the "agent" has no memory files, no context loading priority, and no multi-step workflow beyond its single capability, it should be a skill.
+- Shared issue templates ensure consistency regardless of which agent (or human) creates the issue — the template is the contract, not the creator.
+- Removing a handoff hop (Agent A → Issue Writer → downstream) in favor of inline skill invocation (Agent A uses skill directly) reduces latency and error propagation in multi-agent chains.
+
+**Risks & watch items:**
+- `issue-writer.agent.md` is marked "Pending deletion" — should be deleted once confirmed no other references exist
+- Agents may create issues with inconsistent quality if they skip the skill's quality checks — the HITL gate mitigates this
+- Label creation (e.g., `priority:p0`) requires GitHub permissions — verify agents can create labels if they don't exist
+
+---
+
+### 2026-04-27 — All Agents + Skill — Add distill-knowledge skill and agent learnings capture
+
+**Retro trigger:** Backport from thermo-replacer repo. Knowledge was accumulating in Tier 1 memory files but never compressed into Tier 2 (`knowledge.md`). Agents had no structured convention for recording what they learned during execution — decisions, patterns, and gotchas evaporated between sessions. The MCP knowledge graph was available but Tier 2 had no defined lifecycle.
+
+**Files modified:**
+- `.github/skills/distill-knowledge/SKILL.md` — **Created** 7-step procedure: identify issue → read Tier 1 files → extract learnings → dedup against knowledge.md → write new entries → archive raw files → report. Categories adapted for BudgetManager: Architecture Decisions, Domain Invariants, Codebase Conventions, Build & Tooling, API Patterns, Persistence Patterns, Cross-Context Communication, Review Findings, Frontend Patterns, Gotchas.
+- `.github/agents/backend-planner.agent.md` — Added Step 6 "Record Learnings" with Decisions/Patterns/Gotchas format
+- `.github/agents/frontend-planner.agent.md` — Added "Record Learnings" section at end of workflow
+- `.github/agents/backend-implementor.agent.md` — Added Step 9 "Record Learnings" after memory file write step
+- `.github/agents/frontend-implementor.agent.md` — Added Step 6 "Record Learnings" after memory file template
+- `.github/agents/backend-reviewer.agent.md` — Added "Record Learnings" section after Hand Off
+- `.github/agents/frontend-reviewer.agent.md` — Added "Record Learnings" section after Critical Rules
+- `.github/agents/software-architect.agent.md` — Added "Record Learnings" section before Critical Rules
+- `.github/agents/product-manager.agent.md` — Added "Record Learnings" section before Handoff Chain
+- `.github/agents/ui-designer.agent.md` — Added Step 8 "Record Learnings"; renumbered Hand Off to Step 9
+- `.github/copilot-instructions.md` — Updated Tier 2 definition to reference `distill-knowledge` skill; added agent Learnings convention to Agent Conventions section
+- `AGENTS.md` — Updated Tier 2 lifecycle description
+
+**What changed & why:**
+| # | Section | Change | Rationale |
+|---|---------|--------|-----------|
+| 1 | New skill | Created `distill-knowledge` skill | No mechanism existed to compress Tier 1 → Tier 2; knowledge evaporated between sessions |
+| 2 | All 9 non-improver agents | Added "Record Learnings" section | Agents need a structured way to capture decisions, patterns, and gotchas during execution — raw material for the distill skill |
+| 3 | copilot-instructions.md | Updated Tier 2 definition + agent conventions | Tier 2 lifecycle was vague ("updated after each sprint"); now concrete: "updated after each issue via distill-knowledge skill" |
+| 4 | AGENTS.md | Updated Tier 2 lifecycle | Human-facing docs must match agent-facing instructions |
+
+**What was working (kept):**
+- 3-Tier memory model structure (Active → Distilled → Archive)
+- Memory file templates for each agent role
+- Tier 1 naming conventions (task-context, plan, implementation, code-reviewer)
+- knowledge.md as the distilled knowledge store
+
+**What wasn't working (fixed):**
+- No convention for agents to record learnings during execution — decisions and gotchas were lost
+- No compression step from Tier 1 → Tier 2 was defined beyond "updated after each sprint"
+- knowledge.md had no structured entry format — agents wouldn't know what to write
+
+**Lessons learned:**
+- Knowledge capture must be lightweight enough to not disrupt flow — a simple Decisions/Patterns/Gotchas list at the end of each agent's output is the minimum viable capture. Heavier formats (full narratives, structured JSON) would be skipped.
+- The distill step should be a separate invocation (user-triggered) rather than automatic — agents shouldn't self-distill because they may over-compress or mis-categorize their own learnings.
+- Categories in knowledge.md should map to the project's actual architecture (bounded contexts, hexagonal layers, API patterns) rather than generic software categories — agents can then grep for relevant knowledge by domain area.
+
+**Risks & watch items:**
+- Agents may produce low-quality Learnings sections (too vague, too verbose, or restating the obvious) — review the first few runs and refine the prompt if needed
+- The distill-knowledge skill deduplication step requires reading the full knowledge.md — if the file grows very large, this may hit context window limits
+- Learnings sections add ~5-10 lines to each agent's output — monitor whether this creates noise in the memory files
+
+---
+
+### 2026-04-27 — All Agents + Skill — Replace issue-reader agent with shared task-context skill
+
+**Retro trigger:** Backport from thermo-replacer repo. The Issue Reader was a single-purpose agent that fetched GitHub issue context and wrote a memory file. It had no multi-step workflow, no persistent state, and no unique execution strategy — it was a context-gathering function dressed as an agent. Converting it to a skill allows any agent (Planner, Reviewer, Implementor resuming work) to gather task context inline without a dedicated handoff.
+
+**Files modified:**
+- `.github/skills/task-context/SKILL.md` — **Created** with two modes: Mode 1 (Primary Gather: fetch issue, read codebase, write task-context file) and Mode 2 (Completeness Check: validate existing file against 8-item checklist). Architecture Context section includes bounded context, invariants table, API endpoints table, domain events table, cross-context interactions. Memory file naming: `task-context-<issue-number>.md`.
+- `.github/agents/backend-planner.agent.md` — Replaced issue-reader-* references with task-context-*; updated pre-flight to use task-context skill (Mode 1 or Mode 2); added `task-context` to skills list
+- `.github/agents/frontend-planner.agent.md` — Same pattern as backend-planner
+- `.github/agents/backend-implementor.agent.md` — Added `task-context` skill (Mode 2) to skills list
+- `.github/agents/frontend-implementor.agent.md` — Added `task-context` skill (Mode 2) to skills list
+- `.github/agents/backend-reviewer.agent.md` — Changed context loading from `issue-reader-*` to `task-context-*`; added `task-context` skill (Mode 2)
+- `.github/agents/frontend-reviewer.agent.md` — Same pattern as backend-reviewer
+- `.github/copilot-instructions.md` — Updated Workflow 1 to remove Issue Reader; updated Tier 1 naming example
+- `AGENTS.md` — Updated Delivery Pipeline to remove Issue Reader; changed naming convention from `issue-reader-*` to `task-context-*`
+- `.github/skills/resume/SKILL.md` — Updated memory file paths from `issue-reader-*` to `task-context-*` and from `memory/` to `memory/active/`
+- `.github/agents/agent-improver.agent.md` — Marked `issue-reader.agent.md` as "Pending deletion"; added `task-context/SKILL.md` to inventory
+
+**What changed & why:**
+| # | Section | Change | Rationale |
+|---|---------|--------|-----------|
+| 1 | New skill | Created `task-context` skill with Mode 1 (gather) and Mode 2 (check) | Issue Reader was a single-function agent — same litmus test as Issue Writer: no memory, no multi-step workflow, no unique execution strategy |
+| 2 | Planner pre-flights | Check for task-context file, invoke Mode 1 or Mode 2 | Planners no longer wait for a separate agent — they gather context inline |
+| 3 | All agents | Renamed issue-reader-* → task-context-* in references | New naming reflects the skill's role (gathering task context) not the retired agent's name |
+| 4 | Implementors/Reviewers | Added task-context Mode 2 | Downstream agents can validate context completeness without re-gathering from scratch |
+| 5 | Resume skill | Updated memory file paths | Must reference new naming convention to find files correctly |
+
+**What was working (kept):**
+- The task-context memory file structure (metadata, issue body, codebase context, architecture context)
+- Completeness checklist (8 items covering bounded context, invariants, API endpoints, etc.)
+- GitHub issue fetching workflow (read issue, parse body, extract labels)
+- Mode 2 as a quality gate for downstream agents
+
+**What wasn't working (fixed):**
+- Issue Reader required a dedicated handoff hop before every planning session — added latency
+- Only planners could trigger context gathering — implementors and reviewers that needed fresh context had no mechanism
+- "Issue Reader" naming implied the agent only read issues — the actual capability was broader (codebase exploration, architecture cross-referencing)
+
+**Lessons learned:**
+- The agent-vs-skill litmus test is clear: if the unit has no persistent state, no multi-step execution workflow, and no unique tool requirements beyond reading/writing files, it's a skill. Both Issue Writer and Issue Reader failed this test.
+- Dual-mode skills (Mode 1: create, Mode 2: validate) are effective for context files — the creator mode runs once, the validator mode runs every time a downstream agent loads the file, catching staleness without re-gathering.
+- Renaming memory files during a skill migration requires updating every reference across all agents, skills, and documentation — a grep for the old name across `.md` files is essential to avoid orphaned references.
+- Converting agents to skills shortens the pipeline by removing handoff hops — this directly reduces error compounding in multi-agent chains (fewer handoffs = fewer opportunities for context loss or misinterpretation).
+
+**Risks & watch items:**
+- `issue-reader.agent.md` is marked "Pending deletion" — should be deleted once confirmed no other references exist
+- Legacy `issue-reader-*.md` memory files in `memory/active/` or `memory/archive/` still use the old naming — the resume skill now looks for `task-context-*`, so old files won't be found automatically. Manual renaming or a compatibility note may be needed.
+- Planners now have more responsibility (context gathering + planning) — monitor whether this overloads their context window compared to the previous split
+
+---
+
+### 2026-04-27 — All Agents + Global Instructions — Add HITL (Human In The Loop) gates
+
+**Retro trigger:** Backport from thermo-replacer repo. All thermo-replacer agents had explicit HITL gate steps — confirmation points where agents must pause and get user approval via `vscode/askQuestions` before proceeding. BudgetManager agents were missing these gates entirely (planners, implementors, reviewers, architect) or had only informal confirmation language without explicit HITL labeling (PM, UI Designer). Without structured gates, agents could execute entire workflows without any human checkpoint.
+
+**Files modified:**
+- `.github/copilot-instructions.md` — Added `## HITL (Human In The Loop) Gates` section with per-agent gate table; added HITL agent convention line
+- `.github/agents/backend-planner.agent.md` — Added Step 5 "Present Plan & Get Confirmation (HITL Gate)"; renumbered Steps 6-8; added HITL critical rule
+- `.github/agents/frontend-planner.agent.md` — Added Step 5 "Present Plan & Get Confirmation (HITL Gate)"; added HITL critical rule
+- `.github/agents/backend-implementor.agent.md` — Added Step 0.5 "Confirm High-Level Approach (HITL Gate)"; added Step 7 "Confirm Before Opening PR (HITL Gate)"; renumbered Steps 8-10; added HITL critical rules
+- `.github/agents/frontend-implementor.agent.md` — Added Step 0.5 "Confirm High-Level Approach (HITL Gate)"; added Step 4 "Confirm Before Opening PR (HITL Gate)"; renumbered Steps 5-7; added HITL critical rules
+- `.github/agents/backend-reviewer.agent.md` — Added Step 11 "Confirm Findings (HITL Gate)"; added HITL critical rule
+- `.github/agents/frontend-reviewer.agent.md` — Added Step 10 "Confirm Findings (HITL Gate)"; added HITL critical rule
+- `.github/agents/software-architect.agent.md` — Added Phase 3.5 "Confirm Architecture Plan (HITL Gate)"; added Phase 3.6 "Suggest PRD/Design Changes (HITL Gate)"; added Mode B confirm findings step; added HITL critical rule
+- `.github/agents/ui-designer.agent.md` — Added explicit HITL labels to screen plan confirmation (Step 2), between-screen confirmation (Step 4), and new Step 8.5 "Confirm Before Handoff (HITL Gate)"; updated critical rules with HITL labels
+- `.github/agents/product-manager.agent.md` — Added explicit HITL labels to State 2 confirmation and State 4 finalization; updated critical rules with `vscode/askQuestions` reference
+
+**What changed & why:**
+| # | Section | Change | Rationale |
+|---|---------|--------|-----------|
+| 1 | copilot-instructions.md | Added HITL Gates section with per-agent table + enforcement rule | No centralized definition of where human checkpoints should occur |
+| 2 | copilot-instructions.md | Added HITL agent convention | HITL gates were not part of the shared agent conventions |
+| 3 | Backend/Frontend Planner | Added "Present Plan & Get Confirmation" step before writing to memory | Planners wrote plans to memory without user review — incorrect plans propagated downstream |
+| 4 | Backend/Frontend Implementor | Added "Confirm Approach" before coding + "Confirm Before PR" before pushing | Implementors could execute an entire plan and open a PR without any human checkpoint |
+| 5 | Backend/Frontend Reviewer | Added "Confirm Findings" before posting to GitHub | Reviewers could post findings to GitHub without human verification — false positives create noise |
+| 6 | Software Architect | Added architecture plan + design changes HITL gates | Architect could produce artifacts based on misunderstood requirements without checkpoint |
+| 7 | UI Designer | Added explicit HITL labels + confirm-before-handoff | Had informal confirmation language but no structured gates; missing handoff confirmation |
+| 8 | Product Manager | Added explicit HITL labels + `vscode/askQuestions` refs | Had informal "ask for confirmation" but no explicit HITL labeling or tool reference |
+
+**What was working (kept):**
+- All existing execution workflows (step structures preserved, only insertion/labeling added)
+- Product Manager's State 2 synthesis confirmation (now labeled as HITL gate)
+- UI Designer's screen plan confirmation (now labeled as HITL gate)
+- All critical rules sections (HITL rules added, existing rules unchanged)
+
+**What wasn't working (fixed):**
+- Planners wrote plans to memory without user confirmation — incorrect plans propagated to implementors
+- Implementors could run the entire plan and open PRs without any human checkpoint
+- Reviewers could post findings to GitHub PR threads without human verification
+- Software Architect had no confirmation step between analysis and artifact production
+- UI Designer had no explicit handoff confirmation and no between-screen HITL label
+- Product Manager had informal confirmation language without `vscode/askQuestions` tool reference
+
+**Lessons learned:**
+- HITL gates must be explicit steps in the workflow with the "(HITL Gate)" label in the heading — informal language like "ask for confirmation" is too easily skipped or reinterpreted by agents
+- The `vscode/askQuestions` tool must be named explicitly in HITL instructions — without it, agents may "confirm" by stating their plan in chat and proceeding without waiting for a response
+- A centralized HITL table in global instructions creates accountability — agents can cross-reference their own gates, and the Agent Improver can audit compliance
+- HITL gates at handoff boundaries (before writing to memory, before opening PR, before posting review) are the most critical — they prevent incorrect state from propagating to downstream agents
+
+**Risks & watch items:**
+- HITL gates add latency to every workflow — monitor whether users find them too frequent or want to batch-approve multiple gates
+- Implementors now have two HITL gates (before coding + before PR) — for small fixes, this may feel excessive. Consider adding a "skip HITL for trivial changes" escape hatch if users complain
+- Some agents may interpret "wait for confirmation" as blocking indefinitely — ensure agents present their question clearly and don't proceed until an explicit response arrives

@@ -28,10 +28,10 @@ git log --oneline -10
 
 Read ALL memory files for the issue, in this order:
 
-1. `.github/agents/memory/issue-reader-<issue-number>.md` — Original issue context
-2. `.github/agents/memory/plan-<issue-number>.md` — Implementation plan
-3. `.github/agents/memory/implementation-<issue-number>.md` — Implementation output (if exists)
-4. `.github/agents/memory/code-reviewer-<issue-number>.md` — Review feedback (if exists)
+1. `.github/agents/memory/active/task-context-<issue-number>.md` — Issue context (created by the `task-context` skill)
+2. `.github/agents/memory/active/plan-<issue-number>.md` — Implementation plan
+3. `.github/agents/memory/active/implementation-<issue-number>.md` — Implementation output (if exists)
+4. `.github/agents/memory/active/code-reviewer-<issue-number>.md` — Review feedback (if exists)
 
 ## Step 3: Check Plan Progress Markers
 

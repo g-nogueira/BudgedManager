@@ -157,7 +157,7 @@ flowchart LR
 
 ### Agents Summary
 
-| Agent | File | User-Invokable | Hands Off To |
+| Agent | File | user-invocable | Hands Off To |
 |---|---|---|---|
 | Product Manager | `.github/agents/product-manager.agent.md` | Yes | UI Designer, Software Architect |
 | UI Designer | `.github/agents/ui-designer.agent.md` | Yes | Software Architect, Product Manager |

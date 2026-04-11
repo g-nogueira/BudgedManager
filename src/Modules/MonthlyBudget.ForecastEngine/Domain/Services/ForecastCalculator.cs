@@ -1,13 +1,11 @@
 using MonthlyBudget.ForecastEngine.Domain.Entities;
 namespace MonthlyBudget.ForecastEngine.Domain.Services;
 /// <summary>
-/// Core domain service: computes daily cashflow projection (INV-F1 through INV-F5).
-/// Pure functional — no external dependencies, easily unit-testable.
+/// Core domain service: computes daily cashflow projection (INV-F1, INV-F2, INV-F3, INV-F5).
+/// Pure functional - no external dependencies, easily unit-testable.
 /// </summary>
 public static class ForecastCalculator
 {
-    /// <summary>
-    /// Generates an ORIGINAL forecast from day 1 through <paramref name="monthDays"/>.
     /// <summary>
     /// Creates an original forecast version spanning day 1 through the specified month length.
     /// </summary>
@@ -24,12 +22,10 @@ public static class ForecastCalculator
         int monthDays,
         IReadOnlyList<ExpenseSnapshot> snapshots)
     {
-        var entries = BuildDailyEntries(Guid.Empty, startBalance, monthDays, snapshots, startDay: 1);
+        var entries = BuildDailyEntries(startBalance, monthDays, snapshots, startDay: 1);
         var clonedSnapshots = snapshots.ToList();
         return ForecastVersion.CreateOriginal(budgetId, householdId, startBalance, clonedSnapshots, entries);
     }
-    /// <summary>
-    /// Generates a REFORECAST starting from <paramref name="startDay"/> with <paramref name="actualBalance"/>.
     /// <summary>
     /// Creates a reforecast ForecastVersion that projects end-of-day balances and expense items from the specified start day through the end of the month using the provided actual balance and adjusted snapshots.
     /// </summary>
@@ -52,14 +48,13 @@ public static class ForecastCalculator
         IReadOnlyList<ExpenseSnapshot> adjustedSnapshots,
         string versionLabel)
     {
-        var entries = BuildDailyEntries(Guid.Empty, actualBalance, monthDays, adjustedSnapshots, startDay);
+        var entries = BuildDailyEntries(actualBalance, monthDays, adjustedSnapshots, startDay);
         var clonedSnapshots = adjustedSnapshots.ToList();
         return ForecastVersion.CreateReforecast(budgetId, householdId, parentForecastId,
             startDay, actualBalance, versionLabel, clonedSnapshots, entries);
     }
     // --- Core Algorithm ----------------------------------------------------------
     private static List<DailyEntry> BuildDailyEntries(
-        Guid forecastId,
         decimal startBalance,
         int monthDays,
         IReadOnlyList<ExpenseSnapshot> snapshots,
@@ -100,7 +95,7 @@ public static class ForecastCalculator
                 balance -= spreadToday;
             }
             balance = Math.Round(balance, 2, MidpointRounding.AwayFromZero);
-            entries.Add(DailyEntry.Create(forecastId, day, balance, items));
+            entries.Add(DailyEntry.Create(Guid.Empty, day, balance, items));
         }
         return entries;
     }

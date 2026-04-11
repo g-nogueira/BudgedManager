@@ -148,7 +148,7 @@ public class ForecastCalculatorTests
     }
 
     [Fact]
-    public void CreateOriginal_SnapshotsForecastId_MatchesParentForecastId()
+    public void CreateOriginal_SnapshotsForecastId_MatchesForecastId()
     {
         var snapshots = new List<ExpenseSnapshot>
         {
@@ -162,7 +162,7 @@ public class ForecastCalculatorTests
     }
 
     [Fact]
-    public void CreateOriginal_DailyEntriesForecastId_MatchesParentForecastId()
+    public void CreateOriginal_DailyEntriesForecastId_MatchesForecastId()
     {
         var snapshots = new List<ExpenseSnapshot> { FixedExpense(5, 200m) };
         var forecast = ForecastCalculator.Generate(BudgetId, HouseholdId, 3000m, 31, snapshots);
@@ -211,6 +211,36 @@ public class ForecastCalculatorTests
             "RF-1");
 
         Assert.All(reforecast.DailyEntries, e => Assert.Equal(reforecast.ForecastId, e.ForecastId));
+    }
+
+    [Fact]
+    public void Reforecast_WithParentSnapshots_DoesNotMutateParentForecastId()
+    {
+        var parent = ForecastCalculator.Generate(
+            BudgetId,
+            HouseholdId,
+            3000m,
+            31,
+            new List<ExpenseSnapshot>
+            {
+                FixedExpense(7, 400m),
+                SpreadExpense(31m)
+            });
+
+        var parentForecastId = parent.ForecastId;
+
+        var reforecast = ForecastCalculator.Reforecast(
+            BudgetId,
+            HouseholdId,
+            parentForecastId,
+            10,
+            2200m,
+            31,
+            parent.ExpenseSnapshots,
+            "RF-1");
+
+        Assert.All(parent.ExpenseSnapshots, snapshot => Assert.Equal(parentForecastId, snapshot.ForecastId));
+        Assert.All(reforecast.ExpenseSnapshots, snapshot => Assert.Equal(reforecast.ForecastId, snapshot.ForecastId));
     }
 
     // --- AutoSnapshot on Reforecast policy ---------------------------------------

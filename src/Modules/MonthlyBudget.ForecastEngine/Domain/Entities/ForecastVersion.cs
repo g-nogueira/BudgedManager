@@ -37,11 +37,16 @@ public class ForecastVersion
             StartDay = 0, StartBalance = startBalance, ForecastType = ForecastType.ORIGINAL,
             IsSnapshot = false, CreatedAt = DateTime.UtcNow
         };
-        forecast._expenseSnapshots.AddRange(snapshots);
+        forecast._expenseSnapshots.AddRange(snapshots.Select(snapshot => ExpenseSnapshot.Create(
+            forecast.ForecastId,
+            snapshot.OriginalExpenseId,
+            snapshot.Name,
+            snapshot.Category,
+            snapshot.DayOfMonth,
+            snapshot.IsSpread,
+            snapshot.Amount,
+            snapshot.IsExcluded)));
         forecast._dailyEntries.AddRange(entries);
-
-        foreach (var snapshot in forecast._expenseSnapshots)
-            snapshot.AssignForecastId(forecast.ForecastId);
 
         foreach (var entry in forecast._dailyEntries)
             entry.AssignForecastId(forecast.ForecastId);
@@ -74,11 +79,16 @@ public class ForecastVersion
             ForecastType = ForecastType.REFORECAST, ParentForecastId = parentForecastId,
             IsSnapshot = false, CreatedAt = DateTime.UtcNow
         };
-        forecast._expenseSnapshots.AddRange(snapshots);
+        forecast._expenseSnapshots.AddRange(snapshots.Select(snapshot => ExpenseSnapshot.Create(
+            forecast.ForecastId,
+            snapshot.OriginalExpenseId,
+            snapshot.Name,
+            snapshot.Category,
+            snapshot.DayOfMonth,
+            snapshot.IsSpread,
+            snapshot.Amount,
+            snapshot.IsExcluded)));
         forecast._dailyEntries.AddRange(entries);
-
-        foreach (var snapshot in forecast._expenseSnapshots)
-            snapshot.AssignForecastId(forecast.ForecastId);
 
         foreach (var entry in forecast._dailyEntries)
             entry.AssignForecastId(forecast.ForecastId);

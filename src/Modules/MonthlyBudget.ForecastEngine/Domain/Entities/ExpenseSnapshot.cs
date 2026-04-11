@@ -35,13 +35,4 @@ public class ExpenseSnapshot
         Category = source.Category, DayOfMonth = source.DayOfMonth,
         IsSpread = source.IsSpread, Amount = newAmount ?? source.Amount, IsExcluded = source.IsExcluded
     };
-
-    /// <summary>
-    /// Sets the snapshot's ForecastId to the provided forecast identifier.
-    /// </summary>
-    /// <param name="forecastId">The forecast identifier to assign to this snapshot.</param>
-    internal void AssignForecastId(Guid forecastId)
-    {
-        ForecastId = forecastId;
-    }
 }

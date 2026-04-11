@@ -25,6 +25,9 @@ frontend/build/
 frontend/dist/
 # Agent memory (runtime files, not for version control)
 .github/agents/memory/
+!.github/agents/memory/active/
+!.github/agents/memory/archive/
+!.github/agents/memory/knowledge.md
 # OS
 .DS_Store
 Thumbs.db

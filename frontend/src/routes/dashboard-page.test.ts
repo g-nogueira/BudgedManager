@@ -19,7 +19,12 @@ import { budget, budgetError, budgetLoading } from '$lib/stores/budgetStore';
 import { forecast, forecastError, forecastLoading, forecasts } from '$lib/stores/forecastStore';
 import DashboardPage from './+page.svelte';
 
-const buildBudget = (): Budget => ({
+// Fixed point-in-time used for all time-sensitive assertions in this suite.
+const FIXED_DATE = new Date('2026-04-12T12:00:00Z');
+const FIXED_DAY = 12;
+const FORECAST_CREATED_AT = '2026-04-11T10:00:00Z';
+
+const buildBudget = (overrides?: Partial<Budget>): Budget => ({
   budgetId: 'budget-1',
   householdId: 'household-1',
   yearMonth: '2026-04',
@@ -28,27 +33,24 @@ const buildBudget = (): Budget => ({
   expenses: [],
   totalIncome: 1500,
   createdAt: '2026-04-01T00:00:00Z',
-  updatedAt: '2026-04-01T00:00:00Z'
+  updatedAt: '2026-04-01T00:00:00Z',
+  ...overrides
 });
 
-const buildDailyEntries = (): DailyEntry[] => {
-  const today = new Date().getDate();
-
-  return [
-    {
-      dayNumber: Math.max(1, today - 1),
-      remainingBalance: 950,
-      dailyExpenseTotal: 20,
-      breakdown: []
-    },
-    {
-      dayNumber: today,
-      remainingBalance: 900,
-      dailyExpenseTotal: 50,
-      breakdown: []
-    }
-  ];
-};
+const buildDailyEntries = (): DailyEntry[] => [
+  {
+    dayNumber: FIXED_DAY - 1,
+    remainingBalance: 950,
+    dailyExpenseTotal: 20,
+    breakdown: []
+  },
+  {
+    dayNumber: FIXED_DAY,
+    remainingBalance: 900,
+    dailyExpenseTotal: 50,
+    breakdown: []
+  }
+];
 
 const buildForecastSummary = (): ForecastSummary => ({
   forecastId: 'forecast-1',
@@ -56,7 +58,7 @@ const buildForecastSummary = (): ForecastSummary => ({
   forecastType: 'ORIGINAL',
   endOfMonthBalance: 900,
   isSnapshot: false,
-  createdAt: '2026-04-11T10:00:00Z'
+  createdAt: FORECAST_CREATED_AT
 });
 
 const buildForecast = (overrides?: Partial<Forecast>): Forecast => ({
@@ -83,16 +85,14 @@ const resetStores = (): void => {
   forecastError.set(null);
 };
 
-const configureSuccessfulLoad = (staleValue?: boolean): void => {
-  const budgetValue = buildBudget();
-  const forecastSummary = buildForecastSummary();
-  const forecastValue = buildForecast(
-    staleValue === undefined
-      ? undefined
-      : {
-          isStale: staleValue
-        }
-  );
+// When stale=true, budget was updated after the forecast was created → stale.
+// When stale=false (default), budget was updated before the forecast was created → not stale.
+const configureSuccessfulLoad = (options?: { stale?: boolean }): void => {
+  const budgetValue = buildBudget({
+    updatedAt: options?.stale ? '2026-04-12T10:00:00Z' : '2026-04-01T00:00:00Z'
+  });
+  const forecastSummary = buildForecastSummary(); // createdAt: FORECAST_CREATED_AT ('2026-04-11T10:00:00Z')
+  const forecastValue = buildForecast();
 
   vi.mocked(budgetApi.getBudgetByMonth).mockResolvedValue(budgetValue);
   vi.mocked(forecastApi.getForecastsByBudget).mockResolvedValue([forecastSummary]);
@@ -101,11 +101,14 @@ const configureSuccessfulLoad = (staleValue?: boolean): void => {
 
 describe('Dashboard route', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(FIXED_DATE);
     resetStores();
     vi.resetAllMocks();
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     cleanup();
   });
 
@@ -123,7 +126,7 @@ describe('Dashboard route', () => {
   });
 
   it('renders "No budget for this month" when budget is null', async () => {
-    vi.mocked(budgetApi.getBudgetByMonth).mockResolvedValue(null as unknown as Budget);
+    vi.mocked(budgetApi.getBudgetByMonth).mockResolvedValue(null);
 
     render(DashboardPage);
 
@@ -144,7 +147,7 @@ describe('Dashboard route', () => {
   });
 
   it('renders BalanceSummary with correct data when budget+forecast exist', async () => {
-    configureSuccessfulLoad(false);
+    configureSuccessfulLoad();
 
     render(DashboardPage);
 
@@ -154,7 +157,7 @@ describe('Dashboard route', () => {
   });
 
   it('renders ForecastChart with dailyEntries', async () => {
-    configureSuccessfulLoad(false);
+    configureSuccessfulLoad();
 
     render(DashboardPage);
 
@@ -163,8 +166,8 @@ describe('Dashboard route', () => {
     });
   });
 
-  it('renders stale banner when forecast.isStale is true', async () => {
-    configureSuccessfulLoad(true);
+  it('renders stale banner when budget was updated after forecast was created', async () => {
+    configureSuccessfulLoad({ stale: true });
 
     render(DashboardPage);
 
@@ -173,8 +176,8 @@ describe('Dashboard route', () => {
     });
   });
 
-  it('does not render stale banner when forecast.isStale is false/undefined', async () => {
-    configureSuccessfulLoad();
+  it('does not render stale banner when forecast is more recent than last budget update', async () => {
+    configureSuccessfulLoad({ stale: false });
 
     render(DashboardPage);
 

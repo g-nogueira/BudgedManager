@@ -50,7 +50,28 @@
     return entryForToday?.remainingBalance ?? null;
   });
 
-  const showStaleIndicator = $derived(Boolean($forecast?.isStale));
+  const showStaleIndicator = $derived.by(() => {
+    const currentBudget = $budget;
+    const activeForecast = $forecast;
+
+    if (!currentBudget?.updatedAt || !activeForecast) {
+      return false;
+    }
+
+    const summary = $forecasts.find((f) => f.forecastId === activeForecast.forecastId);
+    if (!summary?.createdAt) {
+      return false;
+    }
+
+    const budgetUpdatedAt = new Date(currentBudget.updatedAt).getTime();
+    const forecastCreatedAt = new Date(summary.createdAt).getTime();
+
+    if (Number.isNaN(budgetUpdatedAt) || Number.isNaN(forecastCreatedAt)) {
+      return false;
+    }
+
+    return budgetUpdatedAt > forecastCreatedAt;
+  });
 
   onMount(async () => {
     await fetchBudgetByMonth(currentYearMonth);
@@ -94,12 +115,14 @@
       Understand your month in one place with your latest forecast and current balance.
     </p>
 
-    <BalanceSummary
-      yearMonth={$budget.yearMonth}
-      endOfMonthBalance={$forecast?.endOfMonthBalance ?? 0}
-      {todayBalance}
-      todayDate={formattedToday}
-    />
+    {#if $forecast}
+      <BalanceSummary
+        yearMonth={$budget.yearMonth}
+        endOfMonthBalance={$forecast.endOfMonthBalance}
+        {todayBalance}
+        todayDate={formattedToday}
+      />
+    {/if}
 
     <StaleIndicator visible={showStaleIndicator} />
 

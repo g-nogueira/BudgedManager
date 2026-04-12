@@ -9,8 +9,6 @@ export interface Forecast {
   startBalance: number;
   endOfMonthBalance: number;
   isSnapshot: boolean;
-  // Stubbed until backend persists stale-state in forecast payloads.
-  isStale?: boolean;
   dailyEntries: DailyEntry[];
 }
 
@@ -20,8 +18,6 @@ export interface ForecastSummary {
   forecastType: ForecastType;
   endOfMonthBalance: number;
   isSnapshot: boolean;
-  // Stubbed until backend persists stale-state in forecast payloads.
-  isStale?: boolean;
   createdAt: string;
 }
 

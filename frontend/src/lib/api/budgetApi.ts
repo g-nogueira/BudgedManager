@@ -34,10 +34,14 @@ export const getBudgetById = async (budgetId: string): Promise<Budget> => {
   return handleResponse<Budget>(response);
 };
 
-export const getBudgetByMonth = async (yearMonth: string): Promise<Budget> => {
+export const getBudgetByMonth = async (yearMonth: string): Promise<Budget | null> => {
   const response = await fetch(`${API_BASE}/api/v1/budgets/by-month/${yearMonth}`, {
     headers: { ...getAuthHeader() }
   });
+
+  if (response.status === 404) {
+    return null;
+  }
 
   return handleResponse<Budget>(response);
 };

@@ -125,8 +125,8 @@ Every agent uses `vscode/askQuestions` for structured confirmation at key decisi
 | UI Designer | Confirm screen plan; confirm between each screen generation; confirm before handoff |
 | Software Architect | Confirm architecture plan; confirm changes needed on PRD/designs; confirm before handoff |
 | Backend/Frontend Planner | Confirm implementation plan before writing to memory; confirm issue creation plan before creating issues |
-| Backend/Frontend Implementor | Confirm high-level approach before coding; confirm before opening PR |
-| Backend/Frontend Reviewer | Confirm review findings before posting to GitHub |
+| Backend/Frontend Implementor | Confirm high-level approach before coding; confirm before opening PR; confirm PR feedback fix plan before addressing review comments |
+| Backend/Frontend Reviewer | Confirm review findings before posting to GitHub (always as COMMENT event — never REQUEST_CHANGES) |
 
 **Rule:** No agent may proceed past a HITL gate without explicit user confirmation via `vscode/askQuestions`.
 
@@ -148,8 +148,9 @@ Use when product scope, UX, or feasibility must be aligned before implementation
 `Backend/Frontend Planner (gathers context via task-context skill) → Backend/Frontend Implementor`
 
 **Workflow 2 — PR Review & Fix (Additive Model):**
-`Reviewer → Planner (filters OPEN RPs) → Implementor (fixes, pushes)`
-Skill: `.github/skills/additive-review/SKILL.md`
+`Reviewer → Implementor (addresses feedback via address-pr-feedback skill, consults Planner sub-agent if needed)`
+The Implementor is the primary agent for addressing PR feedback. For straightforward code fixes, the Implementor handles them directly. For design-level questions, the Implementor invokes the Planner as a sub-agent. The Reviewer then runs the next additive review round.
+Skills: `.github/skills/additive-review/SKILL.md`, `.github/skills/address-pr-feedback/SKILL.md`
 
 **Workflow 3 — Resume Interrupted Work:**
 Skill: `.github/skills/resume/SKILL.md`
@@ -167,6 +168,37 @@ Skill: `.github/skills/resume/SKILL.md`
 - All agents write **Decisions Made** sections in their memory files to prevent re-asking resolved questions
 - All agents append a **## Learnings** section to their memory files (decisions, patterns, gotchas) — raw material for the `distill-knowledge` skill
 - After issue closure, invoke the **distill-knowledge** skill to compress Tier 1 → Tier 2 and archive raw files
+
+### Sub-agent Invocation Convention
+
+Agents can invoke other agents as **sub-agents** for quick, focused consultations without a full handoff. Sub-agents run in isolated context and return a focused response.
+
+**Handoffs vs. Sub-agents — use the right mechanism:**
+- **Handoff** = "I'm done with my part, you take over the full session." The user switches to the new agent.
+- **Sub-agent** = "I need a quick answer, then I'll continue my work." The sub-agent runs in the background and returns a result.
+
+**Allowed sub-agent pairs:**
+| Parent Agent | Can Invoke as Sub-agent | Purpose |
+|---|---|---|
+| Backend Implementor | Backend Planner | Design questions, scope gaps, plan ambiguities |
+| Backend Implementor | Backend Reviewer | Quick code sanity checks (e.g., invariant enforcement correctness) |
+| Backend Reviewer | Backend Planner | Verify whether an implementation choice was deliberate vs. accidental |
+| Frontend Implementor | Frontend Planner | Design questions, scope gaps, plan ambiguities |
+| Frontend Implementor | Frontend Reviewer | Quick code sanity checks (e.g., TypeScript type correctness) |
+| Frontend Reviewer | Frontend Planner | Verify whether an implementation choice was deliberate vs. accidental |
+
+**Anti-chattiness rule:** Only invoke a sub-agent when you've **exhausted your own knowledge** — check your memory files, search the codebase, re-read the plan/spec. Sub-agents are for questions that require another agent's specialized expertise, not for avoiding thinking.
+
+**Sub-agents inherit HITL:** When a sub-agent hits a HITL gate defined in its own agent file, it will ask the user. This is expected — the user stays in control even during sub-agent consultations.
+
+### `vscode/askQuestions` Tool — Long Content Rule
+
+The `vscode/askQuestions` tool has limited display space for question text. When the content you need to present is **too long** for the tool (more than 2-3 short paragraphs or more than ~500 characters of question text):
+
+1. **Write the full context to the chat response first** — present all the details, tables, lists, code snippets, etc. in your normal chat message
+2. **Then use `vscode/askQuestions`** with a **short summary question** that references the written context (e.g., "See the plan above — should I proceed with all 5 items, or do you want to change anything?")
+
+This ensures the user can read all the details at their own pace in the chat, and the tool popup stays scannable and actionable. Never cram detailed analysis, long lists, or multi-paragraph explanations into the `vscode/askQuestions` tool — those belong in the chat response.
 
 ## Blocker Protocol
 

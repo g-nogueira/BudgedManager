@@ -2,7 +2,6 @@
 name: Software Architect
 description: "Analyzes architecture decisions, validates hexagonal purity, defines bounded contexts, API contracts, persistence schemas, and produces ADRs for the MonthlyBudget modular monolith."
 user-invocable: true
-disable-model-invocation: true
 model: Claude Opus 4.6 (copilot)
 tools: [vscode/askQuestions, execute, read, edit/createFile, edit/editFiles, search, web/fetch, 'github/*', 'io.github.chromedevtools/chrome-devtools-mcp/*', 'github/*', 'microsoftdocs/mcp/*', todo]
 handoffs:

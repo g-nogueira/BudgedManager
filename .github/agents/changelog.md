@@ -35,6 +35,74 @@
 ---
 -->
 
+### 2026-04-18 — All Agents + copilot-instructions.md + AGENTS.md — Port PR feedback flow, sub-agents, and COMMENT-only rule from thermo-replacer
+
+**Retro trigger:** Four improvements validated in the `thermo-replacer` project (Genial-T31 Bridge) needed to be ported back to MonthlyBudget. These were project-agnostic pipeline improvements discovered during that project's implementation: (1) Reviewer repeatedly hit REQUEST_CHANGES API errors on own PR. (2) PR feedback routing through Planner was an unnecessary intermediary. (3) Agents couldn't consult each other mid-task because `disable-model-invocation: true` blocked sub-agent calls. (4) `vscode/askQuestions` tool truncated long content, breaking HITL usability.
+
+**Files modified:**
+- `.github/skills/address-pr-feedback/SKILL.md` — **Created.** 10-step workflow for addressing PR review feedback: classify review points (direct-fix vs. escalate-to-planner), HITL confirmation, fix code, build verification, reply to GitHub threads, commit/push, update memory, request re-review. Includes escalation signals checklist and GitHub thread reply conventions. Adapted for both .NET and SvelteKit stacks.
+- `.github/agents/backend-reviewer.agent.md` — Removed `disable-model-invocation: true`. Added `agent` tool and `agents: ['Backend Planner']`. Added "Always use COMMENT event" as top Critical Rule. Updated handoff from Backend Planner → Backend Implementor. Added Sub-agent Invocation section. Updated pre-flight to use task-context completeness check. Updated HITL gate to reference COMMENT-only.
+- `.github/agents/frontend-reviewer.agent.md` — Same changes as backend-reviewer, adapted for frontend (agents: Frontend Planner, handoff to Frontend Implementor).
+- `.github/agents/backend-implementor.agent.md` — Removed `disable-model-invocation: true`. Added `agent` tool and `agents: ['Backend Planner', 'Backend Reviewer']`. Added `address-pr-feedback` skill reference. Added Sub-agent Invocation section with escalation criteria, anti-chattiness rules, HITL inheritance note. Updated pre-flight to use task-context completeness check.
+- `.github/agents/frontend-implementor.agent.md` — Same changes as backend-implementor, adapted for frontend.
+- `.github/agents/backend-planner.agent.md` — Removed `disable-model-invocation: true` (enables sub-agent invocation by Implementor/Reviewer).
+- `.github/agents/frontend-planner.agent.md` — Same as backend-planner.
+- `.github/agents/product-manager.agent.md` — Removed `disable-model-invocation: true`.
+- `.github/agents/software-architect.agent.md` — Removed `disable-model-invocation: true`.
+- `.github/agents/ui-designer.agent.md` — Removed `disable-model-invocation: true`.
+- `.github/copilot-instructions.md` — Updated Workflow 2 to route Reviewer→Implementor (was Reviewer→Planner→Implementor). Added HITL table entries for Implementor PR feedback gate and Reviewer COMMENT note. Added "Sub-agent Invocation Convention" section with allowed pairs table, anti-chattiness rule, and HITL inheritance note. Added "`vscode/askQuestions` Tool — Long Content Rule" section.
+- `AGENTS.md` — Updated Delivery Pipeline section to document the PR Review & Fix additive model with Implementor as primary fixer.
+- `.github/agents/agent-improver.agent.md` — Added `address-pr-feedback/SKILL.md` to skill inventory.
+
+**What changed & why:**
+| # | Section | Change | Rationale |
+|---|---------|--------|-----------|
+| 1 | New skill | Created `address-pr-feedback` with full workflow | Implementor needs structured workflow for addressing review comments with escalation criteria |
+| 2 | Reviewer Critical Rules | Added "Always use COMMENT event" with explanation | Reviewer hits GitHub API error when using REQUEST_CHANGES on own PR — permanent setup constraint |
+| 3 | Reviewer handoff | Target: Planner → Implementor | Developers fix their own code; Planner available as sub-agent for design questions |
+| 4 | Agent frontmatter | Removed `disable-model-invocation: true` from all 9 agents | Enables sub-agent invocation between agents |
+| 5 | Implementor/Reviewer frontmatter | Added `agent` tool + `agents` whitelist | Controlled sub-agent invocation with specific allowed pairs |
+| 6 | Sub-agent guidelines | Added to Implementors, Reviewers, and global instructions | Clear rules about when to use sub-agents vs. handoffs vs. just doing it yourself |
+| 7 | Workflow 2 | `Reviewer → Implementor` (was `Reviewer → Planner → Implementor`) | Removes unnecessary Planner intermediary for straightforward PR fixes |
+| 8 | HITL table | Added Implementor PR feedback gate; added COMMENT note on Reviewer | Reflects new skill's HITL gate and COMMENT constraint |
+| 9 | Global askQuestions rule | Added long-content workaround | Tool truncates long text; writing to chat first solves visibility problem |
+| 10 | Pre-flight checks | Implementors and Reviewers now run task-context completeness check | Downstream agents should verify context, not blindly trust |
+
+**What was working (kept):**
+- Additive review model (baseline, delta, review points) — preserved, skill integrates with it
+- 3-tier memory architecture — preserved
+- Pre-flight checks and self-verification checkpoints — preserved
+- Handoff buttons for full context switches — preserved alongside new sub-agent capability
+- HITL gates at all decision points — preserved, new ones added
+- Git discipline conventions — preserved
+- Skill-based capability pattern — extended with new skill
+- All existing Critical Rules on reviewers — preserved, new rules added
+- Learnings capture across all agents — preserved (already present from earlier sync)
+
+**What wasn't working (fixed):**
+- Reviewer repeatedly got "can't request changes on own PR" API error — now hardcoded to always use COMMENT event with clear explanation of why
+- PR feedback addressing required unnecessary Planner intermediary — now Implementor handles directly with Planner available as sub-agent for design questions
+- All agents had `disable-model-invocation: true` preventing any inter-agent consultation — now all agents can be invoked as sub-agents, with Implementors and Reviewers having controlled `agents` whitelists
+- `vscode/askQuestions` tool questions were too long to read — now agents write full context to chat first and use the tool for a short summary question only
+- Implementors and Reviewers didn't verify context completeness — now pre-flight includes task-context Mode 2 check
+
+**Lessons learned:**
+- **Permanent setup constraints should be elevated to Critical Rules, not left as runtime discoveries.** When an agent encounters the same error repeatedly (like "can't REQUEST_CHANGES on own PR"), the constraint should be baked into its instructions so it never attempts the failing action.
+- **Sub-agent invocation requires a three-part framework: (1) who can invoke whom, (2) when to invoke vs. handle yourself, (3) what the sub-agent should do vs. what the parent continues.** Without all three, agents either never use sub-agents or over-use them.
+- **The "developer addresses reviewer feedback" pattern from real teams maps cleanly to "Implementor addresses PR feedback with Planner sub-agent for escalation."** The Planner-as-intermediary model was an over-formalization that didn't match how real engineering teams work.
+- **Tool limitations should be addressed with explicit workaround conventions, not vague guidance.** The `vscode/askQuestions` truncation issue was causing real HITL failures — the "write to chat first, then ask short question" pattern is a concrete, testable convention.
+- **Cross-project improvement porting is effective when changes are project-agnostic.** The pipeline structural improvements (sub-agents, COMMENT rule, PR feedback flow, askQuestions rule) transferred cleanly because they didn't depend on the tech stack.
+
+**Risks & watch items:**
+- The `agents` property and sub-agent invocation are marked **experimental** in VS Code docs (as of April 2026) — API could change in future updates
+- Agents might **over-invoke sub-agents** instead of making decisions independently — monitor for chattiness and add stricter guidelines if needed
+- The `address-pr-feedback` skill's **escalation checklist** needs validation against real PR review rounds
+- Removing `disable-model-invocation: true` from all agents means any agent with the `agent` tool could invoke them — the `agents` whitelist on the calling agents is the control
+- The **long-content workaround** relies on agent judgment about "too long" — monitor if agents are consistent
+- The Reviewer's handoff now goes to **Implementor instead of Planner** — if the user prefers the Planner to plan fixes first, the workflow may need an alternative path
+
+---
+
 ### 2026-03-21 — UI Designer — Add post-generation consistency self-review
 
 **Retro trigger:** Stitch-generated screens were handed off with missing loading/error/empty states and style/layout drift between screens. No systematic quality gate existed before handoff.

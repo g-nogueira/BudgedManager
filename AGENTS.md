@@ -108,6 +108,10 @@ Used when UI designs are created after backend implementation has started:
 
 `Backend/Frontend Planner (gathers context via task-context skill) → Backend/Frontend Implementor → Backend/Frontend Reviewer`
 
+**PR Review & Fix (Additive Model):**
+`Reviewer → Implementor (addresses feedback via address-pr-feedback skill, consults Planner sub-agent if needed)`
+The Implementor is the primary agent for addressing PR feedback. For straightforward code fixes, the Implementor handles them directly. For design-level questions, the Implementor invokes the Planner as a sub-agent. The Reviewer then runs the next additive review round.
+
 - Memory files live in `.github/agents/memory/active/` (Tier 1 — Working Memory)
 - Naming convention:
 	- `task-context-<issue-number>.md`

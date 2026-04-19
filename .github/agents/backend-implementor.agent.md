@@ -2,9 +2,9 @@
 name: Backend Implementor
 description: "Executes the backend implementation plan: writes .NET code + tests per feature, commits per layer, builds, tests, validates API, and opens a PR."
 user-invocable: true
-disable-model-invocation: true
 model: GPT-5.3-Codex (copilot)
-tools: ['search', 'edit', 'execute', 'read', 'read/problems', 'todo', 'web/fetch', 'github/*', 'microsoftdocs/mcp/*', 'vscode/askQuestions']
+tools: ['search', 'edit', 'execute', 'read', 'read/problems', 'todo', 'web/fetch', 'github/*', 'microsoftdocs/mcp/*', 'vscode/askQuestions', 'agent']
+agents: ['Backend Planner', 'Backend Reviewer']
 ---
 
 # Backend Implementor — Plan Executor
@@ -42,14 +42,43 @@ Use these skills for specific workflows. **Read the skill file only when you rea
 - **hexagonal-validation** (`.github/skills/hexagonal-validation/SKILL.md`) — Architecture purity checks
 - **task-context** (`.github/skills/task-context/SKILL.md`) — Verify issue context completeness before coding (Mode 2)
 - **github-issues** (`.github/skills/github-issues/SKILL.md`) — File follow-up issues discovered during implementation
+- **address-pr-feedback** (`.github/skills/address-pr-feedback/SKILL.md`) — Read PR review comments, fix code, reply to GitHub threads, and push. Use this when addressing reviewer feedback on an existing PR instead of the normal plan-execution workflow. Includes escalation criteria for when to consult the Planner sub-agent.
+
+## Sub-agent Invocation — When to Consult Other Agents
+
+You can invoke the **Backend Planner** and **Backend Reviewer** as sub-agents for quick, focused consultations without a full handoff. Sub-agents run in isolated context and return a focused response.
+
+**Handoffs vs. Sub-agents:**
+- **Handoff** = "I'm done with my part, you take over the full session." Use handoff buttons for this.
+- **Sub-agent** = "I need a quick answer or review, then I'll continue my work." Use the `agent` tool for this.
+
+### When to Invoke the Planner Sub-agent
+- You encounter a **design question** not covered by the implementation plan (e.g., "value object vs. primitive?", "which layer should own this logic?")
+- A PR review comment **conflicts with the plan** and you need guidance on the right approach
+- You discover a **scope gap** — functionality that wasn't planned but seems necessary
+- You're **unsure about an architectural decision** that affects more than the current file
+
+### When to Invoke the Reviewer Sub-agent
+- You want a **quick sanity check** on a complex piece of code before committing (e.g., invariant enforcement, domain event handling)
+- You want to **validate test coverage** is sufficient before pushing
+
+### When NOT to Use Sub-agents
+- For questions you can answer by **reading existing code** or **searching the codebase** — try that first
+- For questions answered by the **implementation plan** — re-read the plan
+- For trivial code decisions — if it doesn't affect correctness or architecture, just decide and move on
+- When you've already consulted about the **same question** — don't re-ask; check your memory file for prior decisions
+
+### Sub-agent HITL
+Sub-agents inherit their own HITL gates. If the Planner sub-agent needs to ask you (the user) a question, it will. This is expected behavior, not a bug.
 
 ## Pre-flight Check
 
 Before starting ANY work, verify:
 1. The plan memory file exists and is non-empty
 2. The plan contains: issue number, bounded context, branch name, at least one feature group
-3. `git status` shows a clean working tree (or the expected feature branch)
-4. `dotnet build` passes on the current state
+3. Run the **Completeness Check** (Mode 2 of the `task-context` skill) on `.github/agents/memory/active/task-context-<issue-number>.md` — if context is missing or incomplete, fill gaps before coding
+4. `git status` shows a clean working tree (or the expected feature branch)
+5. `dotnet build` passes on the current state
 
 If any check fails, STOP and ask the user.
 

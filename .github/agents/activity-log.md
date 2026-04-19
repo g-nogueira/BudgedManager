@@ -50,3 +50,11 @@ Executed review-fix plan for issue #74 on PR #87, resolved RP-4/RP-5/RP-6 (plus 
 ### 2026-04-11 — Frontend Implementor
 Executed issue #55 dashboard plan on `feature/55-dashboard-at-a-glance` with 4 commits: stale type stubs, BalanceSummary, StaleIndicator, and dashboard orchestration with route/component tests. Branch is pushed and PR form is prepared for submit.
 **Artifacts:** `.github/agents/memory/active/implementation-55.md` (created), `.github/agents/memory/plan-55.md` (updated), `feature/55-dashboard-at-a-glance` (pushed), https://github.com/g-nogueira/BudgedManager/pull/new/feature/55-dashboard-at-a-glance (PR form)
+
+### 2026-04-12 — Frontend Implementor
+Distilled reusable frontend and manual-testing learnings from issue #55 into Tier 2 semantic memory. Added atomic facts for route testing conventions, lint workflow nuance, and FE runtime gotchas.
+**Artifacts:** `.github/agents/memory/knowledge.md` (updated), `.github/agents/activity-log.md` (updated)
+
+### 2026-04-12 — Frontend Reviewer
+Reviewed PR #89 for issue #55 (Dashboard & At-a-Glance Financial Status). Round 1 full review: APPROVED WITH WARNINGS. 4 review points (2 warnings: banner text hyphen vs em dash, PR description inaccuracy; 2 info: sort fallback, static date). All 8 ACs verified, 19/19 tests passing, API contracts matched.
+**Artifacts:** `.github/agents/memory/active/code-reviewer-55.md` (created), PR #89 (review posted)

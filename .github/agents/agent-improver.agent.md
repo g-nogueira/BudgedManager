@@ -268,6 +268,7 @@ These are the customization files in this repository. Use this as a reference wh
 
 **Skill files** (`.github/skills/`):
 - `additive-review/SKILL.md` — Additive PR review workflow
+- `address-pr-feedback/SKILL.md` — Address PR review feedback (used by Implementors)
 - `api-exercise/SKILL.md` — API endpoint validation
 - `distill-knowledge/SKILL.md` — Compress Tier 1 memory into Tier 2 knowledge
 - `dotnet-tdd/SKILL.md` — .NET build/test/migration commands

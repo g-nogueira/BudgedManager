@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import { onMount } from 'svelte';
   import ExpenseForm from '$lib/components/ExpenseForm.svelte';
   import ExpenseList from '$lib/components/ExpenseList.svelte';
   import IncomeSection from '$lib/components/IncomeSection.svelte';
@@ -30,21 +29,7 @@
   } from '$lib/types/budget';
 
   let initializing = $state($budget === null);
-
-  const getBudgetIdFromParams = (): string => {
-    const budgetId = page.params.budgetId;
-
-    if (typeof budgetId === 'string' && budgetId.length > 0) {
-      return budgetId;
-    }
-
-    if (typeof window === 'undefined') {
-      return '';
-    }
-
-    const match = window.location.pathname.match(/\/budget\/([^/]+)/);
-    return match?.[1] ?? '';
-  };
+  const routeBudgetId = $derived.by(() => page.params.budgetId ?? '');
 
   const formatBudgetMonth = (value: string): string => {
     const [yearToken, monthToken] = value.split('-');
@@ -134,19 +119,36 @@
     }
   };
 
-  onMount(async () => {
-    const budgetId = getBudgetIdFromParams();
+  $effect(() => {
+    const budgetId = routeBudgetId;
 
     if (budgetId.length === 0) {
       initializing = false;
       return;
     }
 
-    try {
-      await fetchBudgetById(budgetId);
-    } finally {
-      initializing = false;
+    const currentBudget = $budget;
+    const shouldShowLoading = !currentBudget || currentBudget.budgetId !== budgetId;
+
+    if (shouldShowLoading) {
+      initializing = true;
     }
+
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        await fetchBudgetById(budgetId);
+      } finally {
+        if (!cancelled) {
+          initializing = false;
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   });
 
   const budgetStatusClass = $derived.by(() => {
@@ -173,7 +175,14 @@
   });
 
   const showInitialLoading = $derived.by(() => {
-    return initializing || ($budgetLoading && !$budget);
+    const currentBudget = $budget;
+
+    return (
+      initializing ||
+      ($budgetLoading &&
+        (!currentBudget ||
+          (routeBudgetId.length > 0 && currentBudget.budgetId !== routeBudgetId)))
+    );
   });
 
   const canActivateBudget = $derived.by(() => {

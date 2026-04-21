@@ -3,6 +3,18 @@ import type { Writable } from 'svelte/store';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Budget, Expense, IncomeSource } from '$lib/types/budget';
 
+const { mockPage } = vi.hoisted(() => ({
+  mockPage: {
+    params: {
+      budgetId: 'budget-1'
+    }
+  }
+}));
+
+vi.mock('$app/state', () => ({
+  page: mockPage
+}));
+
 const buildIncome = (overrides?: Partial<IncomeSource>): IncomeSource => ({
   incomeId: 'income-1',
   name: 'Salary',
@@ -66,6 +78,7 @@ describe('budget detail page', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockPage.params.budgetId = 'budget-1';
     window.history.pushState({}, '', '/budget/budget-1');
 
     (budgetStore.budgetLoading as Writable<boolean>).set(false);

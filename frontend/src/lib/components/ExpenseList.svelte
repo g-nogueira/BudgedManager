@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { validateExpenseInput } from '$lib/utils/expenseValidation';
+  import { formatCurrency } from '$lib/utils/formatCurrency';
   import type { Expense, ExpenseCategory, UpdateExpenseRequest } from '$lib/types/budget';
 
   interface Props {
@@ -40,46 +42,12 @@
   let actionError = $state<string | null>(null);
   let isSaving = $state(false);
 
-  const formatCurrency = (value: number): string => {
-    return new Intl.NumberFormat('en-IE', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(value);
-  };
-
   const expensesByCategory = (category: ExpenseCategory): Expense[] => {
     return expenses.filter((expense) => expense.category === category);
   };
 
   const subtotalByCategory = (items: Expense[]): number => {
-    return items.reduce((total, item) => total + item.amount, 0);
-  };
-
-  const validateExpense = (
-    name: string,
-    amountInput: string,
-    spread: boolean,
-    dayInput: string
-  ): string | null => {
-    if (name.trim().length === 0) {
-      return 'Expense name is required.';
-    }
-
-    const parsedAmount = Number.parseFloat(amountInput);
-    if (Number.isNaN(parsedAmount) || parsedAmount <= 0) {
-      return 'Amount must be greater than zero.';
-    }
-
-    if (!spread) {
-      const parsedDay = Number.parseInt(dayInput, 10);
-      if (Number.isNaN(parsedDay) || parsedDay < 1 || parsedDay > 31) {
-        return 'Day of month must be between 1 and 31.';
-      }
-    }
-
-    return null;
+    return items.reduce((total, item) => total + (item.isExcluded ? 0 : item.amount), 0);
   };
 
   const toErrorMessage = (value: unknown): string => {
@@ -124,7 +92,13 @@
     editError = null;
     actionError = null;
 
-    const validationError = validateExpense(editName, editAmount, editSpread, editDay);
+    const validationError = validateExpenseInput({
+      name: editName,
+      amountInput: editAmount,
+      isSpread: editSpread,
+      dayInput: editDay
+    });
+
     if (validationError) {
       editError = validationError;
       return;
@@ -193,6 +167,8 @@
         type="button"
         class="expense-category-header"
         onclick={() => toggleCategory(category)}
+        aria-expanded={expanded[category]}
+        aria-controls={`expense-category-panel-${category}`}
         data-testid={`category-toggle-${category}`}
       >
         <span class="expense-category-main">
@@ -208,7 +184,7 @@
       </button>
 
       {#if expanded[category]}
-        <div class="expense-category-list">
+        <div id={`expense-category-panel-${category}`} class="expense-category-list">
           {#if items.length === 0}
             <p class="category-empty">No expenses in this category.</p>
           {/if}

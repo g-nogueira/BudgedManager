@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { formatCurrency } from '$lib/utils/formatCurrency';
   import type { AddIncomeRequest, IncomeSource, UpdateIncomeRequest } from '$lib/types/budget';
 
   interface Props {
@@ -23,15 +24,6 @@
 
   let actionError = $state<string | null>(null);
   let isSaving = $state(false);
-
-  const formatCurrency = (value: number): string => {
-    return new Intl.NumberFormat('en-IE', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(value);
-  };
 
   const validateIncome = (name: string, amountInput: string): string | null => {
     if (name.trim().length === 0) {

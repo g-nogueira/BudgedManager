@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { validateExpenseInput } from '$lib/utils/expenseValidation';
   import type { AddExpenseRequest, ExpenseCategory } from '$lib/types/budget';
 
   interface Props {
@@ -14,26 +15,6 @@
   let amount = $state('');
   let error = $state<string | null>(null);
   let submitting = $state(false);
-
-  const validate = (): string | null => {
-    if (name.trim().length === 0) {
-      return 'Expense name is required.';
-    }
-
-    const parsedAmount = Number.parseFloat(amount);
-    if (Number.isNaN(parsedAmount) || parsedAmount <= 0) {
-      return 'Amount must be greater than zero.';
-    }
-
-    if (!isSpread) {
-      const parsedDay = Number.parseInt(dayOfMonth, 10);
-      if (Number.isNaN(parsedDay) || parsedDay < 1 || parsedDay > 31) {
-        return 'Day of month must be between 1 and 31.';
-      }
-    }
-
-    return null;
-  };
 
   const toErrorMessage = (value: unknown): string => {
     return value instanceof Error ? value.message : 'Unable to save expense.';
@@ -62,7 +43,13 @@
     event.preventDefault();
     error = null;
 
-    const validationError = validate();
+    const validationError = validateExpenseInput({
+      name,
+      amountInput: amount,
+      isSpread,
+      dayInput: dayOfMonth
+    });
+
     if (validationError) {
       error = validationError;
       return;

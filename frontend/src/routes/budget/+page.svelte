@@ -16,8 +16,12 @@
       return;
     }
 
-    const createdBudget = await storeCreateBudget(yearMonth);
-    await goto(`/budget/${createdBudget.budgetId}`);
+    try {
+      const createdBudget = await storeCreateBudget(yearMonth);
+      await goto(`/budget/${createdBudget.budgetId}`);
+    } catch {
+      return;
+    }
   };
 </script>
 

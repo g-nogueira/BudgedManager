@@ -101,6 +101,19 @@ describe('budget detail page', () => {
     expect(screen.getByTestId('activate-budget-button')).toBeInTheDocument();
   });
 
+  it('disables activate button when draft has no incomes', () => {
+    (budgetStore.budget as Writable<Budget | null>).set(
+      buildBudget({
+        incomeSources: [],
+        totalIncome: 0
+      })
+    );
+
+    render(BudgetDetailPage);
+
+    expect(screen.getByTestId('activate-budget-button')).toBeDisabled();
+  });
+
   it('hides activate button for ACTIVE budgets', () => {
     (budgetStore.budget as Writable<Budget | null>).set(buildBudget({ status: 'ACTIVE' }));
 
@@ -119,13 +132,34 @@ describe('budget detail page', () => {
     expect(screen.getByTestId('budget-detail-loading')).toBeInTheDocument();
   });
 
+  it('keeps detail content visible during mutation loading when budget exists', () => {
+    (budgetStore.budgetLoading as Writable<boolean>).set(true);
+
+    render(BudgetDetailPage);
+
+    expect(screen.getByTestId('budget-detail-page')).toBeInTheDocument();
+    expect(screen.queryByTestId('budget-detail-loading')).not.toBeInTheDocument();
+  });
+
   it('shows error state when fetch fails', () => {
     (budgetStore.budgetError as Writable<string | null>).set('Unable to load budget');
     (budgetStore.budget as Writable<Budget | null>).set(null);
 
     render(BudgetDetailPage);
 
-    expect(screen.getByTestId('budget-detail-error')).toHaveTextContent('Unable to load budget');
+    return waitFor(() => {
+      expect(screen.getByTestId('budget-detail-error')).toHaveTextContent('Unable to load budget');
+    });
+  });
+
+  it('shows inline error when mutation fails but budget is loaded', () => {
+    (budgetStore.budgetError as Writable<string | null>).set('Unable to update expense');
+
+    render(BudgetDetailPage);
+
+    expect(screen.getByTestId('budget-detail-inline-error')).toHaveTextContent(
+      'Unable to update expense'
+    );
   });
 
   it('shows summary totals and forecast link', () => {

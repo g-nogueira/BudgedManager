@@ -90,7 +90,7 @@ describe('ExpenseList', () => {
 
     expect(screen.getByTestId('category-total-FIXED')).toHaveTextContent('€1,200.00');
     expect(screen.getByTestId('category-total-SUBSCRIPTION')).toHaveTextContent('€16.00');
-    expect(screen.getByTestId('category-total-VARIABLE')).toHaveTextContent('€485.00');
+    expect(screen.getByTestId('category-total-VARIABLE')).toHaveTextContent('€400.00');
   });
 
   it('shows spread badge for spread expenses', () => {
@@ -144,12 +144,17 @@ describe('ExpenseList', () => {
   it('collapses and expands category content', async () => {
     renderComponent();
 
+    const fixedToggle = screen.getByTestId('category-toggle-FIXED');
+    expect(fixedToggle).toHaveAttribute('aria-expanded', 'true');
+
     expect(screen.getByTestId('expense-row-fixed-1')).toBeInTheDocument();
 
-    await fireEvent.click(screen.getByTestId('category-toggle-FIXED'));
+    await fireEvent.click(fixedToggle);
+    expect(fixedToggle).toHaveAttribute('aria-expanded', 'false');
     expect(screen.queryByTestId('expense-row-fixed-1')).not.toBeInTheDocument();
 
-    await fireEvent.click(screen.getByTestId('category-toggle-FIXED'));
+    await fireEvent.click(fixedToggle);
+    expect(fixedToggle).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByTestId('expense-row-fixed-1')).toBeInTheDocument();
   });
 });

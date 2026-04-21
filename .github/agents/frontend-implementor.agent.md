@@ -2,7 +2,7 @@
 name: Frontend Implementor
 description: "Executes the frontend implementation plan: writes SvelteKit/TypeScript code + tests per feature, commits incrementally, builds, tests, lints, and opens a PR."
 user-invocable: true
-model: GPT-5.3-Codex (copilot)
+model: Claude Sonnet 4.6 (copilot)
 tools: [vscode/askQuestions, execute, read, edit, search, web/fetch, 'microsoftdocs/mcp/*', 'chrome-devtools-mcp/*', 'github/*', todo, 'agent']
 agents: ['Frontend Planner', 'Frontend Reviewer']
 ---
@@ -138,7 +138,7 @@ ALL tests must pass (not just new ones — never break existing tests).
 
 After tests pass, **you MUST open a browser and manually test the implemented pages.** This is not optional — code that hasn't been visually verified in a real browser is not ready to commit.
 
-**Preferred tool:** `chrome-devtools-mcp` (DevTools MCP). **Fallback:** Playwright MCP if DevTools MCP is unavailable.
+**Preferred tool:** `chrome-devtools-mcp` (DevTools MCP).
 
 **Procedure:**
 1. Ensure the dev server is running (`cd frontend; pnpm dev`). Start it if not already running.
@@ -239,7 +239,7 @@ git push origin <branch-name>
   ## Screenshots
   Visual verification evidence from browser testing (DevTools MCP):
 
-  <For each screenshot in artifacts/issue-<N>/, embed as: ![description](../artifacts/issue-<N>/filename.png)>
+  <For each screenshot, embed using raw GitHub URLs like: ![description](https://github.com/<owner>/<repo>/raw/<branch>/artifacts/issue-<N>/filename.png)>
 
   Closes #<issue>
   ```
@@ -313,6 +313,6 @@ If no learnings were generated, write `## Learnings\nNone.`
 - **TypeScript strict mode** — no `any` types
 - **All API calls through `lib/api/` clients** — never raw fetch in components or routes
 - If you encounter an issue not covered by the plan, ask the user before improvising
-- **Browser testing is mandatory** — never commit a feature without first opening it in a real browser via DevTools MCP (preferred) or Playwright MCP (fallback), interacting with it, and saving screenshots to `artifacts/issue-<N>/`. Code that passes tests but looks broken in the browser is not done.
+- **Browser testing is mandatory** — never commit a feature without first opening it in a real browser via DevTools MCP, interacting with it, and saving screenshots to `artifacts/issue-<N>/`. Code that passes tests but looks broken in the browser is not done.
 - **Log cross-team events** — after opening a PR, append a standup-style entry to `.github/agents/activity-log.md` noting the PR number and issue it addresses
 ```

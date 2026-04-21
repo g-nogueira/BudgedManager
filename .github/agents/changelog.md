@@ -588,12 +588,14 @@
 - `.github/agents/frontend-implementor.agent.md` — Added Step 1d-bis (Visual Verification), updated Self-Verification Checkpoint, added Critical Rule, updated PR body template
 
 **What changed & why:**
+
 | # | Section | Change | Rationale |
 |---|---------|--------|-----------|
 | 1 | Step 1 (feature loop) | Added Step **1d-bis: Visual Verification (Browser Testing)** between "Run Tests" (1d) and "Self-Verification Checkpoint" (1e) | Core fix — agent had DevTools MCP tool but no workflow step requiring its use. Includes 6-step procedure: start dev server, navigate to pages, interact with features, take screenshots, save to `artifacts/issue-<N>/`, fix visual issues before committing. Also lists what to verify visually (layout, colors, interactions, error states, loading states). |
 | 2 | Self-Verification Checkpoint (1e) | Added item #7: "Visual verification screenshots exist in `artifacts/issue-<N>/` for this feature group" with redirect back to 1d-bis if missing | Cross-check that browser testing actually happened — prevents the agent from skipping 1d-bis and proceeding to commit |
 | 3 | Critical Rules | Added: "Browser testing is mandatory — never commit a feature without first opening it in a real browser via DevTools MCP (preferred) or Playwright MCP (fallback), interacting with it, and saving screenshots to `artifacts/issue-<N>/`" | Hard enforcement at the rules level, not just a workflow step that could be skipped |
 | 4 | PR Body template (Step 5) | Added `## Screenshots` section with instruction to embed images from `artifacts/issue-<N>/` | Screenshots committed to the repo are referenced in the PR body so reviewers see visual evidence alongside code changes |
+
 
 **What was working (kept):**
 - Existing workflow structure (HITL gates, commit discipline, pre-flight checks, type check → lint → test loop)

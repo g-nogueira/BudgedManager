@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { page } from '$app/state';
   import { onMount } from 'svelte';
   import ExpenseForm from '$lib/components/ExpenseForm.svelte';
   import ExpenseList from '$lib/components/ExpenseList.svelte';
   import IncomeSection from '$lib/components/IncomeSection.svelte';
+  import { formatCurrency } from '$lib/utils/formatCurrency';
   import {
     budget,
     budgetError,
@@ -27,22 +29,21 @@
     UpdateIncomeRequest
   } from '$lib/types/budget';
 
-  const getBudgetIdFromPath = (): string => {
+  let initializing = $state($budget === null);
+
+  const getBudgetIdFromParams = (): string => {
+    const budgetId = page.params.budgetId;
+
+    if (typeof budgetId === 'string' && budgetId.length > 0) {
+      return budgetId;
+    }
+
     if (typeof window === 'undefined') {
       return '';
     }
 
     const match = window.location.pathname.match(/\/budget\/([^/]+)/);
     return match?.[1] ?? '';
-  };
-
-  const formatCurrency = (value: number): string => {
-    return new Intl.NumberFormat('en-IE', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(value);
   };
 
   const formatBudgetMonth = (value: string): string => {
@@ -120,19 +121,32 @@
   };
 
   const handleActivate = async (): Promise<void> => {
-    await withBudget(async (budgetId) => {
-      await storeActivateBudget(budgetId);
-    });
-  };
+    const currentBudget = $budget;
 
-  onMount(async () => {
-    const budgetId = getBudgetIdFromPath();
-
-    if (budgetId.length === 0) {
+    if (!currentBudget || currentBudget.incomeSources.length === 0) {
       return;
     }
 
-    await fetchBudgetById(budgetId);
+    try {
+      await storeActivateBudget(currentBudget.budgetId);
+    } catch {
+      return;
+    }
+  };
+
+  onMount(async () => {
+    const budgetId = getBudgetIdFromParams();
+
+    if (budgetId.length === 0) {
+      initializing = false;
+      return;
+    }
+
+    try {
+      await fetchBudgetById(budgetId);
+    } finally {
+      initializing = false;
+    }
   });
 
   const budgetStatusClass = $derived.by(() => {
@@ -157,13 +171,27 @@
     const currentBudget = $budget;
     return currentBudget?.expenses ?? ([] as Expense[]);
   });
+
+  const showInitialLoading = $derived.by(() => {
+    return initializing || ($budgetLoading && !$budget);
+  });
+
+  const canActivateBudget = $derived.by(() => {
+    const currentBudget = $budget;
+
+    if (!currentBudget) {
+      return false;
+    }
+
+    return currentBudget.incomeSources.length > 0;
+  });
 </script>
 
-{#if $budgetLoading}
+{#if showInitialLoading}
   <section class="budget-state" data-testid="budget-detail-loading">
     Loading budget details...
   </section>
-{:else if $budgetError}
+{:else if !$budget && $budgetError}
   <section class="budget-state budget-state-error" data-testid="budget-detail-error">
     {$budgetError}
   </section>
@@ -184,12 +212,17 @@
           type="button"
           class="activate-button"
           onclick={handleActivate}
+          disabled={!canActivateBudget || $budgetLoading}
           data-testid="activate-budget-button"
         >
           Activate Budget
         </button>
       {/if}
     </header>
+
+    {#if $budgetError}
+      <p class="budget-inline-error" data-testid="budget-detail-inline-error">{$budgetError}</p>
+    {/if}
 
     <IncomeSection
       incomes={$budget.incomeSources}
@@ -300,6 +333,17 @@
     cursor: pointer;
   }
 
+  .activate-button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+
+  .budget-inline-error {
+    margin: 0;
+    color: #b41340;
+    font-weight: 600;
+  }
+
   .budget-state {
     margin: 1rem auto;
     max-width: 720px;
@@ -372,6 +416,10 @@
   }
 
   @media (max-width: 860px) {
+    .budget-detail-page {
+      padding-bottom: calc(16rem + env(safe-area-inset-bottom));
+    }
+
     .budget-summary-bar {
       grid-template-columns: 1fr;
       text-align: center;

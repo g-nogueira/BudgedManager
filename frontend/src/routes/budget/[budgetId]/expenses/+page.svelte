@@ -1,14 +1,10 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { page } from '$app/state';
   import { onMount } from 'svelte';
 
   onMount(async () => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    const match = window.location.pathname.match(/\/budget\/([^/]+)\//);
-    const budgetId = match?.[1];
+    const budgetId = page.params.budgetId;
 
     if (budgetId) {
       await goto(`/budget/${budgetId}`, { replaceState: true });

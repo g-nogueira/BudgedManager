@@ -15,14 +15,14 @@ export const validateExpenseInput = ({
     return 'Expense name is required.';
   }
 
-  const parsedAmount = Number.parseFloat(amountInput);
-  if (Number.isNaN(parsedAmount) || parsedAmount <= 0) {
+  const parsedAmount = Number(amountInput);
+  if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
     return 'Amount must be greater than zero.';
   }
 
   if (!isSpread) {
-    const parsedDay = Number.parseInt(dayInput, 10);
-    if (Number.isNaN(parsedDay) || parsedDay < 1 || parsedDay > 31) {
+    const parsedDay = Number(dayInput);
+    if (!Number.isFinite(parsedDay) || !Number.isInteger(parsedDay) || parsedDay < 1 || parsedDay > 31) {
       return 'Day of month must be between 1 and 31.';
     }
   }

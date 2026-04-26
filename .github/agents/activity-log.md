@@ -72,4 +72,8 @@ Reviewed PR #90 for issue #57 (Budget & Expense Management UI). Round 1 full rev
 
 ### 2026-04-20 — Frontend Implementor
 Addressed PR #90 feedback for issue #57 with fixes for all 14 review points across routes, components, tests, and agent docs. Frontend checks and tests pass for the changed scope (`pnpm check` ✅, `pnpm test` ✅); repo-wide `pnpm lint` still reports pre-existing Prettier drift in unrelated files.
-**Artifacts:** `frontend/src/routes/budget/[budgetId]/+page.svelte` (updated), `frontend/src/lib/components/ExpenseList.svelte` (updated), `frontend/src/lib/utils/formatCurrency.ts` (created), `frontend/src/lib/utils/expenseValidation.ts` (created), PR #90 (feedback fixes pushed)
+**Artifacts:** `frontend/src/routes/budget/[budgetId]/+page.svelte` (updated), `frontend/src/lib/components/ExpenseList.svelte` (updated), `frontend/src/lib/utils/formatCurrency.ts` (created), `frontend/src/lib/utils/expenseValidation.ts` (created), `.github/agents/frontend-implementor.agent.md` (updated), `.github/agents/changelog.md` (updated), `.github/agents/memory/active/code-reviewer-57.md` (updated), PR #90, issue #57 (feedback fixes pushed)
+
+### 2026-04-24 — Frontend Reviewer
+Completed Round 2 additive review of PR #90 (issue #57). All 14 prior RPs confirmed ADDRESSED. Found 1 new critical issue (RP-15): `$effect` in `[budgetId]/+page.svelte` reads `$budget` store, creating an infinite fetch loop in production when `fetchBudgetById` resolves. Fix is `untrack(() => $budget)`. `pnpm check` ✅, `pnpm test` ✅ 66/66.
+**Artifacts:** `.github/agents/memory/active/code-reviewer-57.md` (updated), PR #90 (Round 2 review posted)

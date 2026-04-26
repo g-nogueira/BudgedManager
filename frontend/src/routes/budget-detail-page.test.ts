@@ -101,6 +101,24 @@ describe('budget detail page', () => {
     expect(screen.getByTestId('expense-list')).toBeInTheDocument();
   });
 
+  it('does not refetch when the budget store updates after initial load', async () => {
+    render(BudgetDetailPage);
+
+    await waitFor(() => {
+      expect(budgetStore.fetchBudgetById).toHaveBeenCalledWith('budget-1');
+    });
+
+    // Simulate the store being updated (as would happen when fetchBudgetById resolves).
+    // The $effect must NOT re-trigger a second fetch.
+    (budgetStore.budget as Writable<Budget | null>).set(
+      buildBudget({ totalIncome: 9999 })
+    );
+
+    await waitFor(() => {
+      expect(budgetStore.fetchBudgetById).toHaveBeenCalledTimes(1);
+    });
+  });
+
   it('displays formatted month heading and status badge', () => {
     render(BudgetDetailPage);
 

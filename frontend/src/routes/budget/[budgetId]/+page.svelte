@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { page } from '$app/state';
   import ExpenseForm from '$lib/components/ExpenseForm.svelte';
   import ExpenseList from '$lib/components/ExpenseList.svelte';
@@ -50,7 +51,7 @@
   const withBudget = async (handler: (budgetId: string) => Promise<void>): Promise<void> => {
     const currentBudget = $budget;
 
-    if (!currentBudget) {
+    if (!currentBudget || currentBudget.status === 'CLOSED') {
       return;
     }
 
@@ -127,7 +128,7 @@
       return;
     }
 
-    const currentBudget = $budget;
+    const currentBudget = untrack(() => $budget);
     const shouldShowLoading = !currentBudget || currentBudget.budgetId !== budgetId;
 
     if (shouldShowLoading) {

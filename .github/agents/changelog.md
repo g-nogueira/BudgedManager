@@ -577,3 +577,47 @@
 - HITL gates add latency to every workflow — monitor whether users find them too frequent or want to batch-approve multiple gates
 - Implementors now have two HITL gates (before coding + before PR) — for small fixes, this may feel excessive. Consider adding a "skip HITL for trivial changes" escape hatch if users complain
 - Some agents may interpret "wait for confirmation" as blocking indefinitely — ensure agents present their question clearly and don't proceed until an explicit response arrives
+
+---
+
+### 2026-04-19 — Frontend Implementor — Add mandatory browser testing with DevTools MCP
+
+**Retro trigger:** The Frontend Implementor was completing features (code + tests passing) without ever opening a browser to visually verify the pages. Despite having `chrome-devtools-mcp/*` in its tool list and the plan noting "UI implementation PRs must include screenshot evidence," the agent's workflow had no step requiring browser testing. Code that passes tests but looks broken in the browser was being committed and pushed.
+
+**Files modified:**
+- `.github/agents/frontend-implementor.agent.md` — Added Step 1d-bis (Visual Verification), updated Self-Verification Checkpoint, added Critical Rule, updated PR body template
+
+**What changed & why:**
+
+| # | Section | Change | Rationale |
+|---|---------|--------|-----------|
+| 1 | Step 1 (feature loop) | Added Step **1d-bis: Visual Verification (Browser Testing)** between "Run Tests" (1d) and "Self-Verification Checkpoint" (1e) | Core fix — agent had DevTools MCP tool but no workflow step requiring its use. Includes 6-step procedure: start dev server, navigate to pages, interact with features, take screenshots, save to `artifacts/issue-<N>/`, fix visual issues before committing. Also lists what to verify visually (layout, colors, interactions, error states, loading states). |
+| 2 | Self-Verification Checkpoint (1e) | Added item #7: "Visual verification screenshots exist in `artifacts/issue-<N>/` for this feature group" with redirect back to 1d-bis if missing | Cross-check that browser testing actually happened — prevents the agent from skipping 1d-bis and proceeding to commit |
+| 3 | Critical Rules | Added: "Browser testing is mandatory — never commit a feature without first opening it in a real browser via DevTools MCP (preferred) or Playwright MCP (fallback), interacting with it, and saving screenshots to `artifacts/issue-<N>/`" | Hard enforcement at the rules level, not just a workflow step that could be skipped |
+| 4 | PR Body template (Step 5) | Added `## Screenshots` section with instruction to embed images from `artifacts/issue-<N>/` | Screenshots committed to the repo are referenced in the PR body so reviewers see visual evidence alongside code changes |
+
+
+**What was working (kept):**
+- Existing workflow structure (HITL gates, commit discipline, pre-flight checks, type check → lint → test loop)
+- All existing Critical Rules preserved (never force push, never merge, follow plan, etc.)
+- Self-Verification Checkpoint items 1-6 preserved
+- PR body template existing sections (Summary, Changes, Test Results) preserved
+- `chrome-devtools-mcp/*` was already in the tool list — no tool access change needed
+
+**What wasn't working (fixed):**
+- Agent had browser testing tools available but zero workflow steps requiring their use — tools alone don't drive behavior, workflow steps do
+- Code was committed after passing type check + lint + tests but without any visual verification — "green tests ≠ working UI"
+- PR had no visual evidence section — reviewers couldn't assess UI quality from the PR alone
+- The plan's "Patterns" section noted screenshot requirements, but plan-level notes don't override agent workflow — the agent follows its own `.agent.md` steps
+
+**Lessons learned:**
+- **Tools in the frontmatter are necessary but not sufficient.** An agent with `chrome-devtools-mcp/*` in its tool list will never use it unless a workflow step explicitly tells it to. Tool access is permission; workflow steps are instructions.
+- **Visual verification must be a blocking workflow step, not a suggestion.** Agents optimize for completing steps in order — if browser testing isn't a numbered step between "tests pass" and "commit," it won't happen.
+- **The Self-Verification Checkpoint is the right place for a cross-check** — adding a "screenshots exist" item creates a safety net if the agent somehow skips the visual verification step.
+- **Screenshot evidence in PRs benefits both the agent and human reviewers.** The agent is forced to produce concrete artifacts, and reviewers get visual context alongside code diffs.
+
+**Risks & watch items:**
+- DevTools MCP requires Chrome to be running/accessible — if the browser isn't available, the agent may get stuck. The instruction specifies Playwright MCP as fallback, but Playwright MCP is not currently configured in `.vscode/mcp.json`
+- Starting the dev server (`pnpm dev`) and taking screenshots adds time to each feature group — monitor whether this significantly slows implementation
+- The agent may take low-quality screenshots (wrong page, empty state, no interaction) — the "interact with the page" instruction and "what to verify visually" checklist mitigate this, but quality depends on agent judgment
+- `artifacts/issue-<N>/` directory must be git-committed for PR image references to work — the agent's `git add -A` already covers this

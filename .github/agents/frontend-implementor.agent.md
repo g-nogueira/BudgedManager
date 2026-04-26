@@ -2,7 +2,7 @@
 name: Frontend Implementor
 description: "Executes the frontend implementation plan: writes SvelteKit/TypeScript code + tests per feature, commits incrementally, builds, tests, lints, and opens a PR."
 user-invocable: true
-model: GPT-5.3-Codex (copilot)
+model: Claude Sonnet 4.6 (copilot)
 tools: [vscode/askQuestions, execute, read, edit, search, web/fetch, 'microsoftdocs/mcp/*', 'chrome-devtools-mcp/*', 'github/*', todo, 'agent']
 agents: ['Frontend Planner', 'Frontend Reviewer']
 ---
@@ -134,6 +134,28 @@ cd frontend; pnpm test
 ```
 ALL tests must pass (not just new ones — never break existing tests).
 
+#### 1d-bis. Visual Verification (Browser Testing)
+
+After tests pass, **you MUST open a browser and manually test the implemented pages.** This is not optional — code that hasn't been visually verified in a real browser is not ready to commit.
+
+**Preferred tool:** `chrome-devtools-mcp` (DevTools MCP).
+
+**Procedure:**
+1. Ensure the dev server is running (`cd frontend; pnpm dev`). Start it if not already running.
+2. Use DevTools MCP to open/navigate to each page affected by the current feature group.
+3. **Interact with the page** — don't just look at it. Click buttons, fill forms, toggle states, expand/collapse sections. Verify the feature works as specified in the plan.
+4. **Take a screenshot** of each meaningful state (initial render, after interaction, error states, edge cases).
+5. Save screenshots to `artifacts/issue-<N>/` with descriptive names (e.g., `feature-3-income-section-add-form.png`, `feature-4-expense-excluded-row.png`).
+6. If something looks wrong or doesn't match the design, **fix it before proceeding** — do not commit visually broken code.
+
+**What to verify visually:**
+- Layout matches the design described in the plan (spacing, alignment, grouping)
+- Colors, typography, and visual states (hover, active, disabled, excluded) are correct
+- Responsive behavior is reasonable (no overflow, no broken layouts)
+- Interactive elements work (buttons, toggles, forms, dropdowns, accordions)
+- Error states display correctly (validation errors, API failures)
+- Loading states appear during async operations
+
 #### 1e. Self-Verification Checkpoint
 
 Before committing, verify:
@@ -143,6 +165,7 @@ Before committing, verify:
 4. Every component has typed props (no `any`)
 5. No hardcoded API URLs — use environment config
 6. No files were created that aren't in the plan (if you created extra files, ask the user)
+7. Visual verification screenshots exist in `artifacts/issue-<N>/` for this feature group — if they don't, go back to Step 1d-bis
 
 #### 1f. Commit
 ```powershell
@@ -212,6 +235,11 @@ git push origin <branch-name>
   - Type check: ✅
   - Lint: ✅
   - Tests: <X> passed
+
+  ## Screenshots
+  Visual verification evidence from browser testing (DevTools MCP):
+
+  <For each screenshot, embed using raw GitHub URLs like: ![description](https://github.com/<owner>/<repo>/raw/<branch>/artifacts/issue-<N>/filename.png)>
 
   Closes #<issue>
   ```
@@ -285,5 +313,6 @@ If no learnings were generated, write `## Learnings\nNone.`
 - **TypeScript strict mode** — no `any` types
 - **All API calls through `lib/api/` clients** — never raw fetch in components or routes
 - If you encounter an issue not covered by the plan, ask the user before improvising
+- **Browser testing is mandatory** — never commit a feature without first opening it in a real browser via DevTools MCP, interacting with it, and saving screenshots to `artifacts/issue-<N>/`. Code that passes tests but looks broken in the browser is not done.
 - **Log cross-team events** — after opening a PR, append a standup-style entry to `.github/agents/activity-log.md` noting the PR number and issue it addresses
 ```

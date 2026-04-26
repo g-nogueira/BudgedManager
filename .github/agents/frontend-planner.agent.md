@@ -3,7 +3,7 @@ name: Frontend Planner
 description: "Reads issue context from memory, analyzes the SvelteKit frontend codebase, and produces a precise file-level implementation plan. Hands off to the Frontend Implementor."
 user-invocable: true
 model: Claude Opus 4.6 (copilot)
-tools: ['search', 'read', 'execute', 'edit/createFile', 'todo', 'vscode/askQuestions']
+tools: [vscode/askQuestions, execute, read, edit/createFile, search, 'chrome-devtools-mcp/*', browser, todo]
 handoffs:
   - label: "Hand off to Frontend Implementor"
     agent: Frontend Implementor

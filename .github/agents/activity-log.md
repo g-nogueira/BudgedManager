@@ -58,3 +58,22 @@ Distilled reusable frontend and manual-testing learnings from issue #55 into Tie
 ### 2026-04-12 — Frontend Reviewer
 Reviewed PR #89 for issue #55 (Dashboard & At-a-Glance Financial Status). Round 1 full review: APPROVED WITH WARNINGS. 4 review points (2 warnings: banner text hyphen vs em dash, PR description inaccuracy; 2 info: sort fallback, static date). All 8 ACs verified, 19/19 tests passing, API contracts matched.
 **Artifacts:** `.github/agents/memory/active/code-reviewer-55.md` (created), PR #89 (review posted)
+### 2026-04-19 — Frontend Planner
+Wrote implementation plan for #57 ([Story] Budget & Expense Management UI). 5 feature groups covering store CRUD actions, budget creation page, income management section, expense list/form components, and budget detail orchestration page. Key decisions: single-page design matching budget-setup.html mockup, re-fetch after mutation, inline editing, rollover deferred to separate issue.
+**Artifacts:** `.github/agents/memory/active/task-context-57.md` (created), `.github/agents/memory/active/plan-57.md` (created)
+
+### 2026-04-19 — Frontend Implementor
+Opened PR #90 for issue #57 after pushing implementation commits plus manual browser screenshot evidence and workflow-learnings updates. Evidence includes authenticated happy-path budget detail and redirect-route captures under `artifacts/issue-57/`.
+**Artifacts:** PR #90 (opened), `feature/57-budget-expense-management-ui` (pushed), `artifacts/issue-57/*.png` (created)
+
+### 2026-04-20 — Frontend Reviewer
+Reviewed PR #90 for issue #57 (Budget & Expense Management UI). Round 1 full review: APPROVED WITH WARNINGS. 14 review points (9 warnings, 5 info, 0 critical). Key findings: shared loading state replaces page during mutations, unhandled promise rejections in 2 handlers, Activate button not disabled per INV-B1. All 9/9 ACs verified, 63/63 tests passing, API contracts matched. Validated all 11 existing threads from Copilot and CodeRabbit — all confirmed accurate. Posted consolidated review + threaded replies.
+**Artifacts:** `.github/agents/memory/active/code-reviewer-57.md` (created), PR #90 (review posted)
+
+### 2026-04-20 — Frontend Implementor
+Addressed PR #90 feedback for issue #57 with fixes for all 14 review points across routes, components, tests, and agent docs. Frontend checks and tests pass for the changed scope (`pnpm check` ✅, `pnpm test` ✅); repo-wide `pnpm lint` still reports pre-existing Prettier drift in unrelated files.
+**Artifacts:** `frontend/src/routes/budget/[budgetId]/+page.svelte` (updated), `frontend/src/lib/components/ExpenseList.svelte` (updated), `frontend/src/lib/utils/formatCurrency.ts` (created), `frontend/src/lib/utils/expenseValidation.ts` (created), `.github/agents/frontend-implementor.agent.md` (updated), `.github/agents/changelog.md` (updated), `.github/agents/memory/active/code-reviewer-57.md` (updated), PR #90, issue #57 (feedback fixes pushed)
+
+### 2026-04-24 — Frontend Reviewer
+Completed Round 2 additive review of PR #90 (issue #57). All 14 prior RPs confirmed ADDRESSED. Found 1 new critical issue (RP-15): `$effect` in `[budgetId]/+page.svelte` reads `$budget` store, creating an infinite fetch loop in production when `fetchBudgetById` resolves. Fix is `untrack(() => $budget)`. `pnpm check` ✅, `pnpm test` ✅ 66/66.
+**Artifacts:** `.github/agents/memory/active/code-reviewer-57.md` (updated), PR #90 (Round 2 review posted)

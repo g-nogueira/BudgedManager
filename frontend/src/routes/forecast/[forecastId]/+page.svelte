@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { page } from '$app/state';
   import ForecastChart from '$lib/components/ForecastChart.svelte';
   import ForecastOverlay from '$lib/components/ForecastOverlay.svelte';
@@ -10,12 +9,20 @@
     forecastLoading
   } from '$lib/stores/forecastStore';
 
-  const forecastId = page.params.forecastId;
-  const budgetId = page.url.searchParams.get('budgetId');
+  const forecastId = $derived(page.params.forecastId);
+  const budgetId = $derived(page.url.searchParams.get('budgetId'));
 
-  onMount(async () => {
+  let hasFetched = $state(false);
+  const currentForecast = $derived(
+    $allForecasts.find((fc) => fc.forecastId === forecastId) ?? $allForecasts[0]
+  );
+
+  $effect(() => {
     if (!budgetId) return;
-    await fetchAllForecasts(budgetId);
+    hasFetched = false;
+    void fetchAllForecasts(budgetId).then(() => {
+      hasFetched = true;
+    });
   });
 </script>
 
@@ -33,7 +40,7 @@
   <section data-testid="forecast-detail-page">
     <p class="error" data-testid="error-state">{$forecastError}</p>
   </section>
-{:else if $allForecasts.length === 0}
+{:else if hasFetched && $allForecasts.length === 0}
   <section data-testid="forecast-detail-page">
     <p data-testid="empty-state">No forecasts found for this budget.</p>
   </section>
@@ -58,7 +65,7 @@
       {#if $allForecasts.length > 1}
         <ForecastOverlay forecasts={$allForecasts} />
       {:else}
-        <ForecastChart dailyEntries={$allForecasts[0]?.dailyEntries ?? []} />
+        <ForecastChart dailyEntries={currentForecast?.dailyEntries ?? []} />
       {/if}
     </div>
 

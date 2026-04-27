@@ -34,11 +34,6 @@ describe('ForecastChart', () => {
     expect(screen.getByTestId('forecast-chart')).toBeInTheDocument();
   });
 
-  it('renders with data-testid forecast-chart', () => {
-    render(ForecastChart, { props: { dailyEntries: [] } });
-    expect(screen.getByTestId('forecast-chart')).toBeInTheDocument();
-  });
-
   it('contains tooltip callback config by rendering without error when entries have breakdown', () => {
     const entriesWithBreakdown: DailyEntry[] = [
       {

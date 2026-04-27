@@ -80,12 +80,14 @@ describe('forecast detail page', () => {
     expect(screen.getByText('Network failure')).toBeInTheDocument();
   });
 
-  it('shows empty state when no forecasts found', () => {
+  it('shows empty state when no forecasts found', async () => {
     (forecastStore.allForecasts as Writable<Forecast[]>).set([]);
 
     render(ForecastDetailPage);
 
-    expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+    });
   });
 
   it('shows missing-budgetId error when budgetId query param is absent', () => {

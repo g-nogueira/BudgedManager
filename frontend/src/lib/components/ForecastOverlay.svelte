@@ -34,7 +34,10 @@
     }
   };
 
-  function buildReforecastMarkerPlugin(forecastList: Forecast[]): Plugin<'line'> {
+  function buildReforecastMarkerPlugin(
+    forecastList: Forecast[],
+    axisEntries: { dayNumber: number }[]
+  ): Plugin<'line'> {
     return {
       id: 'reforecastMarker',
       afterDraw(chart) {
@@ -44,7 +47,7 @@
         for (const fc of forecastList) {
           if (fc.forecastType !== 'REFORECAST' || fc.startDay <= 0) continue;
 
-          const labelIndex = fc.dailyEntries.findIndex((e) => e.dayNumber >= fc.startDay);
+          const labelIndex = axisEntries.findIndex((e) => e.dayNumber >= fc.startDay);
           if (labelIndex < 0) continue;
 
           const xPos = scales['x'].getPixelForValue(labelIndex);
@@ -112,7 +115,7 @@
           y: { ticks: { font: { size: 11 } } }
         }
       },
-      plugins: [zeroLinePlugin, buildReforecastMarkerPlugin(forecasts)]
+      plugins: [zeroLinePlugin, buildReforecastMarkerPlugin(forecasts, longestForecast.dailyEntries)]
     };
 
     chartInstance = new Chart(context, config);

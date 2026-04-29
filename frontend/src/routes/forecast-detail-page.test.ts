@@ -96,6 +96,7 @@ describe('forecast detail page', () => {
     render(ForecastDetailPage);
 
     expect(screen.getByTestId('missing-budget-error')).toBeInTheDocument();
+    expect(vi.mocked(forecastStore.fetchAllForecasts)).not.toHaveBeenCalled();
   });
 
   it('renders ForecastChart with single forecast', async () => {
@@ -106,6 +107,7 @@ describe('forecast detail page', () => {
     await waitFor(() => {
       expect(screen.getByTestId('forecast-detail-page')).toBeInTheDocument();
       expect(screen.getByTestId('forecast-chart')).toBeInTheDocument();
+      expect(screen.queryByTestId('forecast-overlay')).toBeNull();
     });
   });
 
@@ -119,6 +121,7 @@ describe('forecast detail page', () => {
         startDay: 10
       })
     ];
+    mockPage.params.forecastId = 'f-2';
     (forecastStore.allForecasts as Writable<Forecast[]>).set(forecasts);
 
     render(ForecastDetailPage);
@@ -126,6 +129,8 @@ describe('forecast detail page', () => {
     await waitFor(() => {
       expect(screen.getByTestId('forecast-detail-page')).toBeInTheDocument();
       expect(screen.getByTestId('forecast-overlay')).toBeInTheDocument();
+      expect(screen.queryByTestId('forecast-chart')).toBeNull();
+      expect(screen.getByText('Re-forecast Apr 10')).toBeInTheDocument();
     });
   });
 });

@@ -99,3 +99,22 @@ Additive review Round 2 on PR #91 (issue #56). All 5 Round 1 actionable items ad
 Addressed PR #91 Round 2 review feedback for issue #56. Fixed RP-12 (multi-forecast test now exercises ID-match logic with `forecastId='f-2'` + versionLabel assertion), RP-10 (side-effect guard `not.toHaveBeenCalled()`), RP-11 (negative `queryByTestId` assertions in both chart/overlay tests). RP-13 and RP-17 WONTFIX (Acceptable MVP). All 6 forecast-detail tests pass in isolation. Committed and pushed `c386c19`.
 **Artifacts:** `feature/56-forecast-chart-overlay` (pushed c386c19), `.github/agents/memory/active/implementation-56.md` (updated), PR #91 (https://github.com/g-nogueira/BudgedManager/pull/91#issuecomment-4346908718)
 
+
+### 2026-04-29 — Frontend Reviewer
+Additive review Round 3 on PR #91 (issue #56). RP-10/11/12 verified ADDRESSED in c386c19. Identified 1 new CRITICAL (RP-18: REFORECAST dataset x-axis misalignment in ForecastOverlay.svelte — data plotted at wrong days) and 1 new INFO (RP-19: missing href assertions for nav links). Dismissed 3 Copilot false-positive comments about Svelte href interpolation. Verdict: ❌ CHANGES REQUESTED.
+- Memory: .github/agents/memory/active/code-reviewer-56.md (Round 3 updated — RP-18/19 added)
+- PR: https://github.com/g-nogueira/BudgedManager/pull/91
+
+### 2026-04-29 — Frontend Reviewer
+Additive review Round 3 on PR #91 (issue #56). RP-10/11/12 verified ADDRESSED in c386c19. Identified 1 new CRITICAL (RP-18: REFORECAST dataset x-axis misalignment in ForecastOverlay.svelte) and 1 new INFO (RP-19: missing href assertions). Dismissed 3 Copilot false-positives on href interpolation. Verdict: CHANGES REQUESTED.
+- Memory: .github/agents/memory/active/code-reviewer-56.md (Round 3 updated)
+- PR: https://github.com/g-nogueira/BudgedManager/pull/91
+
+### 2026-05-01 — Frontend Implementor
+Addressed PR #91 Round 3 feedback for issue #56. Fixed RP-18 (CRITICAL): REFORECAST dataset null-padded by dayNumber in ForecastOverlay.svelte so data aligns to correct x-axis positions. Fixed RP-19 (INFO): added href assertions for reforecast-link and compare-link in forecast-detail-page.test.ts. pnpm check + test all green (78/78). Pushed commit 33cac21.
+- Commit: 33cac21 on feature/56-forecast-chart-overlay
+- PR reply: https://github.com/g-nogueira/BudgedManager/pull/91#issuecomment-4358390822
+
+### 2026-05-01 — Frontend Planner
+Wrote implementation plan for #58 (Re-Forecast Flow UI). 5 feature groups: type extension (ExpenseAdjustment), store action (submitReforecast), ReforecastAdjustmentList component, 3-step wizard page, and page tests. Key decisions: load budget expenses for Step 2 (expense IDs needed for MODIFY/REMOVE), action values follow api-contracts.md (MODIFY/REMOVE/ADD not MODIFIED/REMOVED), fetchAllForecasts refreshes store for Step 3 ForecastOverlay.
+**Artifacts:** .github/agents/memory/active/task-context-58.md (created), .github/agents/memory/active/plan-58.md (created)

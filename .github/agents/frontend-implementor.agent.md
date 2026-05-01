@@ -134,9 +134,9 @@ cd frontend; pnpm test
 ```
 ALL tests must pass (not just new ones — never break existing tests).
 
-#### 1d-bis. Visual Verification (Browser Testing)
+#### 1e. Visual Verification — REQUIRED (Browser Testing)
 
-After tests pass, **you MUST open a browser and manually test the implemented pages.** This is not optional — code that hasn't been visually verified in a real browser is not ready to commit.
+After tests pass, **you MUST open a browser and manually test the implemented pages.** This is non-negotiable — code that hasn't been visually verified in a real browser with screenshots saved is **NOT ready to commit.**
 
 **Preferred tool:** `chrome-devtools-mcp` (DevTools MCP).
 
@@ -156,7 +156,7 @@ After tests pass, **you MUST open a browser and manually test the implemented pa
 - Error states display correctly (validation errors, API failures)
 - Loading states appear during async operations
 
-#### 1e. Self-Verification Checkpoint
+#### 1f. Self-Verification Checkpoint
 
 Before committing, verify:
 1. Every TypeScript type mirrors the API contract exactly (no extra/missing fields)
@@ -165,16 +165,19 @@ Before committing, verify:
 4. Every component has typed props (no `any`)
 5. No hardcoded API URLs — use environment config
 6. No files were created that aren't in the plan (if you created extra files, ask the user)
-7. Visual verification screenshots exist in `artifacts/issue-<N>/` for this feature group — if they don't, go back to Step 1d-bis
+7. Screenshots exist in `artifacts/issue-<N>/` for this feature group — **HARD BLOCK**: if they don't, return to Step 1e immediately. You may NOT proceed past this checkpoint without screenshots on disk.
 
-#### 1f. Commit
+#### 1g. Commit
+
+> ⛔ **STOP — Before committing:** confirm that `artifacts/issue-<N>/` exists and contains at least one screenshot from this feature group. If it doesn't, return to Step 1e (Visual Verification) and complete it first. You may NOT run `git commit` without screenshots on disk.
+
 ```powershell
 git add -A
 git commit -m "<type>(ui): <description> for #<issue>"
 ```
 Commit message types: `feat` for new features, `fix` for bug fixes, `test` for test-only changes, `refactor` for cleanups.
 
-#### 1f-bis. Log Review Point Resolutions (Fix Cycles Only)
+#### 1g-bis. Log Review Point Resolutions (Fix Cycles Only)
 
 If the plan originates from a PR review (the plan has a `## Review Points Being Addressed` section), append an RP resolution entry to the plan memory file after each relevant commit:
 
@@ -182,14 +185,14 @@ If the plan originates from a PR review (the plan has a `## Review Points Being 
 <!-- RP-RESOLVED: RP-<ID> | Fixed in <short-hash> | <what was changed> | Tested by <test name or "existing tests pass"> -->
 ```
 
-#### 1g. Track Progress
+#### 1h. Track Progress
 
 After each commit, append a progress comment to the plan memory file:
 ```markdown
 <!-- PROGRESS: Feature <N> ✅ committed <short-hash> -->
 ```
 
-#### 1h. Repeat for Next Feature
+#### 1i. Repeat for Next Feature
 Move to the next feature group in the plan. Each commit should represent a buildable, testable increment.
 
 ### Step 2: Final Build + Test
@@ -211,6 +214,8 @@ Present to the user via `vscode/askQuestions`:
 - Summary of all changes made (files created/modified, grouped by layer)
 - Test results summary
 - Any deviations from the plan and why
+- Confirmation that `artifacts/issue-<N>/` contains screenshots for **every feature group** — if any are missing, you **MUST** return to Step 1e before proceeding
+- Confirmation that the PR body `## Screenshots` section will contain at least one embedded `![description](URL)` image link (text bullets alone are not acceptable)
 - Ask for confirmation to open the PR
 
 **Wait for explicit confirmation before pushing or opening the PR.**
@@ -221,6 +226,9 @@ git push origin <branch-name>
 ```
 
 **If creating a new PR:** Use GitHub tools to create a Pull Request:
+
+> ⛔ **STOP — Before pushing:** verify the `## Screenshots` section in the PR body contains at least one `![description](URL)` image link pointing to a file in `artifacts/issue-<N>/`. A PR with no embedded screenshots — or with only text bullets in place of images — is not complete. If you have no screenshots, return to Step 1e for each feature group before pushing.
+
 - **Base:** `master`
 - **Title:** `feat(ui): #<issue> — <title>`
 - **Body:**
@@ -314,5 +322,6 @@ If no learnings were generated, write `## Learnings\nNone.`
 - **All API calls through `lib/api/` clients** — never raw fetch in components or routes
 - If you encounter an issue not covered by the plan, ask the user before improvising
 - **Browser testing is mandatory** — never commit a feature without first opening it in a real browser via DevTools MCP, interacting with it, and saving screenshots to `artifacts/issue-<N>/`. Code that passes tests but looks broken in the browser is not done.
+- **Re-verify after feedback** — when addressing PR review comments that modify UI behavior or visual output, repeat Step 1e (Visual Verification) for the affected pages, save new screenshots to `artifacts/issue-<N>/`, and mention them in your reply to the reviewer. Do NOT push a fix-cycle commit without confirming the fix is visually verified.
 - **Log cross-team events** — after opening a PR, append a standup-style entry to `.github/agents/activity-log.md` noting the PR number and issue it addresses
 ```

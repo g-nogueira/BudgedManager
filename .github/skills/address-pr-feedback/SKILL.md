@@ -144,6 +144,34 @@ cd frontend; pnpm check && pnpm lint && pnpm test
 
 ALL must pass. If tests fail, fix them before proceeding.
 
+### Step 6b: Visual Re-verification (Frontend Only)
+
+> ⛔ **Frontend fix cycles ONLY — skip this step for backend-only changes.**
+
+If **any addressed review point modified UI behavior, visual output, or component rendering**, you MUST re-verify the affected pages in a real browser before committing.
+
+**Procedure:**
+1. Ensure the dev server is running (`cd frontend; pnpm dev`). Start it if not already running.
+2. Use DevTools MCP (`chrome-devtools-mcp`) to navigate to each page affected by the fixes.
+3. **Interact with the affected areas** — don't just look. Reproduce the scenario the reviewer flagged and confirm it's fixed.
+4. **Take a screenshot** of each fixed state and any surrounding states that could have been affected.
+5. Save screenshots to `artifacts/issue-<N>/` with descriptive names (e.g., `rp1-fix-reforecast-marker.png`).
+6. If the fix introduced a new visual problem, fix it and re-screenshot before proceeding.
+
+**When this step is required (any of these):**
+- A review point changed a component's template or styling
+- A review point changed reactive state (`$derived`, `$effect`, store values)
+- A review point changed conditional rendering logic
+- A review point changed chart/overlay data or positioning
+- You are unsure whether the fix has visual side effects
+
+**When this step can be skipped:**
+- All addressed points are test-only changes
+- All addressed points are backend-only (no `.svelte` files touched)
+- All addressed points are type/lint-only fixes with no runtime behavior change
+
+> ⛔ **STOP — Before proceeding to commit:** if any UI-affecting review point was addressed, confirm screenshots exist in `artifacts/issue-<N>/` for those fixes. If they don't, complete Step 6b first.
+
 ### Step 7: Reply to GitHub Threads
 
 For each addressed review point, reply to the GitHub comment thread:
@@ -168,6 +196,8 @@ For each addressed review point, reply to the GitHub comment thread:
 - If the reviewer's comment was unclear and you interpreted it, state your interpretation: "Interpreted as [X] — [description of fix]"
 
 ### Step 8: Commit and Push
+
+> ⛔ **Frontend fix cycles:** before running `git commit`, confirm that any UI-affecting fixes have screenshots in `artifacts/issue-<N>/` from Step 6b. A fix commit without screenshot evidence for visual changes is not complete.
 
 ```powershell
 git add -A
@@ -203,3 +233,4 @@ If confirmed, use the handoff to the Reviewer agent for the next additive review
 - **Build after each file** — catch compilation errors early, don't let them accumulate
 - **Never skip thread replies** — every addressed review point must have a GitHub thread reply
 - **Never argue with the reviewer** — just describe what was done
+- **Re-verify visually on frontend fix cycles** — any review point that changes UI behavior, component rendering, or visual state MUST be verified in a real browser (Step 6b) with screenshots saved to `artifacts/issue-<N>/` before committing. Thread replies for those points should mention the screenshot: "Fixed and re-verified in browser — screenshot: `artifacts/issue-<N>/<filename>.png`"

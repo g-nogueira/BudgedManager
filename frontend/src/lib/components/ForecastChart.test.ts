@@ -33,4 +33,21 @@ describe('ForecastChart', () => {
 
     expect(screen.getByTestId('forecast-chart')).toBeInTheDocument();
   });
+
+  it('contains tooltip callback config by rendering without error when entries have breakdown', () => {
+    const entriesWithBreakdown: DailyEntry[] = [
+      {
+        dayNumber: 1,
+        remainingBalance: 1000,
+        dailyExpenseTotal: 200,
+        breakdown: [
+          { name: 'Rent', amount: 150 },
+          { name: 'Utilities', amount: 50 }
+        ]
+      }
+    ];
+
+    render(ForecastChart, { props: { dailyEntries: entriesWithBreakdown } });
+    expect(screen.getByTestId('forecast-chart')).toBeInTheDocument();
+  });
 });

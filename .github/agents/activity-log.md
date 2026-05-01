@@ -77,3 +77,25 @@ Addressed PR #90 feedback for issue #57 with fixes for all 14 review points acro
 ### 2026-04-24 — Frontend Reviewer
 Completed Round 2 additive review of PR #90 (issue #57). All 14 prior RPs confirmed ADDRESSED. Found 1 new critical issue (RP-15): `$effect` in `[budgetId]/+page.svelte` reads `$budget` store, creating an infinite fetch loop in production when `fetchBudgetById` resolves. Fix is `untrack(() => $budget)`. `pnpm check` ✅, `pnpm test` ✅ 66/66.
 **Artifacts:** `.github/agents/memory/active/code-reviewer-57.md` (updated), PR #90 (Round 2 review posted)
+
+### 2026-04-26 — Frontend Implementor
+Implemented issue #56 (Forecast Chart & Multi-Version Overlay) on `feature/56-forecast-chart-overlay`. Enhanced ForecastChart (tooltips, gradient fill, negative zone, zero-reference line), implemented ForecastOverlay (multi-dataset, 5-color palette, re-forecast vertical marker), extended forecastStore (allForecasts + fetchAllForecasts), implemented Forecast Detail route with version pills and guard states. 79/79 tests pass, `pnpm check` ✅, Prettier ✅.
+**Artifacts:** `feature/56-forecast-chart-overlay` (pushed), PR #91 (https://github.com/g-nogueira/BudgedManager/pull/91), `.github/agents/memory/active/implementation-56.md`
+
+### 2026-04-27 — Frontend Reviewer
+Completed Round 1 FULL review of PR #91 (issue #56 Forecast Chart & Multi-Version Overlay). Found 1 CRITICAL (RP-1: reforecast marker wrong x-position — AC7 broken), 4 WARNINGS (RP-2 \ pattern, RP-3 empty-state flash, RP-4 hardcoded gradient height, RP-9 forecastId mismatch), 2 INFO. Dismissed Copilot version-pills comment (out of scope per plan-56.md). Replied to all 11 bot threads.
+**Artifacts:** `.github/agents/memory/active/code-reviewer-56.md` (created), PR #91 review comment https://github.com/g-nogueira/BudgedManager/pull/91#issuecomment-4330240284
+
+### 2026-04-27 — Frontend Implementor
+Addressed PR #91 review feedback for issue #56. Fixed RP-1 (reforecast marker x-position — `buildReforecastMarkerPlugin` now uses `axisEntries` param), RP-2 (`$derived` for forecastId/budgetId + `$effect` replacing `onMount`), RP-3 (`hasFetched` sentinel eliminates empty-state flash), RP-6 (duplicate test removed), RP-9 (`currentForecast` derived by ID). Also fixed Vite proxy port 5000→5290. `pnpm check` ✅, `pnpm test` 78/78 ✅. Browser-tested with real data — ForecastChart and ForecastOverlay render correctly. Reforecast marker confirmed at correct x-position visually.
+**Artifacts:** `feature/56-forecast-chart-overlay` (pushed e952363), `artifacts/issue-56/forecast-chart.png`, `artifacts/issue-56/forecast-overlay.png`, `artifacts/issue-56/forecast-missing-budget-error.png`, `.github/agents/memory/active/implementation-56.md` (updated), PR #91 (threads replied)
+
+### 2026-04-28 — Frontend Reviewer
+Additive review Round 2 on PR #91 (issue #56). All 5 Round 1 actionable items addressed (RP-1 through RP-9). New WARNING: RP-12 test coverage gap — RP-9 fix never exercised in tests. 3 new INFO items (RP-10/11/13). 6 Copilot Round 2 threads replied to. Verdict: ⚠️ APPROVED WITH WARNINGS.
+- Memory: .github/agents/memory/active/code-reviewer-56.md (Round 2 updated)
+- PR: https://github.com/g-nogueira/BudgedManager/pull/91
+
+### 2026-04-28 — Frontend Implementor
+Addressed PR #91 Round 2 review feedback for issue #56. Fixed RP-12 (multi-forecast test now exercises ID-match logic with `forecastId='f-2'` + versionLabel assertion), RP-10 (side-effect guard `not.toHaveBeenCalled()`), RP-11 (negative `queryByTestId` assertions in both chart/overlay tests). RP-13 and RP-17 WONTFIX (Acceptable MVP). All 6 forecast-detail tests pass in isolation. Committed and pushed `c386c19`.
+**Artifacts:** `feature/56-forecast-chart-overlay` (pushed c386c19), `.github/agents/memory/active/implementation-56.md` (updated), PR #91 (https://github.com/g-nogueira/BudgedManager/pull/91#issuecomment-4346908718)
+

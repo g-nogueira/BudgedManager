@@ -73,20 +73,27 @@
     const context = canvasElement.getContext('2d');
     if (!context) return;
 
+    // Use labels from the forecast with most entries for x-axis
+    const longestForecast = forecasts.reduce((a, b) =>
+      a.dailyEntries.length >= b.dailyEntries.length ? a : b
+    );
+
+    // Align each dataset to the shared x-axis by dayNumber.
+    // REFORECAST forecasts start at startDay (e.g. day 10), so their dailyEntries
+    // is a shorter partial array. We null-pad the leading positions so Chart.js
+    // plots each value under the correct day label instead of shifting it left.
     const datasets = forecasts.map((fc, i) => ({
       label: fc.versionLabel,
-      data: fc.dailyEntries.map((e) => e.remainingBalance),
+      data: longestForecast.dailyEntries.map((axis) => {
+        const entry = fc.dailyEntries.find((e) => e.dayNumber === axis.dayNumber);
+        return entry ? entry.remainingBalance : null;
+      }),
       borderColor: COLORS[i % COLORS.length],
       backgroundColor: 'transparent',
       fill: false,
       tension: 0.2,
       pointRadius: 2
     }));
-
-    // Use labels from the forecast with most entries for x-axis
-    const longestForecast = forecasts.reduce((a, b) =>
-      a.dailyEntries.length >= b.dailyEntries.length ? a : b
-    );
 
     const config: ChartConfiguration<'line'> = {
       type: 'line',

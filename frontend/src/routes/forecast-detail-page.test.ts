@@ -131,6 +131,14 @@ describe('forecast detail page', () => {
       expect(screen.getByTestId('forecast-overlay')).toBeInTheDocument();
       expect(screen.queryByTestId('forecast-chart')).toBeNull();
       expect(screen.getByText('Re-forecast Apr 10')).toBeInTheDocument();
+      expect(screen.getByTestId('reforecast-link')).toHaveAttribute(
+        'href',
+        '/forecast/reforecast?budgetId=budget-1&forecastId=f-2'
+      );
+      expect(screen.getByTestId('compare-link')).toHaveAttribute(
+        'href',
+        '/forecast/compare?budgetId=budget-1'
+      );
     });
   });
 });

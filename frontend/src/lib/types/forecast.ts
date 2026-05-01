@@ -80,8 +80,21 @@ export interface GenerateForecastRequest {
   startBalance: number;
 }
 
+export type AdjustmentAction = 'MODIFY' | 'REMOVE' | 'ADD';
+
+export interface ExpenseAdjustment {
+  action: AdjustmentAction;
+  originalExpenseId?: string;
+  name?: string;
+  category?: import('$lib/types/budget').ExpenseCategory;
+  dayOfMonth?: number;
+  isSpread?: boolean;
+  newAmount?: number;
+}
+
 export interface ReforecastRequest {
   startDay: number;
   actualBalance: number;
   versionLabel: string;
+  expenseAdjustments?: ExpenseAdjustment[];
 }

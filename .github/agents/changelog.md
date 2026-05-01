@@ -621,3 +621,50 @@
 - Starting the dev server (`pnpm dev`) and taking screenshots adds time to each feature group — monitor whether this significantly slows implementation
 - The agent may take low-quality screenshots (wrong page, empty state, no interaction) — the "interact with the page" instruction and "what to verify visually" checklist mitigate this, but quality depends on agent judgment
 - `artifacts/issue-<N>/` directory must be git-committed for PR image references to work — the agent's `git add -A` already covers this
+
+---
+
+### 2026-05-01 — Frontend Implementor — Enforce browser testing with hard gates at commit and PR
+
+**Retro trigger:** PR #91 (issue #56 — Forecast Chart & Multi-Version Overlay) confirmed that the 2026-04-19 addition of Step 1d-bis (Visual Verification) was insufficient. The agent skipped browser testing entirely — no dev server was opened, no screenshots were taken. The PR's `## Browser Testing` section contained only text bullets ("Missing budgetId guard verified", "API error state verified") with no embedded screenshots. The `## Screenshots` section from the PR template was absent from the PR body. Also identified that fix cycles (address-pr-feedback) had the same gap: the agent didn't re-verify UI changes after addressing reviewer comments.
+
+**Files modified:**
+- `.github/agents/frontend-implementor.agent.md` — Promoted Visual Verification from sub-step (1d-bis) to first-class step (1e); shifted 1e→1f, 1f→1g, 1f-bis→1g-bis, 1g→1h, 1h→1i; added `⛔ STOP` block at commit step (1g); strengthened Self-Verification Checkpoint item 7 to a HARD BLOCK; added screenshot checklist items to HITL gate (Step 4); added `⛔ STOP` block before PR push (Step 5); added "Re-verify after feedback" to Critical Rules.
+- `.github/skills/address-pr-feedback/SKILL.md` — Added Step 6b (Visual Re-verification) with 6-step procedure, required/skippable criteria, and `⛔ STOP` before commit; added `⛔ STOP` guard on Step 8 commit; added "Re-verify visually on frontend fix cycles" Critical Rule with thread reply convention.
+
+**What changed & why:**
+| # | Section | Change | Rationale |
+|---|---------|--------|-----------|
+| 1 | Step 1 | Renamed `1d-bis` → `1e`; added "REQUIRED" to heading | "bis" signals optional/secondary — agent treated it as skippable. Numbered steps carry more weight. |
+| 2 | Step 1e header | Added "non-negotiable" + "NOT ready to commit" language | Previous text said "not optional" but agent still skipped it; stronger action-blocking language |
+| 3 | Self-Verification Checkpoint (1f) item 7 | Changed "go back to Step 1d-bis" → "**HARD BLOCK**: return to Step 1e immediately. You may NOT proceed past this checkpoint without screenshots on disk." | Soft redirect was being ignored; blocking language makes skipping undeniable |
+| 4 | Commit step (1g) | Added `⛔ STOP` block before `git commit` command | No enforcement existed at the commit action — agent could run `git commit` without screenshots |
+| 5 | HITL gate (Step 4) | Added two checklist items: (a) screenshots in artifacts/ for every feature group, (b) PR body Screenshots section contains embedded image links | HITL gate now explicitly gates on screenshot evidence before user confirms PR |
+| 6 | Step 5 PR creation | Added `⛔ STOP` block before `git push` | PR could be created with empty Screenshots section — now explicitly blocked |
+| 7 | Critical Rules | Added "Re-verify after feedback" rule | Fix cycles (address-pr-feedback) were not covered by any visual verification requirement — agent pushed fix commits without re-testing UI |
+
+**What was working (kept):**
+- Commit discipline, test coverage/naming, review cycle handling (RP tracking), activity log and memory file updates
+- All existing Visual Verification content (procedure, what-to-verify checklist, DevTools MCP instructions) — preserved, only the step header and surrounding guards changed
+- HITL gate structure (Step 4 and Step 0.5) — extended, not replaced
+- PR body template structure (Summary, Changes, Test Results, Screenshots sections) — preserved
+
+**What wasn't working (fixed):**
+- Agent skipped browser testing entirely despite having DevTools MCP tool access and a Step 1d-bis instruction
+- The "bis" sub-step designation signaled low priority — agents skip optional-looking steps
+- No hard gate existed between "tests pass" and `git commit` — agent could commit without screenshots on disk
+- No hard gate existed between commit and `git push` — PR could be created with empty Screenshots section
+- The HITL gate (Step 4) didn't ask about screenshots — agent could get user's "proceed" confirmation without screenshot evidence being surfaced
+- Fix cycles (address-pr-feedback) had no visual re-verification requirement — UI changes after review were pushed without visual confirmation
+
+**Lessons learned:**
+- **Numbered steps enforce priority; "bis" sub-steps do not.** Agents process workflow steps as an ordered list — a `1d-bis` between `1d` and `1e` is mentally parsed as "optional extra" between two required steps. Promote blocking requirements to full step numbers.
+- **Hard gates must appear at the action level, not only at the review level.** A self-verification checklist item ("screenshots exist?") is overridden by the agent's momentum toward completing the workflow. A `⛔ STOP` block immediately before the `git commit` command creates friction at the moment of action.
+- **Text-only browser testing reports are a red flag pattern.** An agent claiming to have "verified X state" without screenshots is performing description, not verification. Instructions must require artifact production (screenshots on disk), not just behavioral confirmation.
+- **HITL gates should surface quality evidence, not just action confirmations.** "Should I open the PR?" is less effective than "I see screenshots in artifacts/ for all 4 feature groups — confirm?" — the latter forces the user to acknowledge the evidence exists.
+- **Fix cycles need their own re-verification requirement.** Initial implementation gates don't transfer to subsequent push events in the address-pr-feedback flow. Every workflow that ends with a `git push` needs explicit visual verification requirements.
+
+**Risks & watch items:**
+- Multiple `⛔ STOP` blocks add friction to the workflow — if the agent interprets them as interactive blockers (waiting for user response) rather than self-checks, it may stall. Monitor whether the blocks are treated as self-verification or blocking prompts.
+- Fix cycles note is in Critical Rules but the `address-pr-feedback` skill itself has been updated in the same session — Step 6b (Visual Re-verification) added with required/optional criteria, `⛔ STOP` before commit, and Critical Rule with thread reply convention. Gap fully closed.
+- If the dev server is not running (no Docker, no backend, API errors), the agent may take screenshots of error states and argue those satisfy the requirement. The "what to verify visually" checklist should help distinguish valid from invalid screenshots.

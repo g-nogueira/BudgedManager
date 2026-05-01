@@ -267,7 +267,7 @@ describe('reforecast page', () => {
     await waitFor(() => expect(screen.getByTestId('step-3')).toBeTruthy());
     await waitFor(() => expect(screen.getByTestId('balance-comparison')).toBeTruthy());
 
-    expect(screen.getByTestId('new-balance')).toHaveTextContent('2800');
+    expect(screen.getByTestId('new-balance')).toHaveTextContent('€2,800.00');
     expect(screen.getByTestId('compare-link')).toBeTruthy();
     expect(screen.getByTestId('new-forecast-link')).toBeTruthy();
   });

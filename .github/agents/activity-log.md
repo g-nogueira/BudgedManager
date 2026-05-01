@@ -105,11 +105,6 @@ Additive review Round 3 on PR #91 (issue #56). RP-10/11/12 verified ADDRESSED in
 - Memory: .github/agents/memory/active/code-reviewer-56.md (Round 3 updated — RP-18/19 added)
 - PR: https://github.com/g-nogueira/BudgedManager/pull/91
 
-### 2026-04-29 — Frontend Reviewer
-Additive review Round 3 on PR #91 (issue #56). RP-10/11/12 verified ADDRESSED in c386c19. Identified 1 new CRITICAL (RP-18: REFORECAST dataset x-axis misalignment in ForecastOverlay.svelte) and 1 new INFO (RP-19: missing href assertions). Dismissed 3 Copilot false-positives on href interpolation. Verdict: CHANGES REQUESTED.
-- Memory: .github/agents/memory/active/code-reviewer-56.md (Round 3 updated)
-- PR: https://github.com/g-nogueira/BudgedManager/pull/91
-
 ### 2026-05-01 — Frontend Implementor
 Addressed PR #91 Round 3 feedback for issue #56. Fixed RP-18 (CRITICAL): REFORECAST dataset null-padded by dayNumber in ForecastOverlay.svelte so data aligns to correct x-axis positions. Fixed RP-19 (INFO): added href assertions for reforecast-link and compare-link in forecast-detail-page.test.ts. pnpm check + test all green (78/78). Pushed commit 33cac21.
 - Commit: 33cac21 on feature/56-forecast-chart-overlay
@@ -118,3 +113,15 @@ Addressed PR #91 Round 3 feedback for issue #56. Fixed RP-18 (CRITICAL): REFOREC
 ### 2026-05-01 — Frontend Planner
 Wrote implementation plan for #58 (Re-Forecast Flow UI). 5 feature groups: type extension (ExpenseAdjustment), store action (submitReforecast), ReforecastAdjustmentList component, 3-step wizard page, and page tests. Key decisions: load budget expenses for Step 2 (expense IDs needed for MODIFY/REMOVE), action values follow api-contracts.md (MODIFY/REMOVE/ADD not MODIFIED/REMOVED), fetchAllForecasts refreshes store for Step 3 ForecastOverlay.
 **Artifacts:** .github/agents/memory/active/task-context-58.md (created), .github/agents/memory/active/plan-58.md (created)
+
+### 2026-05-01 — Frontend Implementor
+Implemented issue #58 (Re-Forecast Flow UI). 3 commits: ExpenseAdjustment types + submitReforecast store action, ReforecastAdjustmentList component (6 tests), 3-step wizard page + 11 page tests. All green: 95 tests, 0 type errors. Key fix: Svelte 5 bind:value on type=number coerces to number breaking .trim() — switched to explicit oninput handlers. Opened PR #92.
+- Branch: feature/58-reforecast-flow-ui
+- PR: https://github.com/g-nogueira/BudgedManager/pull/92
+- Memory: .github/agents/memory/active/implementation-58.md (created)
+
+
+### 2026-05-01 — Frontend Reviewer
+Round 1 full review of PR #92 (issue #58 Re-Forecast Flow UI). API contract compliance ✅, 95/95 tests pass. Found 1 CRITICAL (RP-3: missing budget error state in Step 2), 4 WARNINGS (RP-1 double fetch, RP-2 dead state, RP-4 currency formatting, RP-5 NaN in adjustments), 2 INFO (RP-6 raw amount, RP-7 duplicate log entry). Verdict: APPROVED WITH WARNINGS.
+- Memory: .github/agents/memory/active/code-reviewer-58.md (created)
+- PR review: https://github.com/g-nogueira/BudgedManager/pull/92

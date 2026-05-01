@@ -10,7 +10,8 @@
     reforecastResult,
     submitReforecast
   } from '$lib/stores/forecastStore';
-  import { budget, budgetLoading, fetchBudgetById } from '$lib/stores/budgetStore';
+  import { budget, budgetError, budgetLoading, fetchBudgetById } from '$lib/stores/budgetStore';
+  import { formatCurrency } from '$lib/utils/formatCurrency';
   import type { ExpenseAdjustment } from '$lib/types/forecast';
 
   const budgetId = $derived(page.url.searchParams.get('budgetId'));
@@ -24,7 +25,6 @@
   let versionLabel = $state('');
   let adjustments = $state<ExpenseAdjustment[]>([]);
   let step1Error = $state<string | null>(null);
-  let step3Submitted = $state(false);
 
   const parsedStartDay = $derived(Number.parseInt(startDay, 10));
 
@@ -69,18 +69,12 @@
   const handleGenerate = async (): Promise<void> => {
     if (!budgetId || !forecastId) return;
     currentStep = 3;
-    step3Submitted = false;
     await submitReforecast(budgetId, forecastId, {
       startDay: parsedStartDay,
       actualBalance: Number.parseFloat(actualBalance),
       versionLabel: versionLabel.trim() || autoLabel,
       expenseAdjustments: adjustments.length > 0 ? adjustments : undefined
     });
-    // fetchAllForecasts is called inside submitReforecast
-    if (!$forecastError) {
-      step3Submitted = true;
-      await fetchAllForecasts(budgetId);
-    }
   };
 
   const handleAdjustmentsChange = (updated: ExpenseAdjustment[]): void => {
@@ -171,6 +165,8 @@
 
         {#if $budgetLoading}
           <p data-testid="budget-loading">Loading expenses…</p>
+        {:else if $budgetError}
+          <p class="error" data-testid="budget-error">{$budgetError}</p>
         {:else}
           <ReforecastAdjustmentList
             expenses={futureExpenses}
@@ -210,7 +206,7 @@
             <div class="balance-card">
               <p class="balance-label">Original end-of-month</p>
               <p class="balance-value" data-testid="original-balance">
-                €{(originalForecast?.endOfMonthBalance ?? 0).toFixed(2)}
+                {formatCurrency(originalForecast?.endOfMonthBalance ?? 0)}
               </p>
             </div>
             <span class="comparison-arrow">→</span>
@@ -221,7 +217,7 @@
                 class:balance-value--negative={$reforecastResult.endOfMonthBalance < 0}
                 data-testid="new-balance"
               >
-                €{$reforecastResult.endOfMonthBalance.toFixed(2)}
+                {formatCurrency($reforecastResult.endOfMonthBalance)}
               </p>
             </div>
           </div>

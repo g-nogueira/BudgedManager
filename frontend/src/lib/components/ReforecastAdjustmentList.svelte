@@ -1,5 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte';
+  import { formatCurrency } from '$lib/utils/formatCurrency';
   import { validateExpenseInput } from '$lib/utils/expenseValidation';
   import type { Expense, ExpenseCategory } from '$lib/types/budget';
   import type { ExpenseAdjustment } from '$lib/types/forecast';
@@ -77,6 +78,9 @@
     if (Number.isFinite(parsed) && parsed > 0 && parsed !== row.expense.amount) {
       rows[index] = { ...rows[index], state: 'modified' };
     } else if (Number.isFinite(parsed) && parsed === row.expense.amount) {
+      rows[index] = { ...rows[index], state: 'default' };
+    } else {
+      // empty or invalid input — revert to default, do not emit a MODIFY with NaN
       rows[index] = { ...rows[index], state: 'default' };
     }
     rebuildAdjustments();
@@ -171,7 +175,7 @@
       {/if}
 
       {#if row.state === 'removed'}
-        <span class="amount-display" data-testid="expense-amount">{row.expense.amount}</span>
+        <span class="amount-display" data-testid="expense-amount">{formatCurrency(row.expense.amount)}</span>
         <button
           type="button"
           class="btn-undo"
@@ -211,7 +215,7 @@
       {:else}
         <span class="day-label">Day {added.dayOfMonth}</span>
       {/if}
-      <span class="amount-display">€{added.amount.toFixed(2)}</span>
+      <span class="amount-display">{formatCurrency(added.amount)}</span>
       <button
         type="button"
         class="btn-remove"

@@ -65,12 +65,14 @@ export const submitReforecast = async (
 ): Promise<void> => {
   forecastLoading.set(true);
   forecastError.set(null);
+  reforecastResult.set(null);
   try {
     const result = await reforecast(budgetId, forecastId, request);
     reforecastResult.set(result);
     await fetchAllForecasts(budgetId);
   } catch (error) {
     forecastError.set(error instanceof Error ? error.message : 'Unknown error');
+    reforecastResult.set(null);
   } finally {
     forecastLoading.set(false);
   }
